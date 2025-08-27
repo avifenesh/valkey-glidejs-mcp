@@ -43,6 +43,11 @@ The server uses stdio transport and registers tools on startup.
 - gen.streams {}
 - gen.transaction {}
 - gen.pipeline {}
+- gen.geo {}
+- gen.bitmaps {}
+- gen.hll {}
+- gen.json {}
+- gen.clientAdvanced {}
 - gen.fastify {}
 - gen.rateLimiter { key, points, duration }
 - verify.static { code }

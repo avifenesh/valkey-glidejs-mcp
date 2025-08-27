@@ -145,6 +145,58 @@ pl.get('p1');
 const out = await pl.exec();
 console.log(out);
 `.trim(),
+  geoExample: () => `
+import { createClient } from '@valkey/glide';
+const client = await createClient({ host: 'localhost', port: 6379 });
+await client.geoAdd('places', [{ longitude: 13.361389, latitude: 38.115556, member: 'Palermo' }]);
+const near = await client.geoSearch('places', { byRadius: { center: { longitude: 13.361389, latitude: 38.115556 }, radius: 200, unit: 'km' } });
+console.log(near);
+`.trim(),
+  bitmapsExample: () => `
+import { createClient } from '@valkey/glide';
+const client = await createClient({ host: 'localhost', port: 6379 });
+await client.setBit('featureFlags', 42, 1);
+console.log(await client.getBit('featureFlags', 42));
+console.log(await client.bitCount('featureFlags'));
+`.trim(),
+  hllExample: () => `
+import { createClient } from '@valkey/glide';
+const client = await createClient({ host: 'localhost', port: 6379 });
+await client.pfAdd('visitors', ['u1','u2','u3']);
+console.log(await client.pfCount('visitors'));
+`.trim(),
+  jsonExample: () => `
+import { createClient } from '@valkey/glide';
+const client = await createClient({ host: 'localhost', port: 6379 });
+await client.jsonSet('user:1', '$', { name: 'Avi', age: 30 });
+console.log(await client.jsonGet('user:1', '$.name'));
+`.trim(),
+  clientAdvanced: () => `
+import { createClient, createCluster } from '@valkey/glide';
+
+// Standalone with advanced options
+const client = await createClient({
+  host: 'localhost',
+  port: 6379,
+  username: process.env.VALKEY_USERNAME,
+  password: process.env.VALKEY_PASSWORD,
+  database: 0,
+  tls: process.env.VALKEY_TLS === '1' ? { rejectUnauthorized: false } : undefined,
+  socketTimeout: 10000,
+  reconnect: { retries: 5, intervalMs: 500 },
+});
+
+// Cluster with node list and options
+const cluster = await createCluster([
+  { host: 'localhost', port: 7000 },
+  { host: 'localhost', port: 7001 },
+], {
+  username: process.env.VALKEY_USERNAME,
+  password: process.env.VALKEY_PASSWORD,
+  dnsLookup: (hostname) => hostname,
+  maxRedirections: 16,
+});
+`.trim(),
 };
 
 export function registerGeneratorTools(mcp: McpServer) {
@@ -227,6 +279,31 @@ export function registerGeneratorTools(mcp: McpServer) {
     'gen.pipeline',
     z.object({}).shape,
     async () => ({ structuredContent: { code: templates.pipelineExample() }, content: [{ type: 'text', text: templates.pipelineExample() }] }) as any,
+  );
+  mcp.tool(
+    'gen.geo',
+    z.object({}).shape,
+    async () => ({ structuredContent: { code: templates.geoExample() }, content: [{ type: 'text', text: templates.geoExample() }] }) as any,
+  );
+  mcp.tool(
+    'gen.bitmaps',
+    z.object({}).shape,
+    async () => ({ structuredContent: { code: templates.bitmapsExample() }, content: [{ type: 'text', text: templates.bitmapsExample() }] }) as any,
+  );
+  mcp.tool(
+    'gen.hll',
+    z.object({}).shape,
+    async () => ({ structuredContent: { code: templates.hllExample() }, content: [{ type: 'text', text: templates.hllExample() }] }) as any,
+  );
+  mcp.tool(
+    'gen.json',
+    z.object({}).shape,
+    async () => ({ structuredContent: { code: templates.jsonExample() }, content: [{ type: 'text', text: templates.jsonExample() }] }) as any,
+  );
+  mcp.tool(
+    'gen.clientAdvanced',
+    z.object({}).shape,
+    async () => ({ structuredContent: { code: templates.clientAdvanced() }, content: [{ type: 'text', text: templates.clientAdvanced() }] }) as any,
   );
 }
 

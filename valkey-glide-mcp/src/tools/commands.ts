@@ -163,10 +163,15 @@ function mapCommandToMethod(command: string): string | null {
     XREADGROUP: "xreadgroup",
     XREAD: "xread",
     XGROUP_CREATE: "xgroupCreate",
+    XGROUPCREATE: "xgroupCreate",
     XGROUP_DESTROY: "xgroupDestroy",
+    XGROUPDESTROY: "xgroupDestroy",
     XGROUP_DELCONSUMER: "xgroupDelConsumer",
+    XGROUPDELCONSUMER: "xgroupDelConsumer",
     XGROUP_CREATECONSUMER: "xgroupCreateConsumer",
+    XGROUPCREATECONSUMER: "xgroupCreateConsumer",
     XGROUP_SETID: "xgroupSetId",
+    XGROUPSETID: "xgroupSetId",
     GEOSEARCHSTORE: "geosearchstore",
     GEODIST: "geodist",
     CLIENTGETNAME: "clientGetName",
@@ -180,6 +185,19 @@ function mapCommandToMethod(command: string): string | null {
     SCRIPTEXISTS: "scriptExists",
     SCRIPTFLUSH: "scriptFlush",
     SCRIPTKILL: "scriptKill",
+    SCRIPTSHOW: "scriptShow",
+    FUNCTIONLIST: "functionList",
+    FUNCTIONLOAD: "functionLoad",
+    FUNCTIONRESTORE: "functionRestore",
+    FUNCTIONFLUSH: "functionFlush",
+    FUNCTIONKILL: "functionKill",
+    FUNCTIONDELETE: "functionDelete",
+    FUNCTIONSTATS: "functionStats",
+    PUBSUBCHANNELS: "pubsubChannels",
+    PUBSUBNUMPAT: "pubsubNumPat",
+    PUBSUBNUMSUB: "pubsubNumSub",
+    PUBSUBSHARDCHANNELS: "pubsubShardChannels",
+    PUBSUBSHARDNUMSUB: "pubsubShardNumSub",
   };
   if (specials[simple]) return specials[simple];
   // Default mapping: uppercase to lowercase
@@ -213,7 +231,16 @@ function extractWikiCommandsMarkdown(md: string): string[] {
     const m = /^\|\s*([^|]+?)\s*\|/.exec(line);
     if (!m) continue;
     const cmdRaw = m[1].trim();
-    if (!cmdRaw || cmdRaw.toLowerCase().includes("n/a") || cmdRaw.toLowerCase().includes("api not required")) continue;
+    if (!cmdRaw) continue;
+    const lc = cmdRaw.toLowerCase();
+    if (
+      lc.includes("n/a") ||
+      lc.includes("api not required") ||
+      lc.includes("deprecated") ||
+      lc.includes("not needed") ||
+      lc === "cmd type" ||
+      /^-+$/.test(cmdRaw)
+    ) continue;
     // Normalize to upper snake-ish without extra spaces
     const normalized = cmdRaw.replace(/\s+/g, " ").trim().toUpperCase();
     commands.push(normalized);

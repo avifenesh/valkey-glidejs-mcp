@@ -1,27 +1,87 @@
 {
+  "strings": [
+    {
+      "command": "APPEND",
+      "family": "strings",
+      "method": "append",
+      "owner": "BaseClient",
+      "paramsSignature": "key: GlideString, value: GlideString",
+      "returnType": "number",
+      "source": "wiki",
+      "validated": true
+    },
+    {
+      "command": "DECR",
+      "family": "strings",
+      "method": "decr",
+      "owner": "BaseClient",
+      "paramsSignature": "key: GlideString",
+      "returnType": "number",
+      "source": "wiki",
+      "validated": true
+    },
+    {
+      "command": "GET",
+      "family": "strings",
+      "method": "GlideJson.get",
+      "owner": "GlideJson",
+      "paramsSignature": "client: BaseClient,\n        key: GlideString,\n        options?: JsonGetOptions & DecoderOption,",
+      "returnType": "ReturnTypeJson<GlideString",
+      "source": "wiki",
+      "validated": true
+    },
+    {
+      "command": "INCR",
+      "family": "strings",
+      "method": "incr",
+      "owner": "BaseClient",
+      "paramsSignature": "key: GlideString",
+      "returnType": "number",
+      "source": "wiki",
+      "validated": true
+    },
+    {
+      "command": "MGET",
+      "family": "strings",
+      "method": "GlideJson.mget",
+      "owner": "GlideJson",
+      "paramsSignature": "client: BaseClient,\n        keys: GlideString[],\n        path: GlideString,\n        options?: DecoderOption,",
+      "returnType": "ReturnTypeJson<GlideString[]",
+      "source": "wiki",
+      "validated": true
+    },
+    {
+      "command": "MSET",
+      "family": "strings",
+      "method": "mset",
+      "owner": "BaseClient",
+      "paramsSignature": "keysAndValues: Record<string, GlideString> | GlideRecord<GlideString>,",
+      "returnType": "\"OK\"",
+      "source": "wiki",
+      "validated": true
+    },
+    {
+      "command": "SET",
+      "family": "strings",
+      "method": "GlideJson.set",
+      "owner": "GlideJson",
+      "paramsSignature": "client: BaseClient,\n        key: GlideString,\n        path: GlideString,\n        value: GlideString,\n        options?: { conditionalChange: ConditionalChange } & DecoderOption,",
+      "returnType": "\"OK\" | null",
+      "source": "wiki",
+      "validated": true
+    },
+    {
+      "command": "STRLEN",
+      "family": "strings",
+      "method": "GlideJson.strlen",
+      "owner": "GlideJson",
+      "paramsSignature": "client: BaseClient,\n        key: GlideString,\n        options?: { path: GlideString },",
+      "returnType": "ReturnTypeJson<number",
+      "source": "wiki",
+      "validated": true
+    }
+  ],
   "other": [
-    {
-      "command": "--------------",
-      "family": "other",
-      "method": null,
-      "owner": null,
-      "paramsSignature": null,
-      "returnType": null,
-      "source": "wiki",
-      "validated": false,
-      "notes": "No matching method found in BaseClient"
-    },
-    {
-      "command": "------------------------",
-      "family": "other",
-      "method": null,
-      "owner": null,
-      "paramsSignature": null,
-      "returnType": null,
-      "source": "wiki",
-      "validated": false,
-      "notes": "No matching method found in BaseClient"
-    },
     {
       "command": "AUTH",
       "family": "other",
@@ -114,17 +174,6 @@
       "returnType": "[GlideString, GlideString, number] | null",
       "source": "wiki",
       "validated": true
-    },
-    {
-      "command": "CMD TYPE",
-      "family": "other",
-      "method": null,
-      "owner": null,
-      "paramsSignature": null,
-      "returnType": null,
-      "source": "wiki",
-      "validated": false,
-      "notes": "No matching method found in BaseClient"
     },
     {
       "command": "COMMAND",
@@ -1511,88 +1560,6 @@
       "owner": "BaseClient",
       "paramsSignature": "destination: GlideString,\n        keys: GlideString[] | KeyWeight[],\n        options?: { aggregationType?: AggregationType },",
       "returnType": "number",
-      "source": "wiki",
-      "validated": true
-    }
-  ],
-  "strings": [
-    {
-      "command": "APPEND",
-      "family": "strings",
-      "method": "append",
-      "owner": "BaseClient",
-      "paramsSignature": "key: GlideString, value: GlideString",
-      "returnType": "number",
-      "source": "wiki",
-      "validated": true
-    },
-    {
-      "command": "DECR",
-      "family": "strings",
-      "method": "decr",
-      "owner": "BaseClient",
-      "paramsSignature": "key: GlideString",
-      "returnType": "number",
-      "source": "wiki",
-      "validated": true
-    },
-    {
-      "command": "GET",
-      "family": "strings",
-      "method": "GlideJson.get",
-      "owner": "GlideJson",
-      "paramsSignature": "client: BaseClient,\n        key: GlideString,\n        options?: JsonGetOptions & DecoderOption,",
-      "returnType": "ReturnTypeJson<GlideString",
-      "source": "wiki",
-      "validated": true
-    },
-    {
-      "command": "INCR",
-      "family": "strings",
-      "method": "incr",
-      "owner": "BaseClient",
-      "paramsSignature": "key: GlideString",
-      "returnType": "number",
-      "source": "wiki",
-      "validated": true
-    },
-    {
-      "command": "MGET",
-      "family": "strings",
-      "method": "GlideJson.mget",
-      "owner": "GlideJson",
-      "paramsSignature": "client: BaseClient,\n        keys: GlideString[],\n        path: GlideString,\n        options?: DecoderOption,",
-      "returnType": "ReturnTypeJson<GlideString[]",
-      "source": "wiki",
-      "validated": true
-    },
-    {
-      "command": "MSET",
-      "family": "strings",
-      "method": "mset",
-      "owner": "BaseClient",
-      "paramsSignature": "keysAndValues: Record<string, GlideString> | GlideRecord<GlideString>,",
-      "returnType": "\"OK\"",
-      "source": "wiki",
-      "validated": true
-    },
-    {
-      "command": "SET",
-      "family": "strings",
-      "method": "GlideJson.set",
-      "owner": "GlideJson",
-      "paramsSignature": "client: BaseClient,\n        key: GlideString,\n        path: GlideString,\n        value: GlideString,\n        options?: { conditionalChange: ConditionalChange } & DecoderOption,",
-      "returnType": "\"OK\" | null",
-      "source": "wiki",
-      "validated": true
-    },
-    {
-      "command": "STRLEN",
-      "family": "strings",
-      "method": "GlideJson.strlen",
-      "owner": "GlideJson",
-      "paramsSignature": "client: BaseClient,\n        key: GlideString,\n        options?: { path: GlideString },",
-      "returnType": "ReturnTypeJson<number",
       "source": "wiki",
       "validated": true
     }

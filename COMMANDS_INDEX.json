@@ -1,28 +1,6 @@
 {
   "entries": [
     {
-      "command": "--------------",
-      "family": "other",
-      "method": null,
-      "owner": null,
-      "paramsSignature": null,
-      "returnType": null,
-      "source": "wiki",
-      "validated": false,
-      "notes": "No matching method found in BaseClient"
-    },
-    {
-      "command": "------------------------",
-      "family": "other",
-      "method": null,
-      "owner": null,
-      "paramsSignature": null,
-      "returnType": null,
-      "source": "wiki",
-      "validated": false,
-      "notes": "No matching method found in BaseClient"
-    },
-    {
       "command": "APPEND",
       "family": "strings",
       "method": "append",
@@ -204,17 +182,6 @@
       "returnType": "ClusterResponse<number",
       "source": "wiki",
       "validated": true
-    },
-    {
-      "command": "CMD TYPE",
-      "family": "other",
-      "method": null,
-      "owner": null,
-      "paramsSignature": null,
-      "returnType": null,
-      "source": "wiki",
-      "validated": false,
-      "notes": "No matching method found in BaseClient"
     },
     {
       "command": "COMMAND",

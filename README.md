@@ -1,25 +1,25 @@
 # VGLIDE-JS-MCP
 
-A Model Context Protocol (MCP) server for Valkey GLIDE, providing seamless integration with Valkey/Redis databases through the high-performance GLIDE client.
+A Model Context Protocol (MCP) knowledge server for Valkey GLIDE, providing code generation assistance and migration guidance for building applications with the high-performance GLIDE client.
 
 ## Overview
 
-This MCP server enables AI assistants to interact with Valkey databases using the GLIDE client for Node.js. Whether you're migrating from other Redis clients or building new applications, this server provides easy access to Valkey's powerful features through the MCP protocol.
+This MCP knowledge server helps AI assistants generate code and provide migration guidance for Valkey GLIDE applications. Whether you're migrating from other Redis/Valkey clients or building new applications from scratch, this server provides expert knowledge about GLIDE APIs, best practices, and code patterns through the MCP protocol.
 
 ## Features
 
-- **High Performance**: Built on Valkey GLIDE for optimal performance
+- **Code Generation**: Generate GLIDE client code for various use cases and patterns
+- **Migration Assistance**: Help migrate from other Redis/Valkey clients (node-redis, ioredis, etc.)
+- **Best Practices**: Provide guidance on optimal GLIDE usage and performance patterns
+- **API Knowledge**: Complete knowledge of GLIDE APIs, methods, and configuration options
 - **MCP Integration**: Seamless integration with AI assistants via Model Context Protocol
-- **Easy Migration**: Simplified transition from other Redis/Valkey clients
-- **Full API Access**: Complete access to Valkey commands and features
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js (version 16 or higher)
-- Valkey server running locally or remotely
-- MCP-compatible AI assistant
+- MCP-compatible AI assistant (Claude Desktop, etc.)
 
 ### Installation
 
@@ -27,13 +27,15 @@ This MCP server enables AI assistants to interact with Valkey databases using th
 npm install
 ```
 
-### Configuration
-
-Configure your Valkey connection settings in the MCP server configuration.
-
 ### Usage
 
-Start the MCP server and connect it to your AI assistant to begin interacting with your Valkey database.
+1. Start the MCP knowledge server
+2. Connect it to your AI assistant
+3. Ask for help with:
+   - Generating GLIDE client code
+   - Migrating from other Redis clients
+   - GLIDE best practices and patterns
+   - API usage examples and documentation
 
 ## Development
 

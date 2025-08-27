@@ -1,0 +1,1158 @@
+{
+  "extractedMethodCount": 606,
+  "validatedCount": 28,
+  "totalEntries": 122,
+  "results": [
+    {
+      "symbol": "new Redis(options)",
+      "glideMethods": [
+        "createClient"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "new Redis.Cluster(nodes, options)",
+      "glideMethods": [
+        "createCluster"
+      ],
+      "validated": false,
+      "missing": [
+        "createCluster"
+      ]
+    },
+    {
+      "symbol": "duplicate()",
+      "glideMethods": [
+        "createClient"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "get(key)",
+      "glideMethods": [
+        "get"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "set(key, value, [EX seconds|PX ms|NX|XX])",
+      "glideMethods": [
+        "set"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "del(key|keys)",
+      "glideMethods": [
+        "del"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "expire(key, seconds)",
+      "glideMethods": [
+        "expire"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "hset(key, field, value) | hset(key, object)",
+      "glideMethods": [
+        "hset"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "hget(key, field)",
+      "glideMethods": [
+        "hget"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "publish(channel, message)",
+      "glideMethods": [
+        "publish"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "subscribe(channel, callback)",
+      "glideMethods": [
+        "subscribe"
+      ],
+      "validated": false,
+      "missing": [
+        "subscribe"
+      ]
+    },
+    {
+      "symbol": "lpush(key, value|values)",
+      "glideMethods": [
+        "lPush"
+      ],
+      "validated": false,
+      "missing": [
+        "lPush"
+      ]
+    },
+    {
+      "symbol": "brpop(key, timeout)",
+      "glideMethods": [
+        "brPop"
+      ],
+      "validated": false,
+      "missing": [
+        "brPop"
+      ]
+    },
+    {
+      "symbol": "eval(script, numKeys, ...keysAndArgs)",
+      "glideMethods": [
+        "eval"
+      ],
+      "validated": false,
+      "missing": [
+        "eval"
+      ]
+    },
+    {
+      "symbol": "sadd(key, member|members)",
+      "glideMethods": [
+        "sAdd"
+      ],
+      "validated": false,
+      "missing": [
+        "sAdd"
+      ]
+    },
+    {
+      "symbol": "sismember(key, member)",
+      "glideMethods": [
+        "sIsMember"
+      ],
+      "validated": false,
+      "missing": [
+        "sIsMember"
+      ]
+    },
+    {
+      "symbol": "smembers(key)",
+      "glideMethods": [
+        "sMembers"
+      ],
+      "validated": false,
+      "missing": [
+        "sMembers"
+      ]
+    },
+    {
+      "symbol": "zadd(key, score, member)",
+      "glideMethods": [
+        "zAdd"
+      ],
+      "validated": false,
+      "missing": [
+        "zAdd"
+      ]
+    },
+    {
+      "symbol": "zrange(key, start, stop) | zrevrange(key, start, stop)",
+      "glideMethods": [
+        "zRange"
+      ],
+      "validated": false,
+      "missing": [
+        "zRange"
+      ]
+    },
+    {
+      "symbol": "zrem(key, member|members)",
+      "glideMethods": [
+        "zRem"
+      ],
+      "validated": false,
+      "missing": [
+        "zRem"
+      ]
+    },
+    {
+      "symbol": "xadd(key, id, field value ...)",
+      "glideMethods": [
+        "xAdd"
+      ],
+      "validated": false,
+      "missing": [
+        "xAdd"
+      ]
+    },
+    {
+      "symbol": "xgroup create key group $ mkstream",
+      "glideMethods": [
+        "xGroupCreate"
+      ],
+      "validated": false,
+      "missing": [
+        "xGroupCreate"
+      ]
+    },
+    {
+      "symbol": "xreadgroup group group consumer count block streams key id",
+      "glideMethods": [
+        "xReadGroup"
+      ],
+      "validated": false,
+      "missing": [
+        "xReadGroup"
+      ]
+    },
+    {
+      "symbol": "xack(key, group, id|ids)",
+      "glideMethods": [
+        "xAck"
+      ],
+      "validated": false,
+      "missing": [
+        "xAck"
+      ]
+    },
+    {
+      "symbol": "multi()...exec()",
+      "glideMethods": [
+        "multi",
+        "command",
+        "exec"
+      ],
+      "validated": false,
+      "missing": [
+        "multi"
+      ]
+    },
+    {
+      "symbol": "pipeline()...exec()",
+      "glideMethods": [
+        "pipeline",
+        "command",
+        "exec"
+      ],
+      "validated": false,
+      "missing": [
+        "pipeline"
+      ]
+    },
+    {
+      "symbol": "geoadd(key, longitude, latitude, member)",
+      "glideMethods": [
+        "geoAdd"
+      ],
+      "validated": false,
+      "missing": [
+        "geoAdd"
+      ]
+    },
+    {
+      "symbol": "geosearch(key, frommember|fromlonlat, byradius|bybox, opts)",
+      "glideMethods": [
+        "geoSearch"
+      ],
+      "validated": false,
+      "missing": [
+        "geoSearch"
+      ]
+    },
+    {
+      "symbol": "setbit(key, offset, value)",
+      "glideMethods": [
+        "setBit"
+      ],
+      "validated": false,
+      "missing": [
+        "setBit"
+      ]
+    },
+    {
+      "symbol": "getbit(key, offset)",
+      "glideMethods": [
+        "getBit"
+      ],
+      "validated": false,
+      "missing": [
+        "getBit"
+      ]
+    },
+    {
+      "symbol": "bitcount(key, start?, end?)",
+      "glideMethods": [
+        "bitCount"
+      ],
+      "validated": false,
+      "missing": [
+        "bitCount"
+      ]
+    },
+    {
+      "symbol": "pfadd(key, elements)",
+      "glideMethods": [
+        "pfAdd"
+      ],
+      "validated": false,
+      "missing": [
+        "pfAdd"
+      ]
+    },
+    {
+      "symbol": "pfcount(key|keys)",
+      "glideMethods": [
+        "pfCount"
+      ],
+      "validated": false,
+      "missing": [
+        "pfCount"
+      ]
+    },
+    {
+      "symbol": "pfmerge(destkey, sourcekeys)",
+      "glideMethods": [
+        "pfMerge"
+      ],
+      "validated": false,
+      "missing": [
+        "pfMerge"
+      ]
+    },
+    {
+      "symbol": "JSON.SET key path value",
+      "glideMethods": [
+        "jsonSet"
+      ],
+      "validated": false,
+      "missing": [
+        "jsonSet"
+      ]
+    },
+    {
+      "symbol": "JSON.GET key path",
+      "glideMethods": [
+        "jsonGet"
+      ],
+      "validated": false,
+      "missing": [
+        "jsonGet"
+      ]
+    },
+    {
+      "symbol": "incr(key) | decr(key)",
+      "glideMethods": [
+        "incr",
+        "decr"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "mget(keys) | mset(object)",
+      "glideMethods": [
+        "mGet",
+        "mSet"
+      ],
+      "validated": false,
+      "missing": [
+        "mGet",
+        "mSet"
+      ]
+    },
+    {
+      "symbol": "append(key, value) | strlen(key)",
+      "glideMethods": [
+        "append",
+        "strLen"
+      ],
+      "validated": false,
+      "missing": [
+        "strLen"
+      ]
+    },
+    {
+      "symbol": "exists(...keys) | ttl(key) | persist(key)",
+      "glideMethods": [
+        "exists",
+        "ttl",
+        "persist"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "rename(key, newKey)",
+      "glideMethods": [
+        "rename"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "scan(cursor, opts)",
+      "glideMethods": [
+        "scan"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "hgetall(key) | hmget(key, fields) | hmset(key, object)",
+      "glideMethods": [
+        "hGetAll",
+        "hMGet",
+        "hMSet"
+      ],
+      "validated": false,
+      "missing": [
+        "hGetAll",
+        "hMGet",
+        "hMSet"
+      ]
+    },
+    {
+      "symbol": "hincrby(key, field, increment)",
+      "glideMethods": [
+        "hIncrBy"
+      ],
+      "validated": false,
+      "missing": [
+        "hIncrBy"
+      ]
+    },
+    {
+      "symbol": "hdel(key, fields) | hexists(key, field) | hlen(key)",
+      "glideMethods": [
+        "hDel",
+        "hExists",
+        "hLen"
+      ],
+      "validated": false,
+      "missing": [
+        "hDel",
+        "hExists",
+        "hLen"
+      ]
+    },
+    {
+      "symbol": "hkeys(key) | hvals(key) | hscan(key, cursor, opts)",
+      "glideMethods": [
+        "hKeys",
+        "hVals",
+        "hScan"
+      ],
+      "validated": false,
+      "missing": [
+        "hKeys",
+        "hVals",
+        "hScan"
+      ]
+    },
+    {
+      "symbol": "lrange(key, start, stop) | llen(key)",
+      "glideMethods": [
+        "lRange",
+        "lLen"
+      ],
+      "validated": false,
+      "missing": [
+        "lRange",
+        "lLen"
+      ]
+    },
+    {
+      "symbol": "lpop(key) | rpop(key) | rpush(key, values) | ltrim(key, start, stop)",
+      "glideMethods": [
+        "lPop",
+        "rPop",
+        "rPush",
+        "lTrim"
+      ],
+      "validated": false,
+      "missing": [
+        "lPop",
+        "rPop",
+        "rPush",
+        "lTrim"
+      ]
+    },
+    {
+      "symbol": "srem(key, members) | scard(key) | spop(key, count?) | srandmember(key, count?)",
+      "glideMethods": [
+        "sRem",
+        "sCard",
+        "sPop",
+        "sRandMember"
+      ],
+      "validated": false,
+      "missing": [
+        "sRem",
+        "sCard",
+        "sPop",
+        "sRandMember"
+      ]
+    },
+    {
+      "symbol": "sdiff(keys) | sinter(keys) | sunion(keys)",
+      "glideMethods": [
+        "sDiff",
+        "sInter",
+        "sUnion"
+      ],
+      "validated": false,
+      "missing": [
+        "sDiff",
+        "sInter",
+        "sUnion"
+      ]
+    },
+    {
+      "symbol": "zcard(key) | zscore(key, member) | zincrby(key, increment, member)",
+      "glideMethods": [
+        "zCard",
+        "zScore",
+        "zIncrBy"
+      ],
+      "validated": false,
+      "missing": [
+        "zCard",
+        "zScore",
+        "zIncrBy"
+      ]
+    },
+    {
+      "symbol": "zrank(key, member) | zrevrank(key, member)",
+      "glideMethods": [
+        "zRank",
+        "zRevRank"
+      ],
+      "validated": false,
+      "missing": [
+        "zRank",
+        "zRevRank"
+      ]
+    },
+    {
+      "symbol": "zcount(key, min, max) | zremrangebyscore(key, min, max) | zremrangebyrank(key, start, stop)",
+      "glideMethods": [
+        "zCount",
+        "zRemRangeByScore",
+        "zRemRangeByRank"
+      ],
+      "validated": false,
+      "missing": [
+        "zCount",
+        "zRemRangeByScore",
+        "zRemRangeByRank"
+      ]
+    },
+    {
+      "symbol": "zpopmax(key, count?) | zpopmin(key, count?)",
+      "glideMethods": [
+        "zPopMax",
+        "zPopMin"
+      ],
+      "validated": false,
+      "missing": [
+        "zPopMax",
+        "zPopMin"
+      ]
+    },
+    {
+      "symbol": "geodist(key, member1, member2, unit?) | geopos(key, members) | geohash(key, members)",
+      "glideMethods": [
+        "geoDist",
+        "geoPos",
+        "geoHash"
+      ],
+      "validated": false,
+      "missing": [
+        "geoDist",
+        "geoPos",
+        "geoHash"
+      ]
+    },
+    {
+      "symbol": "bitop(operation, destKey, keys) | bitpos(key, bit, start?, end?)",
+      "glideMethods": [
+        "bitOp",
+        "bitPos"
+      ],
+      "validated": false,
+      "missing": [
+        "bitOp",
+        "bitPos"
+      ]
+    },
+    {
+      "symbol": "evalsha(sha, keys, args) | script load|exists|flush",
+      "glideMethods": [
+        "evalSha"
+      ],
+      "validated": false,
+      "missing": [
+        "evalSha"
+      ]
+    },
+    {
+      "symbol": "psubscribe(pattern) | punsubscribe(pattern)",
+      "glideMethods": [
+        "pSubscribe",
+        "pUnsubscribe"
+      ],
+      "validated": false,
+      "missing": [
+        "pSubscribe",
+        "pUnsubscribe"
+      ]
+    },
+    {
+      "symbol": "createClient(options)",
+      "glideMethods": [
+        "createClient"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "createCluster(options)",
+      "glideMethods": [
+        "createCluster"
+      ],
+      "validated": false,
+      "missing": [
+        "createCluster"
+      ]
+    },
+    {
+      "symbol": "duplicate()",
+      "glideMethods": [
+        "createClient"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "get(key)",
+      "glideMethods": [
+        "get"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "set(key, value, options?)",
+      "glideMethods": [
+        "set"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "publish(channel, message)",
+      "glideMethods": [
+        "publish"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "subscribe(channel, listener)",
+      "glideMethods": [
+        "subscribe"
+      ],
+      "validated": false,
+      "missing": [
+        "subscribe"
+      ]
+    },
+    {
+      "symbol": "lPush(key, value|values)",
+      "glideMethods": [
+        "lPush"
+      ],
+      "validated": false,
+      "missing": [
+        "lPush"
+      ]
+    },
+    {
+      "symbol": "brPop(key, timeout)",
+      "glideMethods": [
+        "brPop"
+      ],
+      "validated": false,
+      "missing": [
+        "brPop"
+      ]
+    },
+    {
+      "symbol": "geoAdd(key, items)",
+      "glideMethods": [
+        "geoAdd"
+      ],
+      "validated": false,
+      "missing": [
+        "geoAdd"
+      ]
+    },
+    {
+      "symbol": "geoSearch(key, opts)",
+      "glideMethods": [
+        "geoSearch"
+      ],
+      "validated": false,
+      "missing": [
+        "geoSearch"
+      ]
+    },
+    {
+      "symbol": "setBit(key, offset, value)",
+      "glideMethods": [
+        "setBit"
+      ],
+      "validated": false,
+      "missing": [
+        "setBit"
+      ]
+    },
+    {
+      "symbol": "getBit(key, offset)",
+      "glideMethods": [
+        "getBit"
+      ],
+      "validated": false,
+      "missing": [
+        "getBit"
+      ]
+    },
+    {
+      "symbol": "bitCount(key, start?, end?)",
+      "glideMethods": [
+        "bitCount"
+      ],
+      "validated": false,
+      "missing": [
+        "bitCount"
+      ]
+    },
+    {
+      "symbol": "pfAdd(key, elements)",
+      "glideMethods": [
+        "pfAdd"
+      ],
+      "validated": false,
+      "missing": [
+        "pfAdd"
+      ]
+    },
+    {
+      "symbol": "pfCount(key|keys)",
+      "glideMethods": [
+        "pfCount"
+      ],
+      "validated": false,
+      "missing": [
+        "pfCount"
+      ]
+    },
+    {
+      "symbol": "pfMerge(destKey, sourceKeys)",
+      "glideMethods": [
+        "pfMerge"
+      ],
+      "validated": false,
+      "missing": [
+        "pfMerge"
+      ]
+    },
+    {
+      "symbol": "jsonSet(key, path, value)",
+      "glideMethods": [
+        "jsonSet"
+      ],
+      "validated": false,
+      "missing": [
+        "jsonSet"
+      ]
+    },
+    {
+      "symbol": "jsonGet(key, path)",
+      "glideMethods": [
+        "jsonGet"
+      ],
+      "validated": false,
+      "missing": [
+        "jsonGet"
+      ]
+    },
+    {
+      "symbol": "incr(key) | decr(key)",
+      "glideMethods": [
+        "incr",
+        "decr"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "mGet(keys) | mSet(object)",
+      "glideMethods": [
+        "mGet",
+        "mSet"
+      ],
+      "validated": false,
+      "missing": [
+        "mGet",
+        "mSet"
+      ]
+    },
+    {
+      "symbol": "exists(...keys) | ttl(key) | persist(key) | rename(key,newKey)",
+      "glideMethods": [
+        "exists"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "scan(cursor, opts) | hScan/sScan/zScan",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "hGetAll | hMGet | hMSet | hIncrBy | hDel | hExists | hLen | hKeys | hVals",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "lRange | lLen | lPop | rPop | rPush | lTrim",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "sRem | sCard | sPop | sRandMember | sDiff | sInter | sUnion",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "zCard | zScore | zIncrBy | zRank | zRevRank | zCount | zRemRangeByScore | zRemRangeByRank | zPopMax | zPopMin",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "geoDist | geoPos | geoHash",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "bitOp | bitPos",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "evalSha | scriptLoad | scriptExists | scriptFlush",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "pSubscribe | pUnsubscribe",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "createClient(options)",
+      "glideMethods": [
+        "createClient"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "createCluster(nodes, options)",
+      "glideMethods": [
+        "createCluster"
+      ],
+      "validated": false,
+      "missing": [
+        "createCluster"
+      ]
+    },
+    {
+      "symbol": "get(key)",
+      "glideMethods": [
+        "get"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "set(key, value, options?)",
+      "glideMethods": [
+        "set"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "del(...keys)",
+      "glideMethods": [
+        "del"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "expire(key, seconds)",
+      "glideMethods": [
+        "expire"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "hset(key, field, value)|hset(key, object)",
+      "glideMethods": [
+        "hset"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "hget(key, field)",
+      "glideMethods": [
+        "hget"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "publish(channel, message)",
+      "glideMethods": [
+        "publish"
+      ],
+      "validated": true,
+      "missing": []
+    },
+    {
+      "symbol": "subscribe(channel, listener)",
+      "glideMethods": [
+        "subscribe"
+      ],
+      "validated": false,
+      "missing": [
+        "subscribe"
+      ]
+    },
+    {
+      "symbol": "eval(script, keys, args)",
+      "glideMethods": [
+        "eval"
+      ],
+      "validated": false,
+      "missing": [
+        "eval"
+      ]
+    },
+    {
+      "symbol": "lPush(key, value|values)",
+      "glideMethods": [
+        "lPush"
+      ],
+      "validated": false,
+      "missing": [
+        "lPush"
+      ]
+    },
+    {
+      "symbol": "brPop(key, timeout)",
+      "glideMethods": [
+        "brPop"
+      ],
+      "validated": false,
+      "missing": [
+        "brPop"
+      ]
+    },
+    {
+      "symbol": "geoAdd(key, items)",
+      "glideMethods": [
+        "geoAdd"
+      ],
+      "validated": false,
+      "missing": [
+        "geoAdd"
+      ]
+    },
+    {
+      "symbol": "geoSearch(key, opts)",
+      "glideMethods": [
+        "geoSearch"
+      ],
+      "validated": false,
+      "missing": [
+        "geoSearch"
+      ]
+    },
+    {
+      "symbol": "setBit(key, offset, value)",
+      "glideMethods": [
+        "setBit"
+      ],
+      "validated": false,
+      "missing": [
+        "setBit"
+      ]
+    },
+    {
+      "symbol": "getBit(key, offset)",
+      "glideMethods": [
+        "getBit"
+      ],
+      "validated": false,
+      "missing": [
+        "getBit"
+      ]
+    },
+    {
+      "symbol": "bitCount(key, start?, end?)",
+      "glideMethods": [
+        "bitCount"
+      ],
+      "validated": false,
+      "missing": [
+        "bitCount"
+      ]
+    },
+    {
+      "symbol": "pfAdd(key, elements)",
+      "glideMethods": [
+        "pfAdd"
+      ],
+      "validated": false,
+      "missing": [
+        "pfAdd"
+      ]
+    },
+    {
+      "symbol": "pfCount(key|keys)",
+      "glideMethods": [
+        "pfCount"
+      ],
+      "validated": false,
+      "missing": [
+        "pfCount"
+      ]
+    },
+    {
+      "symbol": "pfMerge(destKey, sourceKeys)",
+      "glideMethods": [
+        "pfMerge"
+      ],
+      "validated": false,
+      "missing": [
+        "pfMerge"
+      ]
+    },
+    {
+      "symbol": "jsonSet(key, path, value)",
+      "glideMethods": [
+        "jsonSet"
+      ],
+      "validated": false,
+      "missing": [
+        "jsonSet"
+      ]
+    },
+    {
+      "symbol": "jsonGet(key, path)",
+      "glideMethods": [
+        "jsonGet"
+      ],
+      "validated": false,
+      "missing": [
+        "jsonGet"
+      ]
+    },
+    {
+      "symbol": "incr | decr | mGet | mSet | append | strLen",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "exists | ttl | persist | rename | scan",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "hGetAll | hMGet | hMSet | hIncrBy | hDel | hExists | hLen | hKeys | hVals | hScan",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "lRange | lLen | lPop | rPop | rPush | lTrim",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "sRem | sCard | sPop | sRandMember | sDiff | sInter | sUnion",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "zCard | zScore | zIncrBy | zRank | zRevRank | zCount | zRemRangeByScore | zRemRangeByRank | zPopMax | zPopMin",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "geoDist | geoPos | geoHash",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "bitOp | bitPos",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "evalSha | scriptLoad | scriptExists | scriptFlush",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    },
+    {
+      "symbol": "pSubscribe | pUnsubscribe",
+      "glideMethods": [],
+      "validated": false,
+      "missing": []
+    }
+  ]
+}

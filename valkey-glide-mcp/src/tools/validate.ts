@@ -60,14 +60,13 @@ export function registerValidationTools(mcp: McpServer) {
       })
       .shape,
     async (args) => {
-      const defaultUrls = (
-        args.urls ?? [
-          // best-effort guesses; callers can override
-          "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/index.ts",
-          "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/client.ts",
-          "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/cluster.ts",
-        ]
-      );
+      const defaultUrls = (args.urls ?? [
+        "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/index.ts",
+        "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/BaseClient.ts",
+        "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/GlideClient.ts",
+        "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/GlideClusterClient.ts",
+        "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/Commands.ts",
+      ]);
 
       const sources: { id: string; text: string }[] = [];
       if (args.sources && args.sources.length) {

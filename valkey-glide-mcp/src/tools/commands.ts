@@ -6,12 +6,14 @@ type ParsedMethod = {
   name: string;
   paramsSignature: string;
   returnType: string | null;
+  owner: string; // BaseClient | GlideClient | GlideClusterClient | GlideJson
 };
 
 type CommandEntry = {
   command: string;
   family: string;
   method: string | null;
+  owner?: string | null;
   paramsSignature: string | null;
   returnType: string | null;
   source: "wiki";
@@ -167,6 +169,17 @@ function mapCommandToMethod(command: string): string | null {
     XGROUP_SETID: "xgroupSetId",
     GEOSEARCHSTORE: "geosearchstore",
     GEODIST: "geodist",
+    CLIENTGETNAME: "clientGetName",
+    CLIENTID: "clientId",
+    CONFIGGET: "configGet",
+    CONFIGSET: "configSet",
+    CONFIGREWRITE: "configRewrite",
+    CONFIGRESETSTAT: "configResetStat",
+    DBSIZE: "dbsize",
+    RANDOMKEY: "randomKey",
+    SCRIPTEXISTS: "scriptExists",
+    SCRIPTFLUSH: "scriptFlush",
+    SCRIPTKILL: "scriptKill",
   };
   if (specials[simple]) return specials[simple];
   // Default mapping: uppercase to lowercase
@@ -179,7 +192,7 @@ async function fetchText(url: string): Promise<string> {
   return await res.text();
 }
 
-function extractWikiCommands(html: string): string[] {
+function extractWikiCommandsHtml(html: string): string[] {
   const commands = new Set<string>();
   const codeTagRe = /<code>([A-Z][A-Z0-9_\s]{1,})<\/code>/g;
   let m: RegExpExecArray | null;
@@ -193,15 +206,27 @@ function extractWikiCommands(html: string): string[] {
   return Array.from(commands);
 }
 
-function extractPublicMethods(ts: string): ParsedMethod[] {
+function extractWikiCommandsMarkdown(md: string): string[] {
+  const commands: string[] = [];
+  const lines = md.split(/\n/);
+  for (const line of lines) {
+    const m = /^\|\s*([^|]+?)\s*\|/.exec(line);
+    if (!m) continue;
+    const cmdRaw = m[1].trim();
+    if (!cmdRaw || cmdRaw.toLowerCase().includes("n/a") || cmdRaw.toLowerCase().includes("api not required")) continue;
+    // Normalize to upper snake-ish without extra spaces
+    const normalized = cmdRaw.replace(/\s+/g, " ").trim().toUpperCase();
+    commands.push(normalized);
+  }
+  return Array.from(new Set(commands));
+}
+
+function extractPublicMethods(ts: string, owner: string): ParsedMethod[] {
   const lines = ts.split(/\n/);
   const out: ParsedMethod[] = [];
-  const sigRe = /public\s+async\s+([a-zA-Z0-9_]+)\s*\(([^)]*)\)\s*:\s*Promise<([^>]+)>/;
-  for (const line of lines) {
-    const m = sigRe.exec(line);
-    if (m) {
-      out.push({ name: m[1], paramsSignature: m[2].trim(), returnType: m[3].trim() });
-    }
+  const res = ts.matchAll(/(?:public\s+)?(?:static\s+)?async\s+([a-zA-Z0-9_]+)\s*\(([^)]*)\)\s*:\s*Promise<([^>]+)>/g);
+  for (const m of res) {
+    out.push({ name: String(m[1]), paramsSignature: String(m[2]).trim(), returnType: String(m[3]).trim(), owner });
   }
   return out;
 }
@@ -218,12 +243,32 @@ export function registerCommandsTools(mcp: McpServer) {
       .object({ start: z.number().int().min(0).default(0), count: z.number().int().min(1).max(20).default(10), refresh: z.boolean().optional() })
       .shape,
     async (args) => {
-      const wikiUrl = "https://github.com/valkey-io/valkey-glide/wiki/ValKey-Commands-Implementation-Progress";
+      const mdUrl = "https://raw.githubusercontent.com/wiki/valkey-io/valkey-glide/ValKey-Commands-Implementation-Progress.md";
+      const htmlUrl = "https://github.com/valkey-io/valkey-glide/wiki/ValKey-Commands-Implementation-Progress";
       const baseClientUrl = "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/BaseClient.ts";
-      const html = await fetchText(wikiUrl);
-      const ts = await fetchText(baseClientUrl);
-      const wikiCommands = extractWikiCommands(html).sort();
-      const methods = extractPublicMethods(ts);
+      const glideClientUrl = "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/GlideClient.ts";
+      const glideClusterUrl = "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/GlideClusterClient.ts";
+      const glideJsonUrl = "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/server-modules/GlideJson.ts";
+
+      const md = await fetchText(mdUrl);
+      const wikiCommands = extractWikiCommandsMarkdown(md).sort();
+      if (wikiCommands.length === 0) {
+        const html = await fetchText(htmlUrl);
+        wikiCommands.push(...extractWikiCommandsHtml(html));
+      }
+
+      const [tsBase, tsClient, tsCluster, tsJson] = await Promise.all([
+        fetchText(baseClientUrl),
+        fetchText(glideClientUrl),
+        fetchText(glideClusterUrl),
+        fetchText(glideJsonUrl),
+      ]);
+      const methods = [
+        ...extractPublicMethods(tsBase, "BaseClient"),
+        ...extractPublicMethods(tsClient, "GlideClient"),
+        ...extractPublicMethods(tsCluster, "GlideClusterClient"),
+        ...extractPublicMethods(tsJson, "GlideJson"),
+      ];
       const nameToMethod = new Map(methods.map((m) => [m.name.toLowerCase(), m]));
 
       const slice = wikiCommands.slice(args.start, args.start + args.count);
@@ -233,7 +278,8 @@ export function registerCommandsTools(mcp: McpServer) {
         return {
           command: cmd,
           family: pickFamily(cmd),
-          method: m ? m.name : null,
+          method: m ? (m.owner && m.owner !== "BaseClient" ? `${m.owner}.${m.name}` : m.name) : null,
+          owner: m ? m.owner : null,
           paramsSignature: m ? m.paramsSignature : null,
           returnType: m ? m.returnType : null,
           source: "wiki",

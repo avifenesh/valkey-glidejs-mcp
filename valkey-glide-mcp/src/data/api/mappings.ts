@@ -51,6 +51,14 @@ export const IOREDIS_DATASET: ApiDataset = {
         "Both accept node addresses; option names differ. Align timeouts/retries accordingly.",
     },
     {
+      category: "client",
+      symbol: "duplicate()",
+      equivalent: { glide: "createClient(options)" },
+      description:
+        "Create a separate connection for Pub/Sub or blocking operations by creating another Glide client.",
+      quirks: "Use a dedicated subscriber client while the main client publishes.",
+    },
+    {
       category: "strings",
       symbol: "get(key)",
       equivalent: { glide: "get(key)" },
@@ -99,10 +107,22 @@ export const IOREDIS_DATASET: ApiDataset = {
     {
       category: "pubsub",
       symbol: "subscribe(channel, callback)",
-      equivalent: { glide: "subscribe(channel, listener)" },
+      equivalent: { glide: "subscribe(channel, listener) | for await ..." },
       description:
         "ioredis uses pattern or direct subscribe with event listeners; Glide provides subscribe with callbacks/async iterables.",
       quirks: "Ensure dedicated subscriber connection if needed.",
+    },
+    {
+      category: "lists",
+      symbol: "lpush(key, value|values)",
+      equivalent: { glide: "lPush(key, value|values)" },
+      description: "Push values to a list head.",
+    },
+    {
+      category: "lists",
+      symbol: "brpop(key, timeout)",
+      equivalent: { glide: "brPop(key, timeout)" },
+      description: "Blocking pop from list tail.",
     },
     {
       category: "scripts",
@@ -132,6 +152,12 @@ export const NODE_REDIS_DATASET: ApiDataset = {
       description: "Create cluster client.",
     },
     {
+      category: "client",
+      symbol: "duplicate()",
+      equivalent: { glide: "createClient(options)" },
+      description: "Create another client for separate connections (e.g., subscriber).",
+    },
+    {
       category: "strings",
       symbol: "get(key)",
       equivalent: { glide: "get(key)" },
@@ -150,6 +176,24 @@ export const NODE_REDIS_DATASET: ApiDataset = {
       symbol: "publish(channel, message)",
       equivalent: { glide: "publish(channel, message)" },
       description: "Publish to channel.",
+    },
+    {
+      category: "pubsub",
+      symbol: "subscribe(channel, listener)",
+      equivalent: { glide: "subscribe(channel, listener) | for await ..." },
+      description: "Subscribe to channel.",
+    },
+    {
+      category: "lists",
+      symbol: "lPush(key, value|values)",
+      equivalent: { glide: "lPush(key, value|values)" },
+      description: "Push to list head.",
+    },
+    {
+      category: "lists",
+      symbol: "brPop(key, timeout)",
+      equivalent: { glide: "brPop(key, timeout)" },
+      description: "Blocking pop from list tail.",
     },
   ],
 };
@@ -176,8 +220,10 @@ export const GLIDE_SURFACE: ApiDataset = {
     { category: "hashes", symbol: "hset(key, field, value)|hset(key, object)", equivalent: { glide: "hset(...)" }, description: "Hash set." },
     { category: "hashes", symbol: "hget(key, field)", equivalent: { glide: "hget(key, field)" }, description: "Hash get." },
     { category: "pubsub", symbol: "publish(channel, message)", equivalent: { glide: "publish(channel, message)" }, description: "PubSub publish." },
-    { category: "pubsub", symbol: "subscribe(channel, listener)", equivalent: { glide: "subscribe(channel, listener)" }, description: "PubSub subscribe." },
+    { category: "pubsub", symbol: "subscribe(channel, listener)", equivalent: { glide: "subscribe(channel, listener) | for await ..." }, description: "PubSub subscribe." },
     { category: "scripts", symbol: "eval(script, keys, args)", equivalent: { glide: "eval(script, keys, args)" }, description: "EVAL script." },
+    { category: "lists", symbol: "lPush(key, value|values)", equivalent: { glide: "lPush(key, value|values)" }, description: "List push." },
+    { category: "lists", symbol: "brPop(key, timeout)", equivalent: { glide: "brPop(key, timeout)" }, description: "Blocking list pop." },
   ],
 };
 

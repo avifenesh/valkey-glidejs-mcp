@@ -2,6 +2,35 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
 const templates = {
+  clientBasic: () => `
+import { createClient } from '@valkey/glide';
+const client = await createClient({ host: 'localhost', port: 6379 });
+await client.set('hello', 'world');
+console.log(await client.get('hello'));
+`.trim(),
+  clientCluster: () => `
+import { createCluster } from '@valkey/glide';
+const cluster = await createCluster([
+  { host: '127.0.0.1', port: 7000 },
+  { host: '127.0.0.1', port: 7001 },
+]);
+console.log(await cluster.get('hello'));
+`.trim(),
+  pubsubAdvanced: ({ channel }: { channel: string }) => `
+import { createClient } from '@valkey/glide';
+// Use dedicated clients for subscriber and publisher
+const publisher = await createClient({ host: 'localhost', port: 6379 });
+const subscriber = await createClient({ host: 'localhost', port: 6379 });
+
+// Async iterator style
+(async () => {
+  for await (const message of subscriber.subscribe('${channel}')) {
+    console.log('received', message);
+  }
+})();
+
+await publisher.publish('${channel}', JSON.stringify({ type: 'greeting', payload: 'hello' }));
+`.trim(),
   cache: ({ key, ttlSeconds }: { key: string; ttlSeconds: number }) => `
 import { createClient } from '@valkey/glide';
 const client = await createClient({ host: 'localhost', port: 6379 });
@@ -74,6 +103,16 @@ while (true) {
 
 export function registerGeneratorTools(mcp: McpServer) {
   mcp.tool(
+    'gen.clientBasic',
+    z.object({}).shape,
+    async () => ({ structuredContent: { code: templates.clientBasic() }, content: [{ type: 'text', text: templates.clientBasic() }] }) as any,
+  );
+  mcp.tool(
+    'gen.clientCluster',
+    z.object({}).shape,
+    async () => ({ structuredContent: { code: templates.clientCluster() }, content: [{ type: 'text', text: templates.clientCluster() }] }) as any,
+  );
+  mcp.tool(
     'gen.cache',
     z.object({ key: z.string(), ttlSeconds: z.number().int().positive() }).shape,
     async (args) => ({ structuredContent: { code: templates.cache(args as any) }, content: [{ type: 'text', text: templates.cache(args as any) }] }) as any,
@@ -92,6 +131,11 @@ export function registerGeneratorTools(mcp: McpServer) {
     'gen.pubsubSubscriber',
     z.object({ channel: z.string() }).shape,
     async (args) => ({ structuredContent: { code: templates.pubsubSubscriber(args as any) }, content: [{ type: 'text', text: templates.pubsubSubscriber(args as any) }] }) as any,
+  );
+  mcp.tool(
+    'gen.pubsubAdvanced',
+    z.object({ channel: z.string() }).shape,
+    async (args) => ({ structuredContent: { code: templates.pubsubAdvanced(args as any) }, content: [{ type: 'text', text: templates.pubsubAdvanced(args as any) }] }) as any,
   );
   mcp.tool(
     'gen.fastify',

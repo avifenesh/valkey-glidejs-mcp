@@ -206,14 +206,14 @@ export const IOREDIS_DATASET: ApiDataset = {
     {
       category: "transactions",
       symbol: "multi()...exec()",
-      equivalent: { glide: "multi().command(...).exec()" },
+      equivalent: { glide: "new Batch(client).command(...).exec()" },
       description: "Transactional execution of multiple commands.",
       quirks: "Ensure errors are handled; Glide returns array of results/errors.",
     },
     {
       category: "pipeline",
       symbol: "pipeline()...exec()",
-      equivalent: { glide: "pipeline().command(...).exec()" },
+      equivalent: { glide: "new Batch(client).command(...).exec()" },
       description: "Batch multiple commands without transactional guarantees.",
     },
     {
@@ -409,8 +409,8 @@ export const IOREDIS_DATASET: ApiDataset = {
     {
       category: "pubsub",
       symbol: "psubscribe(pattern) | punsubscribe(pattern)",
-      equivalent: { glide: "pSubscribe(pattern) | pUnsubscribe(pattern)" },
-      description: "Pattern Pub/Sub.",
+      equivalent: { glide: "customCommand(['PSUBSCRIBE', pattern]) + getPubSubMessage() | customCommand(['PUNSUBSCRIBE', pattern])" },
+      description: "Pattern Pub/Sub via customCommand and getPubSubMessage.",
     },
   ],
 };
@@ -461,7 +461,7 @@ export const NODE_REDIS_DATASET: ApiDataset = {
     {
       category: "pubsub",
       symbol: "subscribe(channel, listener)",
-      equivalent: { glide: "subscribe(channel, listener) | for await ..." },
+      equivalent: { glide: "customCommand(['SUBSCRIBE', channel]) + getPubSubMessage()" },
       description: "Subscribe to channel.",
     },
     {
@@ -526,14 +526,14 @@ export const NODE_REDIS_DATASET: ApiDataset = {
     },
     {
       category: "json",
-      symbol: "jsonSet(key, path, value)",
-      equivalent: { glide: "jsonSet(key, path, value)" },
+      symbol: "GlideJson.set(client, key, path, value)",
+      equivalent: { glide: "GlideJson.set(client, key, path, value)" },
       description: "Set JSON value.",
     },
     {
       category: "json",
-      symbol: "jsonGet(key, path)",
-      equivalent: { glide: "jsonGet(key, path)" },
+      symbol: "GlideJson.get(client, key, { path })",
+      equivalent: { glide: "GlideJson.get(client, key, { path })" },
       description: "Get JSON value.",
     },
     {
@@ -605,8 +605,8 @@ export const NODE_REDIS_DATASET: ApiDataset = {
     {
       category: "pubsub",
       symbol: "pSubscribe | pUnsubscribe",
-      equivalent: { glide: "pSubscribe | pUnsubscribe" },
-      description: "Pattern Pub/Sub.",
+      equivalent: { glide: "customCommand(['PSUBSCRIBE', pattern]) + getPubSubMessage() | customCommand(['PUNSUBSCRIBE', pattern])" },
+      description: "Pattern Pub/Sub via customCommand and getPubSubMessage.",
     },
   ],
 };
@@ -655,8 +655,8 @@ export const GLIDE_SURFACE: ApiDataset = {
     { category: "zsets", symbol: "zCard | zScore | zIncrBy | zRank | zRevRank | zCount | zRemRangeByScore | zRemRangeByRank | zPopMax | zPopMin", equivalent: { glide: "zCard | zScore | zIncrBy | zRank | zRevRank | zCount | zRemRangeByScore | zRemRangeByRank | zPopMax | zPopMin" }, description: "Sorted set utilities." },
     { category: "geo", symbol: "geoDist | geoPos | geoHash", equivalent: { glide: "geoDist | geoPos | geoHash" }, description: "Geo utilities." },
     { category: "bitmaps", symbol: "bitOp | bitPos", equivalent: { glide: "bitOp | bitPos" }, description: "Bitmap ops." },
-    { category: "scripts", symbol: "evalSha | scriptLoad | scriptExists | scriptFlush", equivalent: { glide: "evalSha | scriptLoad | scriptExists | scriptFlush" }, description: "Scripting helpers." },
-    { category: "pubsub", symbol: "pSubscribe | pUnsubscribe", equivalent: { glide: "pSubscribe | pUnsubscribe" }, description: "Pattern Pub/Sub." },
+    { category: "scripts", symbol: "evalSha | scriptLoad | scriptExists | scriptFlush", equivalent: { glide: "scriptLoad | scriptExists | scriptFlush" }, description: "Scripting helpers." },
+    { category: "pubsub", symbol: "pSubscribe | pUnsubscribe", equivalent: { glide: "customCommand(['PSUBSCRIBE', pattern]) + getPubSubMessage() | customCommand(['PUNSUBSCRIBE', pattern])" }, description: "Pattern Pub/Sub via customCommand and getPubSubMessage." },
   ],
 };
 

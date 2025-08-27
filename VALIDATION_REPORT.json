@@ -1,6 +1,6 @@
 {
   "extractedMethodCount": 645,
-  "validatedCount": 114,
+  "validatedCount": 122,
   "totalEntries": 122,
   "results": [
     {
@@ -214,26 +214,22 @@
     {
       "symbol": "multi()...exec()",
       "glideMethods": [
-        "multi",
         "command",
-        "exec"
+        "exec",
+        "batch"
       ],
-      "validated": false,
-      "missing": [
-        "multi"
-      ]
+      "validated": true,
+      "missing": []
     },
     {
       "symbol": "pipeline()...exec()",
       "glideMethods": [
-        "pipeline",
         "command",
-        "exec"
+        "exec",
+        "batch"
       ],
-      "validated": false,
-      "missing": [
-        "pipeline"
-      ]
+      "validated": true,
+      "missing": []
     },
     {
       "symbol": "geoadd(key, longitude, latitude, member)",
@@ -534,14 +530,11 @@
     {
       "symbol": "psubscribe(pattern) | punsubscribe(pattern)",
       "glideMethods": [
-        "psubscribe",
-        "punsubscribe"
+        "customcommand",
+        "getpubsubmessage"
       ],
-      "validated": false,
-      "missing": [
-        "psubscribe",
-        "punsubscribe"
-      ]
+      "validated": true,
+      "missing": []
     },
     {
       "symbol": "createClient(options)",
@@ -595,12 +588,11 @@
     {
       "symbol": "subscribe(channel, listener)",
       "glideMethods": [
-        "subscribe"
+        "customcommand",
+        "getpubsubmessage"
       ],
-      "validated": false,
-      "missing": [
-        "subscribe"
-      ]
+      "validated": true,
+      "missing": []
     },
     {
       "symbol": "lPush(key, value|values)",
@@ -689,27 +681,23 @@
       "missing": []
     },
     {
-      "symbol": "jsonSet(key, path, value)",
+      "symbol": "GlideJson.set(client, key, path, value)",
       "glideMethods": [
-        "jsonset",
+        "set",
         "path",
         "value"
       ],
-      "validated": false,
-      "missing": [
-        "jsonset"
-      ]
+      "validated": true,
+      "missing": []
     },
     {
-      "symbol": "jsonGet(key, path)",
+      "symbol": "GlideJson.get(client, key, { path })",
       "glideMethods": [
-        "jsonget",
+        "get",
         "path"
       ],
-      "validated": false,
-      "missing": [
-        "jsonget"
-      ]
+      "validated": true,
+      "missing": []
     },
     {
       "symbol": "incr(key) | decr(key)",
@@ -842,8 +830,11 @@
     },
     {
       "symbol": "pSubscribe | pUnsubscribe",
-      "glideMethods": [],
-      "validated": false,
+      "glideMethods": [
+        "customcommand",
+        "getpubsubmessage"
+      ],
+      "validated": true,
       "missing": []
     },
     {
@@ -1159,8 +1150,11 @@
     },
     {
       "symbol": "pSubscribe | pUnsubscribe",
-      "glideMethods": [],
-      "validated": false,
+      "glideMethods": [
+        "customcommand",
+        "getpubsubmessage"
+      ],
+      "validated": true,
       "missing": []
     }
   ]

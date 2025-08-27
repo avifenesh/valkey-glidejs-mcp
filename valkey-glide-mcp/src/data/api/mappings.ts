@@ -131,6 +131,91 @@ export const IOREDIS_DATASET: ApiDataset = {
       description: "Execute Lua script.",
       paramsDiff: "Glide prefers arrays for keys/args instead of numKeys.",
     },
+    {
+      category: "sets",
+      symbol: "sadd(key, member|members)",
+      equivalent: { glide: "sAdd(key, member|members)" },
+      description: "Add one or more set members.",
+      examples: {
+        source: `await redis.sadd('tags', 'a', 'b');`,
+        glide: `await client.sAdd('tags', ['a', 'b']);`,
+      },
+    },
+    {
+      category: "sets",
+      symbol: "sismember(key, member)",
+      equivalent: { glide: "sIsMember(key, member)" },
+      description: "Check set membership.",
+    },
+    {
+      category: "sets",
+      symbol: "smembers(key)",
+      equivalent: { glide: "sMembers(key)" },
+      description: "Get all set members.",
+    },
+    {
+      category: "zsets",
+      symbol: "zadd(key, score, member)",
+      equivalent: { glide: "zAdd(key, [{ score, member }])" },
+      description: "Add a member with score to a sorted set.",
+      examples: {
+        source: `await redis.zadd('lb', 10, 'alice');`,
+        glide: `await client.zAdd('lb', [{ score: 10, member: 'alice' }]);`,
+      },
+    },
+    {
+      category: "zsets",
+      symbol: "zrange(key, start, stop) | zrevrange(key, start, stop)",
+      equivalent: { glide: "zRange(key, start, stop, { REV?: true, WITHSCORES?: true })" },
+      description: "Range over sorted set with optional reverse and scores.",
+    },
+    {
+      category: "zsets",
+      symbol: "zrem(key, member|members)",
+      equivalent: { glide: "zRem(key, member|members)" },
+      description: "Remove member(s) from a sorted set.",
+    },
+    {
+      category: "streams",
+      symbol: "xadd(key, id, field value ...)",
+      equivalent: { glide: "xAdd(key, id, map)" },
+      description: "Append an entry to a stream.",
+      examples: {
+        source: `await redis.xadd('mystream', '*', 'f1', 'v1');`,
+        glide: `await client.xAdd('mystream', '*', { f1: 'v1' });`,
+      },
+    },
+    {
+      category: "streams",
+      symbol: "xgroup create key group $ mkstream",
+      equivalent: { glide: "xGroupCreate(key, group, '$', { MKSTREAM: true })" },
+      description: "Create a consumer group; optionally create stream if missing.",
+    },
+    {
+      category: "streams",
+      symbol: "xreadgroup group group consumer count block streams key id",
+      equivalent: { glide: "xReadGroup(group, consumer, opts)" },
+      description: "Read from a stream as part of a consumer group.",
+    },
+    {
+      category: "streams",
+      symbol: "xack(key, group, id|ids)",
+      equivalent: { glide: "xAck(key, group, ids)" },
+      description: "Acknowledge processed entries.",
+    },
+    {
+      category: "transactions",
+      symbol: "multi()...exec()",
+      equivalent: { glide: "multi().command(...).exec()" },
+      description: "Transactional execution of multiple commands.",
+      quirks: "Ensure errors are handled; Glide returns array of results/errors.",
+    },
+    {
+      category: "pipeline",
+      symbol: "pipeline()...exec()",
+      equivalent: { glide: "pipeline().command(...).exec()" },
+      description: "Batch multiple commands without transactional guarantees.",
+    },
   ],
 };
 

@@ -28,6 +28,8 @@ The server uses stdio transport and registers tools on startup.
 - api.search { query }
 - api.categories {}
 - api.byCategory { category }
+- api.families {}
+- api.byFamily { family }
 - migrate.naive { from, code }
 - gen.cache { key, ttlSeconds }
 - gen.lock { lockKey, ttlMs }
@@ -36,6 +38,11 @@ The server uses stdio transport and registers tools on startup.
 - gen.pubsubPublisher { channel }
 - gen.pubsubSubscriber { channel }
 - gen.pubsubAdvanced { channel }
+- gen.sets {}
+- gen.zsets {}
+- gen.streams {}
+- gen.transaction {}
+- gen.pipeline {}
 - gen.fastify {}
 - gen.rateLimiter { key, points, duration }
 - verify.static { code }

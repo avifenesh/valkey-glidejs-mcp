@@ -99,6 +99,52 @@ while (true) {
   // process msg
 }
 `.trim(),
+  setExample: () => `
+import { createClient } from '@valkey/glide';
+const client = await createClient({ host: 'localhost', port: 6379 });
+await client.sAdd('tags', ['a', 'b']);
+console.log(await client.sIsMember('tags', 'a'));
+console.log(await client.sMembers('tags'));
+`.trim(),
+  zsetExample: () => `
+import { createClient } from '@valkey/glide';
+const client = await createClient({ host: 'localhost', port: 6379 });
+await client.zAdd('lb', [{ score: 10, member: 'alice' }, { score: 20, member: 'bob' }]);
+console.log(await client.zRange('lb', 0, -1, { WITHSCORES: true }));
+await client.zRem('lb', 'alice');
+`.trim(),
+  streamExample: () => `
+import { createClient } from '@valkey/glide';
+const client = await createClient({ host: 'localhost', port: 6379 });
+await client.xGroupCreate('mystream', 'workers', '$', { MKSTREAM: true });
+await client.xAdd('mystream', '*', { f1: 'v1' });
+const res = await client.xReadGroup('workers', 'c1', { COUNT: 1, BLOCK: 1000, STREAMS: { mystream: '>' } });
+if (res) {
+  for (const [stream, entries] of Object.entries(res)) {
+    for (const [id] of entries) {
+      await client.xAck(stream, 'workers', [id]);
+    }
+  }
+}
+`.trim(),
+  transactionExample: () => `
+import { createClient } from '@valkey/glide';
+const client = await createClient({ host: 'localhost', port: 6379 });
+const tx = client.multi();
+tx.set('a', '1');
+tx.incr('a');
+const results = await tx.exec();
+console.log(results);
+`.trim(),
+  pipelineExample: () => `
+import { createClient } from '@valkey/glide';
+const client = await createClient({ host: 'localhost', port: 6379 });
+const pl = client.pipeline();
+pl.set('p1', 'v1');
+pl.get('p1');
+const out = await pl.exec();
+console.log(out);
+`.trim(),
 };
 
 export function registerGeneratorTools(mcp: McpServer) {
@@ -156,6 +202,31 @@ export function registerGeneratorTools(mcp: McpServer) {
     'gen.queueConsumer',
     z.object({ queue: z.string() }).shape,
     async (args) => ({ structuredContent: { code: templates.queueConsumer(args as any) }, content: [{ type: 'text', text: templates.queueConsumer(args as any) }] }) as any,
+  );
+  mcp.tool(
+    'gen.sets',
+    z.object({}).shape,
+    async () => ({ structuredContent: { code: templates.setExample() }, content: [{ type: 'text', text: templates.setExample() }] }) as any,
+  );
+  mcp.tool(
+    'gen.zsets',
+    z.object({}).shape,
+    async () => ({ structuredContent: { code: templates.zsetExample() }, content: [{ type: 'text', text: templates.zsetExample() }] }) as any,
+  );
+  mcp.tool(
+    'gen.streams',
+    z.object({}).shape,
+    async () => ({ structuredContent: { code: templates.streamExample() }, content: [{ type: 'text', text: templates.streamExample() }] }) as any,
+  );
+  mcp.tool(
+    'gen.transaction',
+    z.object({}).shape,
+    async () => ({ structuredContent: { code: templates.transactionExample() }, content: [{ type: 'text', text: templates.transactionExample() }] }) as any,
+  );
+  mcp.tool(
+    'gen.pipeline',
+    z.object({}).shape,
+    async () => ({ structuredContent: { code: templates.pipelineExample() }, content: [{ type: 'text', text: templates.pipelineExample() }] }) as any,
   );
 }
 

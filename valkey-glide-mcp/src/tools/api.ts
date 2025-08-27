@@ -86,5 +86,30 @@ export function registerApiTools(mcp: McpServer) {
       return { structuredContent: { category: args.category, entries }, content: [{ type: "text", text: JSON.stringify(entries, null, 2) }] } as any;
     }
   );
+
+  // Aliases: families
+  mcp.tool(
+    "api.families",
+    z.object({}).shape,
+    async () => {
+      const families = new Set<string>();
+      [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE].forEach((ds) =>
+        ds.entries.forEach((e) => families.add(e.category))
+      );
+      const list = Array.from(families).sort();
+      return { structuredContent: { families: list }, content: [{ type: "text", text: JSON.stringify(list) }] } as any;
+    }
+  );
+  mcp.tool(
+    "api.byFamily",
+    z.object({ family: z.string() }).shape,
+    async (args) => {
+      const fam = args.family.toLowerCase();
+      const entries = [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE]
+        .flatMap((ds) => ds.entries)
+        .filter((e) => e.category.toLowerCase() === fam);
+      return { structuredContent: { family: args.family, entries }, content: [{ type: "text", text: JSON.stringify(entries, null, 2) }] } as any;
+    }
+  );
 }
 

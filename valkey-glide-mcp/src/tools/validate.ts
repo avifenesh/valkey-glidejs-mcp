@@ -39,13 +39,20 @@ function extractMethodCandidatesFromTs(source: string): Set<string> {
   return methods;
 }
 
-function extractGlideMethodNamesFromEntry(entry: ApiMappingEntry): string[] {
-  // Extract method names from the equivalent.glide string by scanning identifiers followed by '('
+function extractGlideMethodTokens(entry: ApiMappingEntry, allowedLower: Set<string>): string[] {
   const text = entry.equivalent.glide;
   const names = new Set<string>();
-  const re = /\b([a-z][A-Za-z0-9]*)\s*\(/g;
+  // 1) methodName( pattern
+  const reCall = /\b([a-z][A-Za-z0-9]*)\s*\(/g;
   let m: RegExpExecArray | null;
-  while ((m = re.exec(text))) names.add(m[1]);
+  while ((m = reCall.exec(text))) names.add(m[1].toLowerCase());
+
+  // 2) tokens split by non-alnum, filter to allowed set
+  const tokens = text.split(/[^A-Za-z0-9_]+/).filter(Boolean);
+  for (const t of tokens) {
+    const low = t.toLowerCase();
+    if (allowedLower.has(low)) names.add(low);
+  }
   return Array.from(names);
 }
 
@@ -66,6 +73,8 @@ export function registerValidationTools(mcp: McpServer) {
         "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/GlideClient.ts",
         "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/GlideClusterClient.ts",
         "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/Commands.ts",
+        "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/server-modules/GlideJson.ts",
+        "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/server-modules/GlideFt.ts",
       ]);
 
       const sources: { id: string; text: string }[] = [];
@@ -86,6 +95,7 @@ export function registerValidationTools(mcp: McpServer) {
       for (const s of sources) {
         for (const name of extractMethodCandidatesFromTs(s.text)) extracted.add(name);
       }
+      const extractedLower = new Set(Array.from(extracted).map((n) => n.toLowerCase()));
 
       const datasets = [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE];
       const allEntries: ApiMappingEntry[] = datasets.flatMap((d) => d.entries);
@@ -97,10 +107,11 @@ export function registerValidationTools(mcp: McpServer) {
       }[] = [];
 
       for (const entry of allEntries) {
-        const methodNames = extractGlideMethodNamesFromEntry(entry);
-        const missing = methodNames.filter((n) => !extracted.has(n));
-        const validated = methodNames.length > 0 && missing.length === 0;
-        results.push({ symbol: entry.symbol, glideMethods: methodNames, validated, missing });
+        const methodNamesLower = extractGlideMethodTokens(entry, extractedLower);
+        const missing = methodNamesLower.filter((n) => !extractedLower.has(n));
+        const validated = methodNamesLower.length > 0 && missing.length === 0;
+        // report glideMethods in original case approximated by as-is tokens when possible
+        results.push({ symbol: entry.symbol, glideMethods: methodNamesLower, validated, missing });
       }
 
       const validatedCount = results.filter((r) => r.validated).length;

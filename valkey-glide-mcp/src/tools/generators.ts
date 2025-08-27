@@ -171,6 +171,44 @@ const client = await createClient({ host: 'localhost', port: 6379 });
 await client.jsonSet('user:1', '$', { name: 'Avi', age: 30 });
 console.log(await client.jsonGet('user:1', '$.name'));
 `.trim(),
+  hashesAdvanced: () => `
+import { createClient } from '@valkey/glide';
+const client = await createClient({ host: 'localhost', port: 6379 });
+await client.hMSet('user:1', { name: 'Avi', age: '30' });
+await client.hIncrBy('user:1', 'age', 1);
+console.log(await client.hGetAll('user:1'));
+`.trim(),
+  listsAdvanced: () => `
+import { createClient } from '@valkey/glide';
+const client = await createClient({ host: 'localhost', port: 6379 });
+await client.rPush('jobs', ['a','b','c']);
+console.log(await client.lRange('jobs', 0, -1));
+await client.lTrim('jobs', 1, -1);
+`.trim(),
+  zsetRankings: () => `
+import { createClient } from '@valkey/glide';
+const client = await createClient({ host: 'localhost', port: 6379 });
+await client.zAdd('lb', [{ score: 100, member: 'alice' }, { score: 120, member: 'bob' }]);
+console.log('rank alice', await client.zRank('lb', 'alice'));
+console.log('top', await client.zRange('lb', -3, -1, { REV: true, WITHSCORES: true }));
+`.trim(),
+  jsonAdvanced: () => `
+import { createClient } from '@valkey/glide';
+const client = await createClient({ host: 'localhost', port: 6379 });
+await client.jsonSet('user:2', '$', { profile: { visits: 1, tags: [] } });
+await client.jsonSet('user:2', '$.profile.tags', ['a','b']);
+console.log(await client.jsonGet('user:2', '$.profile'));
+`.trim(),
+  scanExample: () => `
+import { createClient } from '@valkey/glide';
+const client = await createClient({ host: 'localhost', port: 6379 });
+let cursor = '0';
+do {
+  const res = await client.scan(cursor, { MATCH: 'user:*', COUNT: 100 });
+  cursor = res.cursor;
+  for (const key of res.keys) console.log(key);
+} while (cursor !== '0');
+`.trim(),
   clientAdvanced: () => `
 import { createClient, createCluster } from '@valkey/glide';
 
@@ -299,6 +337,31 @@ export function registerGeneratorTools(mcp: McpServer) {
     'gen.json',
     z.object({}).shape,
     async () => ({ structuredContent: { code: templates.jsonExample() }, content: [{ type: 'text', text: templates.jsonExample() }] }) as any,
+  );
+  mcp.tool(
+    'gen.hashesAdvanced',
+    z.object({}).shape,
+    async () => ({ structuredContent: { code: templates.hashesAdvanced() }, content: [{ type: 'text', text: templates.hashesAdvanced() }] }) as any,
+  );
+  mcp.tool(
+    'gen.listsAdvanced',
+    z.object({}).shape,
+    async () => ({ structuredContent: { code: templates.listsAdvanced() }, content: [{ type: 'text', text: templates.listsAdvanced() }] }) as any,
+  );
+  mcp.tool(
+    'gen.zsetRankings',
+    z.object({}).shape,
+    async () => ({ structuredContent: { code: templates.zsetRankings() }, content: [{ type: 'text', text: templates.zsetRankings() }] }) as any,
+  );
+  mcp.tool(
+    'gen.jsonAdvanced',
+    z.object({}).shape,
+    async () => ({ structuredContent: { code: templates.jsonAdvanced() }, content: [{ type: 'text', text: templates.jsonAdvanced() }] }) as any,
+  );
+  mcp.tool(
+    'gen.scan',
+    z.object({}).shape,
+    async () => ({ structuredContent: { code: templates.scanExample() }, content: [{ type: 'text', text: templates.scanExample() }] }) as any,
   );
   mcp.tool(
     'gen.clientAdvanced',

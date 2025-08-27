@@ -48,6 +48,11 @@ The server uses stdio transport and registers tools on startup.
 - gen.hll {}
 - gen.json {}
 - gen.clientAdvanced {}
+- gen.hashesAdvanced {}
+- gen.listsAdvanced {}
+- gen.zsetRankings {}
+- gen.jsonAdvanced {}
+- gen.scan {}
 - gen.fastify {}
 - gen.rateLimiter { key, points, duration }
 - verify.static { code }

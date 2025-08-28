@@ -9,7 +9,7 @@ function naiveTransform(source: string, from: "ioredis" | "node-redis") {
   if (from === "ioredis") {
     code = code.replace(
       /import\s+Redis\s+from\s+['"]ioredis['"];?/g,
-      "import { createClient } from '@valkey/glide';",
+      "import { createClient } from '@valkey/valkey-glide';",
     );
     code = code.replace(/new\s+Redis\s*\(([^)]*)\)/g, "await createClient($1)");
     code = code.replace(
@@ -17,7 +17,7 @@ function naiveTransform(source: string, from: "ioredis" | "node-redis") {
       "await createCluster($1)",
     );
   } else {
-    code = code.replace(/from\s+['"]redis['"]/g, "from '@valkey/glide'");
+    code = code.replace(/from\s+['"]redis['"]/g, "from '@valkey/valkey-glide'");
     code = code.replace(/createClient\s*\(/g, "createClient(");
   }
   return code;

@@ -6,8 +6,8 @@ function staticChecks(code: string) {
     warnings: [],
     errors: [],
   };
-  if (!code.includes("@valkey/glide")) {
-    result.warnings.push("Code does not import '@valkey/glide'.");
+  if (!code.includes("@valkey/valkey-glide")) {
+    result.warnings.push("Code does not import '@valkey/valkey-glide'.");
   }
   if (/new\s+Redis\s*\(/.test(code)) {
     result.errors.push(

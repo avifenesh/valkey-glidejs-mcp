@@ -11,7 +11,7 @@ import { registerDataTools } from "./tools/data.js";
 import { registerValidationTools } from "./tools/validate.js";
 import { registerCommandsTools } from "./tools/commands.js";
 
-const mcp = new McpServer({ name: "valkey-glide-mcp", version: "0.1.0" });
+const mcp = new McpServer({ name: "valkey-glidejs-mcp", version: "0.1.0" });
 
 registerHealthTool(mcp);
 registerDocsTools(mcp);

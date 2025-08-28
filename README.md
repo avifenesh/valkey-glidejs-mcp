@@ -1,7 +1,7 @@
 # valkey-glidejs-mcp
 
-[![npm version](https://badge.fury.io/js/valkey-glide-mcp.svg)](https://badge.fury.io/js/valkey-glide-mcp)
-[![Node.js CI](https://github.com/avifenesh/valkey-glide-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/avifenesh/valkey-glide-mcp/actions/workflows/ci.yml)
+[![npm version](https://badge.fury.io/js/valkey-glidejs-mcp.svg)](https://badge.fury.io/js/valkey-glidejs-mcp)
+[![Node.js CI](https://github.com/avifenesh/valkey-glidejs-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/avifenesh/valkey-glidejs-mcp/actions/workflows/ci.yml)
 
 A Model Context Protocol (MCP) knowledge server for Valkey GLIDE, providing code generation assistance and migration guidance for building applications with the high-performance GLIDE client.
 
@@ -22,7 +22,7 @@ This repository contains the MCP server implementation that helps AI assistants 
 ### Installation
 
 ```bash
-npm install -g valkey-glide-mcp
+npm install -g valkey-glidejs-mcp
 ```
 
 ### Usage
@@ -33,7 +33,7 @@ Add to your MCP client configuration:
 {
   "mcpServers": {
     "valkey-glide": {
-      "command": "valkey-glide-mcp",
+      "command": "valkey-glidejs-mcp",
       "args": []
     }
   }
@@ -42,14 +42,14 @@ Add to your MCP client configuration:
 
 ## Documentation
 
-For detailed documentation, API reference, and examples, see the [package README](./valkey-glide-mcp/README.md).
+For detailed documentation, API reference, and examples, see the [package README](./valkey-glidejs-mcp/README.md).
 
 ## Development
 
-The main package is located in the `valkey-glide-mcp/` directory:
+The main package is located in the `valkey-glidejs-mcp/` directory:
 
 ```bash
-cd valkey-glide-mcp
+cd valkey-glidejs-mcp
 npm install
 npm run dev
 ```

@@ -9,16 +9,18 @@ function naiveTransform(source: string, from: "ioredis" | "node-redis") {
   if (from === "ioredis") {
     code = code.replace(
       /import\s+Redis\s+from\s+['"]ioredis['"];?/g,
-      "import { createClient } from '@valkey/valkey-glide';",
+      "import { GlideClient } from '@valkey/valkey-glide';",
     );
-    code = code.replace(/new\s+Redis\s*\(([^)]*)\)/g, "await createClient($1)");
+    code = code.replace(/new\s+Redis\s*\(([^)]*)\)/g, "await GlideClient.createClient({ addresses: [{ host: 'localhost', port: 6379 }] })");
     code = code.replace(
       /new\s+Redis\.Cluster\s*\(([^)]*)\)/g,
-      "await createCluster($1)",
+      "await GlideClusterClient.createClient({ addresses: [] })",
     );
   } else {
     code = code.replace(/from\s+['"]redis['"]/g, "from '@valkey/valkey-glide'");
-    code = code.replace(/createClient\s*\(/g, "createClient(");
+    code = code.replace(/import\s*{\s*createClient\s*}\s*from/g, "import { GlideClient } from");
+    code = code.replace(/createClient\s*\(/g, "GlideClient.createClient(");
+    code = code.replace(/client\.connect\(\);?/g, "// Connection is automatic in GLIDE");
   }
   return code;
 }

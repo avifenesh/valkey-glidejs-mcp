@@ -116,11 +116,10 @@ The server uses stdio transport and registers tools on startup.
 ### 1. Create a Basic Client
 
 ```typescript
-import { createClient } from "@valkey/glide";
+import { GlideClient } from "@valkey/valkey-glide";
 
-const client = await createClient({
-  host: "localhost",
-  port: 6379,
+const client = await GlideClient.createClient({
+  addresses: [{ host: "localhost", port: 6379 }],
 });
 
 // Use the client
@@ -132,10 +131,14 @@ console.log(value); // 'value'
 ### 2. Pub/Sub with Dedicated Connections
 
 ```typescript
-import { createClient } from "@valkey/glide";
+import { GlideClient } from "@valkey/valkey-glide";
 
-const publisher = await createClient({ host: "localhost", port: 6379 });
-const subscriber = await createClient({ host: "localhost", port: 6379 });
+const publisher = await GlideClient.createClient({
+  addresses: [{ host: "localhost", port: 6379 }],
+});
+const subscriber = await GlideClient.createClient({
+  addresses: [{ host: "localhost", port: 6379 }],
+});
 
 // Subscribe to messages
 (async () => {

@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+*.tgz
+
+# Build outputs
+dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Testing
+coverage/
+test-results/
+test-results.txt
+*.tmp
+
+# Generated files (for development only)
+api-coverage-report.json
+behavior-differences.json
+glide-api-inventory.json
+
+# Validation artifacts
+test/validate-*.ts
+test-compile.ts
+
+# Development/temporary files
+*.bak
+*.orig
+*~

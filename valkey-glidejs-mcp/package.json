@@ -54,6 +54,6 @@
     "@valkey/valkey-glide": "^2.0.1",
     "prettier": "^3.3.3",
     "tsx": "^4.19.2",
-    "typescript": "^5.6.3"
+    "typescript": "^5.9.2"
   }
 }

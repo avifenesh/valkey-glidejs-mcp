@@ -213,15 +213,29 @@ ${code}
   fs.writeFileSync(testFile, testCode);
 
   try {
-    // Use the project's tsconfig but exclude test files
-    execSync(`npx tsc ${testFile} --noEmit --skipLibCheck`, {
+    // Use the project's typescript directly to avoid npm warnings
+    const tscPath = path.join(__dirname, '..', 'node_modules', '.bin', 'tsc');
+    execSync(`${tscPath} ${testFile} --noEmit --skipLibCheck --moduleResolution node --allowImportingTsExtensions false`, {
       stdio: 'pipe',
       cwd: path.join(__dirname, '..')
     });
     return true;
   } catch (error: any) {
-    const errorMsg = error.stderr?.toString() || error.stdout?.toString() || error.message;
-    log(`  Compilation error: ${errorMsg.slice(0, 200)}...`, 'red');
+    let errorMsg = error.stderr?.toString() || error.stdout?.toString() || error.message;
+    
+    // Filter out npm warnings to see actual TypeScript errors
+    const lines = errorMsg.split('\n');
+    const filteredLines = lines.filter(line => 
+      !line.includes('npm warn') && 
+      !line.includes('always-auth') &&
+      line.trim().length > 0
+    );
+    
+    if (filteredLines.length > 0) {
+      log(`  Compilation error: ${filteredLines.join('\n').slice(0, 300)}...`, 'red');
+    } else {
+      log(`  Compilation error: Unknown TypeScript error`, 'red');
+    }
     return false;
   }
 }

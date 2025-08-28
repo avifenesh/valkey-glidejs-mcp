@@ -1,4 +1,4 @@
-# valkey-glide-mcp
+# valkey-glidejs-mcp
 
 [![npm version](https://badge.fury.io/js/valkey-glide-mcp.svg)](https://badge.fury.io/js/valkey-glide-mcp)
 [![Node.js CI](https://github.com/avifenesh/valkey-glide-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/avifenesh/valkey-glide-mcp/actions/workflows/ci.yml)

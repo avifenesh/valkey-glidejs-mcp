@@ -1,4 +1,4 @@
-# VGLIDE-JS-MCP
+# valkey-glide-mcp
 
 A Model Context Protocol (MCP) knowledge server for Valkey GLIDE, providing code generation assistance and migration guidance for building applications with the high-performance GLIDE client.
 

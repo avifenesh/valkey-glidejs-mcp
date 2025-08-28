@@ -1,0 +1,39 @@
+# Testing and validation
+examples-validation/
+
+# Development files
+*.ts
+tsconfig.json
+.prettierignore
+
+# Test files
+test/
+*.test.*
+
+# Memory bank (development documentation)
+memory-bank/
+
+# Scripts (not needed for runtime)
+scripts/
+
+# Source maps
+*.map
+
+# Git
+.git
+.gitignore
+
+# CI/CD
+.github/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor directories
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db

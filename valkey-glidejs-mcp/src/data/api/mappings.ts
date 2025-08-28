@@ -160,11 +160,11 @@ export const IOREDIS_DATASET: ApiDataset = {
     {
       category: "zsets",
       symbol: "zadd(key, score, member)",
-      equivalent: { glide: "zadd(key, [{ score, member }])" },
+      equivalent: { glide: "zadd(key, { member: score })" },
       description: "Add a member with score to a sorted set.",
       examples: {
         source: `await redis.zadd('lb', 10, 'alice');`,
-        glide: `await client.zadd('lb', [{ score: 10, member: 'alice' }]);`,
+        glide: `await client.zadd('lb', { 'alice': 10 });`,
       },
     },
     {
@@ -184,11 +184,11 @@ export const IOREDIS_DATASET: ApiDataset = {
     {
       category: "streams",
       symbol: "xadd(key, id, field value ...)",
-      equivalent: { glide: "xAdd(key, id, map)" },
+      equivalent: { glide: "xadd(key, [id, entries])" },
       description: "Append an entry to a stream.",
       examples: {
         source: `await redis.xadd('mystream', '*', 'f1', 'v1');`,
-        glide: `await client.xAdd('mystream', '*', { f1: 'v1' });`,
+        glide: `await client.xadd('mystream', [['f1', 'v1']]);`,
       },
     },
     {
@@ -229,11 +229,11 @@ export const IOREDIS_DATASET: ApiDataset = {
     {
       category: "geo",
       symbol: "geoadd(key, longitude, latitude, member)",
-      equivalent: { glide: "geoadd(key, [{ longitude, latitude, member }])" },
+      equivalent: { glide: "geoadd(key, { member: {longitude, latitude} })" },
       description: "Add geospatial items.",
       examples: {
         source: `await redis.geoadd('places', 13.361389, 38.115556, 'Palermo');`,
-        glide: `await client.geoadd('places', [{ longitude: 13.361389, latitude: 38.115556, member: 'Palermo' }]);`,
+        glide: `await client.geoadd('places', { 'Palermo': { longitude: 13.361389, latitude: 38.115556 } });`,
       },
     },
     {

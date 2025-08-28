@@ -135,3 +135,8 @@ COMMANDS_BY_FAMILY.json
 COMMANDS_INDEX.json
 validation/
 memory-bank/
+
+# Examples validation generated files
+valkey-glidejs-mcp/examples-validation/validation-output.txt
+valkey-glidejs-mcp/examples-validation/api-mappings-validation-report.json
+valkey-glidejs-mcp/examples-validation/extracted-examples.json

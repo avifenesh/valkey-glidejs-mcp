@@ -127,3 +127,10 @@ lib/
 
 # MCP specific
 mcp-server.log
+
+# Generated validation and command artifacts
+VALIDATION_REPORT.json
+VALIDATION_REPORT.md
+COMMANDS_BY_FAMILY.json
+COMMANDS_INDEX.json
+validation/

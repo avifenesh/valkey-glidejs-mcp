@@ -1,7 +1,12 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { promises as fs } from "node:fs";
-import { IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE, ApiMappingEntry } from "../data/api/mappings.js";
+import {
+  IOREDIS_DATASET,
+  NODE_REDIS_DATASET,
+  GLIDE_SURFACE,
+  ApiMappingEntry,
+} from "../data/api/mappings.js";
 
 function extractMethodCandidatesFromTs(source: string): Set<string> {
   const methods = new Set<string>();
@@ -39,7 +44,10 @@ function extractMethodCandidatesFromTs(source: string): Set<string> {
   return methods;
 }
 
-function extractGlideMethodTokens(entry: ApiMappingEntry, allowedLower: Set<string>): string[] {
+function extractGlideMethodTokens(
+  entry: ApiMappingEntry,
+  allowedLower: Set<string>,
+): string[] {
   const text = entry.equivalent.glide;
   const names = new Set<string>();
   // 1) methodName( pattern
@@ -59,15 +67,15 @@ function extractGlideMethodTokens(entry: ApiMappingEntry, allowedLower: Set<stri
 export function registerValidationTools(mcp: McpServer) {
   mcp.tool(
     "validate.glideSurface",
-    z
-      .object({
-        urls: z.array(z.string().url()).optional(),
-        sources: z.array(z.object({ id: z.string(), text: z.string() })).optional(),
-        writeReport: z.boolean().optional().default(true),
-      })
-      .shape,
+    z.object({
+      urls: z.array(z.string().url()).optional(),
+      sources: z
+        .array(z.object({ id: z.string(), text: z.string() }))
+        .optional(),
+      writeReport: z.boolean().optional().default(true),
+    }).shape,
     async (args) => {
-      const defaultUrls = (args.urls ?? [
+      const defaultUrls = args.urls ?? [
         "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/index.ts",
         "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/BaseClient.ts",
         "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/GlideClient.ts",
@@ -75,7 +83,7 @@ export function registerValidationTools(mcp: McpServer) {
         "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/Commands.ts",
         "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/server-modules/GlideJson.ts",
         "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/server-modules/GlideFt.ts",
-      ]);
+      ];
 
       const sources: { id: string; text: string }[] = [];
       if (args.sources && args.sources.length) {
@@ -93,9 +101,12 @@ export function registerValidationTools(mcp: McpServer) {
 
       const extracted = new Set<string>();
       for (const s of sources) {
-        for (const name of extractMethodCandidatesFromTs(s.text)) extracted.add(name);
+        for (const name of extractMethodCandidatesFromTs(s.text))
+          extracted.add(name);
       }
-      const extractedLower = new Set(Array.from(extracted).map((n) => n.toLowerCase()));
+      const extractedLower = new Set(
+        Array.from(extracted).map((n) => n.toLowerCase()),
+      );
 
       const datasets = [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE];
       const allEntries: ApiMappingEntry[] = datasets.flatMap((d) => d.entries);
@@ -107,11 +118,19 @@ export function registerValidationTools(mcp: McpServer) {
       }[] = [];
 
       for (const entry of allEntries) {
-        const methodNamesLower = extractGlideMethodTokens(entry, extractedLower);
+        const methodNamesLower = extractGlideMethodTokens(
+          entry,
+          extractedLower,
+        );
         const missing = methodNamesLower.filter((n) => !extractedLower.has(n));
         const validated = methodNamesLower.length > 0 && missing.length === 0;
         // report glideMethods in original case approximated by as-is tokens when possible
-        results.push({ symbol: entry.symbol, glideMethods: methodNamesLower, validated, missing });
+        results.push({
+          symbol: entry.symbol,
+          glideMethods: methodNamesLower,
+          validated,
+          missing,
+        });
       }
 
       const validatedCount = results.filter((r) => r.validated).length;
@@ -133,9 +152,9 @@ export function registerValidationTools(mcp: McpServer) {
               results,
             },
             null,
-            2
+            2,
           ),
-          "utf8"
+          "utf8",
         );
         const md = [
           `# Glide API Validation Report`,
@@ -145,13 +164,18 @@ export function registerValidationTools(mcp: McpServer) {
           ``,
           `## Missing/Unvalidated Entries`,
           ``,
-          ...unvalidated.slice(0, 500).map((r) => `- ${r.symbol} -> ${r.glideMethods.join(", ")} (missing: ${r.missing.join(", ") || "-"})`),
+          ...unvalidated
+            .slice(0, 500)
+            .map(
+              (r) =>
+                `- ${r.symbol} -> ${r.glideMethods.join(", ")} (missing: ${r.missing.join(", ") || "-"})`,
+            ),
         ].join("\n");
         await fs.writeFile(reportMdPath, md, "utf8");
         await fs.writeFile(
           validatedListPath,
           JSON.stringify({ methods: Array.from(extracted) }, null, 2),
-          "utf8"
+          "utf8",
         );
       }
 
@@ -163,10 +187,12 @@ export function registerValidationTools(mcp: McpServer) {
           results,
         },
         content: [
-          { type: "text", text: `validated ${validatedCount}/${results.length} entries; extracted ${extracted.size} methods` },
+          {
+            type: "text",
+            text: `validated ${validatedCount}/${results.length} entries; extracted ${extracted.size} methods`,
+          },
         ],
       } as any;
-    }
+    },
   );
 }
-

@@ -7,7 +7,10 @@ test("api.findEquivalent returns mapping for get", async () => {
   const mcp = new McpServer({ name: "test", version: "0.0.0" });
   registerApiTools(mcp);
   const tool = (mcp as any)._registeredTools?.["api.findEquivalent"];
-  const res = await tool.callback({ source: "ioredis", symbol: "get" } as any, {} as any);
+  const res = await tool.callback(
+    { source: "ioredis", symbol: "get" } as any,
+    {} as any,
+  );
   assert.ok(res.structuredContent.results.length >= 1);
 });
 

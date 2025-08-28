@@ -240,7 +240,8 @@ function extractWikiCommandsMarkdown(md: string): string[] {
       lc.includes("not needed") ||
       lc === "cmd type" ||
       /^-+$/.test(cmdRaw)
-    ) continue;
+    )
+      continue;
     // Normalize to upper snake-ish without extra spaces
     const normalized = cmdRaw.replace(/\s+/g, " ").trim().toUpperCase();
     commands.push(normalized);
@@ -251,9 +252,16 @@ function extractWikiCommandsMarkdown(md: string): string[] {
 function extractPublicMethods(ts: string, owner: string): ParsedMethod[] {
   const lines = ts.split(/\n/);
   const out: ParsedMethod[] = [];
-  const res = ts.matchAll(/(?:public\s+)?(?:static\s+)?async\s+([a-zA-Z0-9_]+)\s*\(([^)]*)\)\s*:\s*Promise<([^>]+)>/g);
+  const res = ts.matchAll(
+    /(?:public\s+)?(?:static\s+)?async\s+([a-zA-Z0-9_]+)\s*\(([^)]*)\)\s*:\s*Promise<([^>]+)>/g,
+  );
   for (const m of res) {
-    out.push({ name: String(m[1]), paramsSignature: String(m[2]).trim(), returnType: String(m[3]).trim(), owner });
+    out.push({
+      name: String(m[1]),
+      paramsSignature: String(m[2]).trim(),
+      returnType: String(m[3]).trim(),
+      owner,
+    });
   }
   return out;
 }
@@ -266,23 +274,33 @@ function pickFamily(command: string): string {
 export function registerCommandsTools(mcp: McpServer) {
   mcp.tool(
     "commands.ingest",
-    z
-      .object({
-        start: z.number().int().min(0).default(0),
-        count: z.number().int().min(1).max(20).default(10),
-        refresh: z.boolean().optional(),
-        sources: z
-          .object({ md: z.string().optional(), tsBase: z.string().optional(), tsClient: z.string().optional(), tsCluster: z.string().optional(), tsJson: z.string().optional() })
-          .optional(),
-      })
-      .shape,
+    z.object({
+      start: z.number().int().min(0).default(0),
+      count: z.number().int().min(1).max(20).default(10),
+      refresh: z.boolean().optional(),
+      sources: z
+        .object({
+          md: z.string().optional(),
+          tsBase: z.string().optional(),
+          tsClient: z.string().optional(),
+          tsCluster: z.string().optional(),
+          tsJson: z.string().optional(),
+        })
+        .optional(),
+    }).shape,
     async (args) => {
-      const mdUrl = "https://raw.githubusercontent.com/wiki/valkey-io/valkey-glide/ValKey-Commands-Implementation-Progress.md";
-      const htmlUrl = "https://github.com/valkey-io/valkey-glide/wiki/ValKey-Commands-Implementation-Progress";
-      const baseClientUrl = "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/BaseClient.ts";
-      const glideClientUrl = "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/GlideClient.ts";
-      const glideClusterUrl = "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/GlideClusterClient.ts";
-      const glideJsonUrl = "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/server-modules/GlideJson.ts";
+      const mdUrl =
+        "https://raw.githubusercontent.com/wiki/valkey-io/valkey-glide/ValKey-Commands-Implementation-Progress.md";
+      const htmlUrl =
+        "https://github.com/valkey-io/valkey-glide/wiki/ValKey-Commands-Implementation-Progress";
+      const baseClientUrl =
+        "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/BaseClient.ts";
+      const glideClientUrl =
+        "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/GlideClient.ts";
+      const glideClusterUrl =
+        "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/GlideClusterClient.ts";
+      const glideJsonUrl =
+        "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/server-modules/GlideJson.ts";
 
       const md = args.sources?.md ?? (await fetchText(mdUrl));
       const wikiCommands = extractWikiCommandsMarkdown(md).sort();
@@ -303,16 +321,24 @@ export function registerCommandsTools(mcp: McpServer) {
         ...extractPublicMethods(tsCluster, "GlideClusterClient"),
         ...extractPublicMethods(tsJson, "GlideJson"),
       ];
-      const nameToMethod = new Map(methods.map((m) => [m.name.toLowerCase(), m]));
+      const nameToMethod = new Map(
+        methods.map((m) => [m.name.toLowerCase(), m]),
+      );
 
       const slice = wikiCommands.slice(args.start, args.start + args.count);
       const enriched: CommandEntry[] = slice.map((cmd) => {
         const methodName = mapCommandToMethod(cmd);
-        const m = methodName ? nameToMethod.get(methodName.toLowerCase()) : undefined;
+        const m = methodName
+          ? nameToMethod.get(methodName.toLowerCase())
+          : undefined;
         return {
           command: cmd,
           family: pickFamily(cmd),
-          method: m ? (m.owner && m.owner !== "BaseClient" ? `${m.owner}.${m.name}` : m.name) : null,
+          method: m
+            ? m.owner && m.owner !== "BaseClient"
+              ? `${m.owner}.${m.name}`
+              : m.name
+            : null,
           owner: m ? m.owner : null,
           paramsSignature: m ? m.paramsSignature : null,
           returnType: m ? m.returnType : null,
@@ -335,7 +361,11 @@ export function registerCommandsTools(mcp: McpServer) {
       const byCommand = new Map<string, CommandEntry>();
       for (const e of existing.entries) byCommand.set(e.command, e);
       for (const e of enriched) byCommand.set(e.command, e);
-      const merged = { entries: Array.from(byCommand.values()).sort((a, b) => a.command.localeCompare(b.command)) };
+      const merged = {
+        entries: Array.from(byCommand.values()).sort((a, b) =>
+          a.command.localeCompare(b.command),
+        ),
+      };
       await fs.writeFile(outPath, JSON.stringify(merged, null, 2), "utf8");
 
       // Group by family for assistant-friendly listing
@@ -343,37 +373,58 @@ export function registerCommandsTools(mcp: McpServer) {
       for (const e of merged.entries) {
         (byFamily[e.family] ??= []).push(e);
       }
-      await fs.writeFile(`${outDir}/COMMANDS_BY_FAMILY.json`, JSON.stringify(byFamily, null, 2), "utf8");
+      await fs.writeFile(
+        `${outDir}/COMMANDS_BY_FAMILY.json`,
+        JSON.stringify(byFamily, null, 2),
+        "utf8",
+      );
 
       return {
-        structuredContent: { total: wikiCommands.length, processed: enriched.length, start: args.start, count: args.count, validated: enriched.filter((e) => e.validated).length },
-        content: [{ type: "text", text: `Processed ${args.count} commands starting at ${args.start}. Validated ${enriched.filter((e) => e.validated).length}/${enriched.length}. Written COMMANDS_INDEX.json.` }],
+        structuredContent: {
+          total: wikiCommands.length,
+          processed: enriched.length,
+          start: args.start,
+          count: args.count,
+          validated: enriched.filter((e) => e.validated).length,
+        },
+        content: [
+          {
+            type: "text",
+            text: `Processed ${args.count} commands starting at ${args.start}. Validated ${enriched.filter((e) => e.validated).length}/${enriched.length}. Written COMMANDS_INDEX.json.`,
+          },
+        ],
       } as any;
-    }
+    },
   );
 
-  mcp.tool(
-    "commands.listFamilies",
-    z.object({}).shape,
-    async () => {
-      const outDir = new URL("../../..", import.meta.url).pathname;
-      const raw = await fs.readFile(`${outDir}/COMMANDS_BY_FAMILY.json`, "utf8");
-      const data = JSON.parse(raw) as Record<string, CommandEntry[]>;
-      const families = Object.keys(data).sort();
-      return { structuredContent: { families }, content: [{ type: "text", text: JSON.stringify(families) }] } as any;
-    }
-  );
+  mcp.tool("commands.listFamilies", z.object({}).shape, async () => {
+    const outDir = new URL("../../..", import.meta.url).pathname;
+    const raw = await fs.readFile(`${outDir}/COMMANDS_BY_FAMILY.json`, "utf8");
+    const data = JSON.parse(raw) as Record<string, CommandEntry[]>;
+    const families = Object.keys(data).sort();
+    return {
+      structuredContent: { families },
+      content: [{ type: "text", text: JSON.stringify(families) }],
+    } as any;
+  });
 
   mcp.tool(
     "commands.getByFamily",
     z.object({ family: z.string() }).shape,
     async (args) => {
       const outDir = new URL("../../..", import.meta.url).pathname;
-      const raw = await fs.readFile(`${outDir}/COMMANDS_BY_FAMILY.json`, "utf8");
+      const raw = await fs.readFile(
+        `${outDir}/COMMANDS_BY_FAMILY.json`,
+        "utf8",
+      );
       const data = JSON.parse(raw) as Record<string, CommandEntry[]>;
       const entries = data[args.family] ?? [];
-      return { structuredContent: { family: args.family, entries }, content: [{ type: "text", text: JSON.stringify(entries.slice(0, 20), null, 2) }] } as any;
-    }
+      return {
+        structuredContent: { family: args.family, entries },
+        content: [
+          { type: "text", text: JSON.stringify(entries.slice(0, 20), null, 2) },
+        ],
+      } as any;
+    },
   );
 }
-

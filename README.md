@@ -1,10 +1,13 @@
 # valkey-glide-mcp
 
+[![npm version](https://badge.fury.io/js/valkey-glide-mcp.svg)](https://badge.fury.io/js/valkey-glide-mcp)
+[![Node.js CI](https://github.com/avifenesh/valkey-glide-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/avifenesh/valkey-glide-mcp/actions/workflows/ci.yml)
+
 A Model Context Protocol (MCP) knowledge server for Valkey GLIDE, providing code generation assistance and migration guidance for building applications with the high-performance GLIDE client.
 
 ## Overview
 
-This MCP knowledge server helps AI assistants generate code and provide migration guidance for Valkey GLIDE applications. Whether you're migrating from other Redis/Valkey clients or building new applications from scratch, this server provides expert knowledge about GLIDE APIs, best practices, and code patterns through the MCP protocol.
+This repository contains the MCP server implementation that helps AI assistants generate code and provide migration guidance for Valkey GLIDE applications. Whether you're migrating from other Redis/Valkey clients or building new applications from scratch, this server provides expert knowledge about GLIDE APIs, best practices, and code patterns through the MCP protocol.
 
 ## Features
 
@@ -14,32 +17,46 @@ This MCP knowledge server helps AI assistants generate code and provide migratio
 - **API Knowledge**: Complete knowledge of GLIDE APIs, methods, and configuration options
 - **MCP Integration**: Seamless integration with AI assistants via Model Context Protocol
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js (version 16 or higher)
-- MCP-compatible AI assistant (Claude Desktop, etc.)
+## Quick Start
 
 ### Installation
 
 ```bash
-npm install
+npm install -g valkey-glide-mcp
 ```
 
 ### Usage
 
-1. Start the MCP knowledge server
-2. Connect it to your AI assistant
-3. Ask for help with:
-   - Generating GLIDE client code
-   - Migrating from other Redis clients
-   - GLIDE best practices and patterns
-   - API usage examples and documentation
+Add to your MCP client configuration:
+
+```json
+{
+  "mcpServers": {
+    "valkey-glide": {
+      "command": "valkey-glide-mcp",
+      "args": []
+    }
+  }
+}
+```
+
+## Documentation
+
+For detailed documentation, API reference, and examples, see the [package README](./valkey-glide-mcp/README.md).
 
 ## Development
 
-This project is in active development. Contributions and feedback are welcome!
+The main package is located in the `valkey-glide-mcp/` directory:
+
+```bash
+cd valkey-glide-mcp
+npm install
+npm run dev
+```
+
+## Contributing
+
+Contributions and feedback are welcome! Please feel free to submit issues and pull requests.
 
 ## License
 

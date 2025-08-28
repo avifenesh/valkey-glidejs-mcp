@@ -46,6 +46,16 @@ const SOURCES = [
   { id: "ioredis-repo", url: "https://github.com/redis/ioredis/tree/main/lib", kind: "repo" },
   { id: "node-redis-api", url: "https://redis.js.org/#node-redis-packages", kind: "docs" },
   { id: "node-redis-repo", url: "https://github.com/redis/node-redis/tree/master/packages", kind: "repo" },
+  {
+    id: "wiki-migration-ioredis",
+    url: "https://github.com/valkey-io/valkey-glide/wiki/Migration-Guide-ioredis",
+    kind: "wiki",
+  },
+  {
+    id: "wiki-general-concepts",
+    url: "https://github.com/valkey-io/valkey-glide/wiki/General-Concepts",
+    kind: "wiki",
+  },
 ];
 
 export function registerDocsTools(mcp: McpServer) {
@@ -82,15 +92,26 @@ export function registerDocsTools(mcp: McpServer) {
     }
   );
 
+  // Simple in-memory cache for fetched docs
+  const CACHE = new Map<string, string>();
+
   // Fetch content of a URL (uses global fetch in Node >=18)
   mcp.tool(
     "docs.fetch",
-    z.object({ url: z.string().url() }).shape,
+    z.object({ url: z.string().url(), refresh: z.boolean().optional() }).shape,
     async (args) => {
+      if (!args.refresh && CACHE.has(args.url)) {
+        const cached = CACHE.get(args.url)!;
+        return {
+          structuredContent: { url: args.url, length: cached.length, cached: true },
+          content: [{ type: "text", text: cached.slice(0, 20000) }],
+        } as any;
+      }
       const res = await fetch(args.url);
       const text = await res.text();
+      CACHE.set(args.url, text);
       return {
-        structuredContent: { url: args.url, length: text.length },
+        structuredContent: { url: args.url, length: text.length, cached: false },
         content: [{ type: "text", text: text.slice(0, 20000) }],
       } as any;
     }

@@ -3,34 +3,34 @@ import assert from "node:assert/strict";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { registerGeneratorTools } from "../src/tools/generators.js";
 
-test("gen.sets contains sAdd and sIsMember", async () => {
+test("gen.sets contains sadd and sismember", async () => {
   const mcp = new McpServer({ name: "test", version: "0.0.0" });
   registerGeneratorTools(mcp);
   const tool = (mcp as any)._registeredTools?.["gen.sets"];
   const res = await tool.callback({} as any, {} as any);
   const code = res.structuredContent.code as string;
-  assert.ok(code.includes("sAdd"));
-  assert.ok(code.includes("sIsMember"));
+  assert.ok(code.includes("sadd"));
+  assert.ok(code.includes("sismember"));
 });
 
-test("gen.zsets contains zAdd and zRange", async () => {
+test("gen.zsets contains zadd and zrange", async () => {
   const mcp = new McpServer({ name: "test", version: "0.0.0" });
   registerGeneratorTools(mcp);
   const tool = (mcp as any)._registeredTools?.["gen.zsets"];
   const res = await tool.callback({} as any, {} as any);
   const code = res.structuredContent.code as string;
-  assert.ok(code.includes("zAdd"));
-  assert.ok(code.includes("zRange"));
+  assert.ok(code.includes("zadd"));
+  assert.ok(code.includes("zrange"));
 });
 
-test("gen.streams contains xGroupCreate and xAdd", async () => {
+test("gen.streams contains xgroupCreate and xadd", async () => {
   const mcp = new McpServer({ name: "test", version: "0.0.0" });
   registerGeneratorTools(mcp);
   const tool = (mcp as any)._registeredTools?.["gen.streams"];
   const res = await tool.callback({} as any, {} as any);
   const code = res.structuredContent.code as string;
-  assert.ok(code.includes("xGroupCreate"));
-  assert.ok(code.includes("xAdd"));
+  assert.ok(code.includes("xgroupCreate"));
+  assert.ok(code.includes("xadd"));
 });
 
 test("gen.transaction and gen.pipeline return code", async () => {
@@ -40,6 +40,6 @@ test("gen.transaction and gen.pipeline return code", async () => {
   const pl = (mcp as any)._registeredTools?.["gen.pipeline"];
   const resTx = await tx.callback({} as any, {} as any);
   const resPl = await pl.callback({} as any, {} as any);
-  assert.match(resTx.structuredContent.code, /multi/);
-  assert.match(resPl.structuredContent.code, /pipeline/);
+  assert.match(resTx.structuredContent.code, /Transaction/);
+  assert.match(resPl.structuredContent.code, /Transaction/);
 });

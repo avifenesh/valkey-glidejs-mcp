@@ -12,5 +12,5 @@ test("migrate.naive transforms ioredis import", async () => {
     { from: "ioredis", code: src } as any,
     {} as any,
   );
-  assert.match(res.structuredContent.transformed, /@valkey\/glide/);
+  assert.match(res.structuredContent.transformed, /@valkey\/valkey-glide/);
 });

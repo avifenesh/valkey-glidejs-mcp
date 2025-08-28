@@ -11,12 +11,12 @@ test("gen.clientBasic returns code with createClient", async () => {
   assert.match(res.structuredContent.code, /createClient/);
 });
 
-test("gen.clientCluster returns code with createCluster", async () => {
+test("gen.clientCluster returns code with GlideClusterClient", async () => {
   const mcp = new McpServer({ name: "test", version: "0.0.0" });
   registerGeneratorTools(mcp);
   const tool = (mcp as any)._registeredTools?.["gen.clientCluster"];
   const res = await tool.callback({} as any, {} as any);
-  assert.match(res.structuredContent.code, /createCluster/);
+  assert.match(res.structuredContent.code, /GlideClusterClient/);
 });
 
 test("gen.pubsubAdvanced uses dedicated clients and subscribe iterator", async () => {

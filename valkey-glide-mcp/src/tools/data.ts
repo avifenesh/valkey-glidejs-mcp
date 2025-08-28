@@ -87,7 +87,7 @@ export function registerDataTools(mcp: McpServer) {
 
       const results: Record<string, { sections: EnrichedSection[]; length: number }> = {};
       for (const src of sources) {
-        const html = src.html ?? (await (await fetch(src.url)).text());
+        const html = (src as any).html ?? (await (await fetch(src.url)).text());
         const sections = extractSectionsFromHtml(html);
         results[src.id] = { sections, length: html.length };
       }

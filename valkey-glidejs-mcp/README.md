@@ -1,7 +1,7 @@
-# Valkey Glide MCP
+# Valkey GLIDE JavaScript MCP
 
-[![npm version](https://badge.fury.io/js/valkey-glide-mcp.svg)](https://badge.fury.io/js/valkey-glide-mcp)
-[![Node.js CI](https://github.com/avifenesh/valkey-glide-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/avifenesh/valkey-glide-mcp/actions/workflows/ci.yml)
+[![npm version](https://badge.fury.io/js/valkey-glidejs-mcp.svg)](https://badge.fury.io/js/valkey-glidejs-mcp)
+[![Node.js CI](https://github.com/avifenesh/valkey-glidejs-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/avifenesh/valkey-glidejs-mcp/actions/workflows/ci.yml)
 
 A Model Context Protocol (MCP) server that provides expert knowledge and code generation assistance for [Valkey GLIDE](https://valkey.io/valkey-glide/), the high-performance Valkey client.
 
@@ -23,14 +23,14 @@ This MCP server helps AI assistants generate code and provide migration guidance
 ### Via npm
 
 ```bash
-npm install -g valkey-glide-mcp
+npm install -g valkey-glidejs-mcp
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/avifenesh/valkey-glide-mcp.git
-cd valkey-glide-mcp/valkey-glide-mcp
+git clone https://github.com/avifenesh/valkey-glidejs-mcp.git
+cd valkey-glidejs-mcp/valkey-glidejs-mcp
 npm install
 npm run build
 ```
@@ -45,7 +45,7 @@ Add to your MCP client configuration (e.g., Claude Desktop):
 {
   "mcpServers": {
     "valkey-glide": {
-      "command": "valkey-glide-mcp",
+      "command": "valkey-glidejs-mcp",
       "args": []
     }
   }

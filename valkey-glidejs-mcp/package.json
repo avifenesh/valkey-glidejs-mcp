@@ -1,5 +1,5 @@
 {
-  "name": "valkey-glide-mcp",
+  "name": "valkey-glidejs-mcp",
   "version": "0.1.0",
   "type": "module",
   "description": "Model Context Protocol (MCP) server for Valkey Glide Node.js migration, API mapping, and use-case generation",
@@ -13,20 +13,20 @@
     "code-generation",
     "ai-assistant"
   ],
-  "homepage": "https://github.com/avifenesh/valkey-glide-mcp#readme",
+  "homepage": "https://github.com/avifenesh/valkey-glidejs-mcp#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/avifenesh/valkey-glide-mcp.git",
-    "directory": "valkey-glide-mcp"
+    "url": "https://github.com/avifenesh/valkey-glidejs-mcp.git",
+    "directory": "valkey-glidejs-mcp"
   },
   "bugs": {
-    "url": "https://github.com/avifenesh/valkey-glide-mcp/issues"
+    "url": "https://github.com/avifenesh/valkey-glidejs-mcp/issues"
   },
   "author": "avifenesh",
   "license": "MIT",
   "main": "dist/server.js",
   "bin": {
-    "valkey-glide-mcp": "dist/server.js"
+    "valkey-glidejs-mcp": "dist/server.js"
   },
   "files": [
     "dist/**/*",

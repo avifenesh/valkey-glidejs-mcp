@@ -36,7 +36,8 @@ export const IOREDIS_DATASET: ApiDataset = {
         "Create a standalone client. In Glide, you create the client via a factory and typically await readiness.",
       paramsDiff:
         "ioredis uses constructor options; Glide uses a factory. Options fields may differ (e.g., retry/cluster strategy).",
-      returnDiff: "Both return a client-like object. Methods mostly align on command names.",
+      returnDiff:
+        "Both return a client-like object. Methods mostly align on command names.",
       examples: {
         source: `import Redis from "ioredis";\nconst redis = new Redis({ host: "localhost", port: 6379 });`,
         glide: `import { createClient } from "@valkey/glide";\nconst client = await createClient({ host: "localhost", port: 6379 });`,
@@ -56,7 +57,8 @@ export const IOREDIS_DATASET: ApiDataset = {
       equivalent: { glide: "createClient(options)" },
       description:
         "Create a separate connection for Pub/Sub or blocking operations by creating another Glide client.",
-      quirks: "Use a dedicated subscriber client while the main client publishes.",
+      quirks:
+        "Use a dedicated subscriber client while the main client publishes.",
     },
     {
       category: "strings",
@@ -107,7 +109,9 @@ export const IOREDIS_DATASET: ApiDataset = {
     {
       category: "pubsub",
       symbol: "subscribe(channel, callback)",
-      equivalent: { glide: "customCommand(['SUBSCRIBE', channel]) + getPubSubMessage()" },
+      equivalent: {
+        glide: "customCommand(['SUBSCRIBE', channel]) + getPubSubMessage()",
+      },
       description:
         "Use SUBSCRIBE via customCommand and consume messages via getPubSubMessage or a callback configured at client creation.",
       quirks: "Ensure dedicated subscriber connection if needed.",
@@ -166,7 +170,9 @@ export const IOREDIS_DATASET: ApiDataset = {
     {
       category: "zsets",
       symbol: "zrange(key, start, stop) | zrevrange(key, start, stop)",
-      equivalent: { glide: "zrange(key, start, stop, { REV?: true, WITHSCORES?: true })" },
+      equivalent: {
+        glide: "zrange(key, start, stop, { REV?: true, WITHSCORES?: true })",
+      },
       description: "Range over sorted set with optional reverse and scores.",
     },
     {
@@ -188,8 +194,11 @@ export const IOREDIS_DATASET: ApiDataset = {
     {
       category: "streams",
       symbol: "xgroup create key group $ mkstream",
-      equivalent: { glide: "xgroupCreate(key, group, '$', { MKSTREAM: true })" },
-      description: "Create a consumer group; optionally create stream if missing.",
+      equivalent: {
+        glide: "xgroupCreate(key, group, '$', { MKSTREAM: true })",
+      },
+      description:
+        "Create a consumer group; optionally create stream if missing.",
     },
     {
       category: "streams",
@@ -208,7 +217,8 @@ export const IOREDIS_DATASET: ApiDataset = {
       symbol: "multi()...exec()",
       equivalent: { glide: "new Batch(client).command(...).exec()" },
       description: "Transactional execution of multiple commands.",
-      quirks: "Ensure errors are handled; Glide returns array of results/errors.",
+      quirks:
+        "Ensure errors are handled; Glide returns array of results/errors.",
     },
     {
       category: "pipeline",
@@ -319,7 +329,9 @@ export const IOREDIS_DATASET: ApiDataset = {
     {
       category: "hashes",
       symbol: "hgetall(key) | hmget(key, fields) | hset(key, object)",
-      equivalent: { glide: "hgetall(key) | hmget(key, fields) | hset(key, object)" },
+      equivalent: {
+        glide: "hgetall(key) | hmget(key, fields) | hset(key, object)",
+      },
       description: "Hash get all and bulk set by object using hset.",
     },
     {
@@ -331,13 +343,17 @@ export const IOREDIS_DATASET: ApiDataset = {
     {
       category: "hashes",
       symbol: "hdel(key, fields) | hexists(key, field) | hlen(key)",
-      equivalent: { glide: "hDel(key, fields) | hExists(key, field) | hLen(key)" },
+      equivalent: {
+        glide: "hDel(key, fields) | hExists(key, field) | hLen(key)",
+      },
       description: "Delete and introspect hash fields.",
     },
     {
       category: "hashes",
       symbol: "hkeys(key) | hvals(key) | hscan(key, cursor, opts)",
-      equivalent: { glide: "hKeys(key) | hVals(key) | hScan(key, cursor, opts)" },
+      equivalent: {
+        glide: "hKeys(key) | hVals(key) | hScan(key, cursor, opts)",
+      },
       description: "Iterate hash keys/values and scan.",
     },
     {
@@ -348,14 +364,22 @@ export const IOREDIS_DATASET: ApiDataset = {
     },
     {
       category: "lists",
-      symbol: "lpop(key) | rpop(key) | rpush(key, values) | ltrim(key, start, stop)",
-      equivalent: { glide: "lPop(key) | rPop(key) | rPush(key, values) | lTrim(key, start, stop)" },
+      symbol:
+        "lpop(key) | rpop(key) | rpush(key, values) | ltrim(key, start, stop)",
+      equivalent: {
+        glide:
+          "lPop(key) | rPop(key) | rPush(key, values) | lTrim(key, start, stop)",
+      },
       description: "Common list mutations.",
     },
     {
       category: "sets",
-      symbol: "srem(key, members) | scard(key) | spop(key, count?) | srandmember(key, count?)",
-      equivalent: { glide: "sRem(key, members) | sCard(key) | sPop(key, count?) | sRandMember(key, count?)" },
+      symbol:
+        "srem(key, members) | scard(key) | spop(key, count?) | srandmember(key, count?)",
+      equivalent: {
+        glide:
+          "sRem(key, members) | sCard(key) | sPop(key, count?) | sRandMember(key, count?)",
+      },
       description: "Set mutations and random ops.",
     },
     {
@@ -366,8 +390,12 @@ export const IOREDIS_DATASET: ApiDataset = {
     },
     {
       category: "zsets",
-      symbol: "zcard(key) | zscore(key, member) | zincrby(key, increment, member)",
-      equivalent: { glide: "zCard(key) | zScore(key, member) | zIncrBy(key, increment, member)" },
+      symbol:
+        "zcard(key) | zscore(key, member) | zincrby(key, increment, member)",
+      equivalent: {
+        glide:
+          "zCard(key) | zScore(key, member) | zIncrBy(key, increment, member)",
+      },
       description: "Sorted set cardinality, score lookup and increment.",
     },
     {
@@ -378,8 +406,12 @@ export const IOREDIS_DATASET: ApiDataset = {
     },
     {
       category: "zsets",
-      symbol: "zcount(key, min, max) | zremrangebyscore(key, min, max) | zremrangebyrank(key, start, stop)",
-      equivalent: { glide: "zCount(key, min, max) | zRemRangeByScore(key, min, max) | zRemRangeByRank(key, start, stop)" },
+      symbol:
+        "zcount(key, min, max) | zremrangebyscore(key, min, max) | zremrangebyrank(key, start, stop)",
+      equivalent: {
+        glide:
+          "zCount(key, min, max) | zRemRangeByScore(key, min, max) | zRemRangeByRank(key, start, stop)",
+      },
       description: "Sorted set range operations.",
     },
     {
@@ -390,14 +422,22 @@ export const IOREDIS_DATASET: ApiDataset = {
     },
     {
       category: "geo",
-      symbol: "geodist(key, member1, member2, unit?) | geopos(key, members) | geohash(key, members)",
-      equivalent: { glide: "geoDist(key, m1, m2, unit?) | geoPos(key, members) | geoHash(key, members)" },
+      symbol:
+        "geodist(key, member1, member2, unit?) | geopos(key, members) | geohash(key, members)",
+      equivalent: {
+        glide:
+          "geoDist(key, m1, m2, unit?) | geoPos(key, members) | geoHash(key, members)",
+      },
       description: "Geo utilities.",
     },
     {
       category: "bitmaps",
-      symbol: "bitop(operation, destKey, keys) | bitpos(key, bit, start?, end?)",
-      equivalent: { glide: "bitOp(operation, destKey, keys) | bitPos(key, bit, start?, end?)" },
+      symbol:
+        "bitop(operation, destKey, keys) | bitpos(key, bit, start?, end?)",
+      equivalent: {
+        glide:
+          "bitOp(operation, destKey, keys) | bitPos(key, bit, start?, end?)",
+      },
       description: "Bitmap operations.",
     },
     {
@@ -409,7 +449,10 @@ export const IOREDIS_DATASET: ApiDataset = {
     {
       category: "pubsub",
       symbol: "psubscribe(pattern) | punsubscribe(pattern)",
-      equivalent: { glide: "customCommand(['PSUBSCRIBE', pattern]) + getPubSubMessage() | customCommand(['PUNSUBSCRIBE', pattern])" },
+      equivalent: {
+        glide:
+          "customCommand(['PSUBSCRIBE', pattern]) + getPubSubMessage() | customCommand(['PUNSUBSCRIBE', pattern])",
+      },
       description: "Pattern Pub/Sub via customCommand and getPubSubMessage.",
     },
   ],
@@ -436,14 +479,16 @@ export const NODE_REDIS_DATASET: ApiDataset = {
       category: "client",
       symbol: "duplicate()",
       equivalent: { glide: "createClient(options)" },
-      description: "Create another client for separate connections (e.g., subscriber).",
+      description:
+        "Create another client for separate connections (e.g., subscriber).",
     },
     {
       category: "strings",
       symbol: "get(key)",
       equivalent: { glide: "get(key)" },
       description: "Get the value of key.",
-      returnDiff: "Node-redis can return Buffer if configured; Glide similar if binary mode enabled.",
+      returnDiff:
+        "Node-redis can return Buffer if configured; Glide similar if binary mode enabled.",
     },
     {
       category: "strings",
@@ -461,7 +506,9 @@ export const NODE_REDIS_DATASET: ApiDataset = {
     {
       category: "pubsub",
       symbol: "subscribe(channel, listener)",
-      equivalent: { glide: "customCommand(['SUBSCRIBE', channel]) + getPubSubMessage()" },
+      equivalent: {
+        glide: "customCommand(['SUBSCRIBE', channel]) + getPubSubMessage()",
+      },
       description: "Subscribe to channel.",
     },
     {
@@ -562,8 +609,12 @@ export const NODE_REDIS_DATASET: ApiDataset = {
     },
     {
       category: "hashes",
-      symbol: "hGetAll | hMGet | hMSet | hIncrBy | hDel | hExists | hLen | hKeys | hVals",
-      equivalent: { glide: "hGetAll | hMGet | hMSet | hIncrBy | hDel | hExists | hLen | hKeys | hVals" },
+      symbol:
+        "hGetAll | hMGet | hMSet | hIncrBy | hDel | hExists | hLen | hKeys | hVals",
+      equivalent: {
+        glide:
+          "hGetAll | hMGet | hMSet | hIncrBy | hDel | hExists | hLen | hKeys | hVals",
+      },
       description: "Hash utilities.",
     },
     {
@@ -575,13 +626,19 @@ export const NODE_REDIS_DATASET: ApiDataset = {
     {
       category: "sets",
       symbol: "sRem | sCard | sPop | sRandMember | sDiff | sInter | sUnion",
-      equivalent: { glide: "sRem | sCard | sPop | sRandMember | sDiff | sInter | sUnion" },
+      equivalent: {
+        glide: "sRem | sCard | sPop | sRandMember | sDiff | sInter | sUnion",
+      },
       description: "Set utilities.",
     },
     {
       category: "zsets",
-      symbol: "zCard | zScore | zIncrBy | zRank | zRevRank | zCount | zRemRangeByScore | zRemRangeByRank | zPopMax | zPopMin",
-      equivalent: { glide: "zCard | zScore | zIncrBy | zRank | zRevRank | zCount | zRemRangeByScore | zRemRangeByRank | zPopMax | zPopMin" },
+      symbol:
+        "zCard | zScore | zIncrBy | zRank | zRevRank | zCount | zRemRangeByScore | zRemRangeByRank | zPopMax | zPopMin",
+      equivalent: {
+        glide:
+          "zCard | zScore | zIncrBy | zRank | zRevRank | zCount | zRemRangeByScore | zRemRangeByRank | zPopMax | zPopMin",
+      },
       description: "Sorted set utilities.",
     },
     {
@@ -599,13 +656,18 @@ export const NODE_REDIS_DATASET: ApiDataset = {
     {
       category: "scripts",
       symbol: "evalSha | scriptLoad | scriptExists | scriptFlush",
-      equivalent: { glide: "evalSha | scriptLoad | scriptExists | scriptFlush" },
+      equivalent: {
+        glide: "evalSha | scriptLoad | scriptExists | scriptFlush",
+      },
       description: "Scripting helpers.",
     },
     {
       category: "pubsub",
       symbol: "pSubscribe | pUnsubscribe",
-      equivalent: { glide: "customCommand(['PSUBSCRIBE', pattern]) + getPubSubMessage() | customCommand(['PUNSUBSCRIBE', pattern])" },
+      equivalent: {
+        glide:
+          "customCommand(['PSUBSCRIBE', pattern]) + getPubSubMessage() | customCommand(['PUNSUBSCRIBE', pattern])",
+      },
       description: "Pattern Pub/Sub via customCommand and getPubSubMessage.",
     },
   ],
@@ -626,57 +688,231 @@ export const GLIDE_SURFACE: ApiDataset = {
       equivalent: { glide: "GlideClusterClient.createClient(options)" },
       description: "Create a cluster client.",
     },
-    { category: "strings", symbol: "get(key)", equivalent: { glide: "get(key)" }, description: "Get a key." },
-    { category: "strings", symbol: "set(key, value, options?)", equivalent: { glide: "set(key, value, options?)" }, description: "Set a key." },
-    { category: "keys", symbol: "del(...keys)", equivalent: { glide: "del(...keys)" }, description: "Delete keys." },
-    { category: "keys", symbol: "expire(key, seconds)", equivalent: { glide: "expire(key, seconds)" }, description: "Set TTL." },
-    { category: "hashes", symbol: "hset(key, field, value)|hset(key, object)", equivalent: { glide: "hset(...)" }, description: "Hash set." },
-    { category: "hashes", symbol: "hget(key, field)", equivalent: { glide: "hget(key, field)" }, description: "Hash get." },
-    { category: "pubsub", symbol: "publish(channel, message)", equivalent: { glide: "publish(channel, message)" }, description: "PubSub publish." },
-    { category: "pubsub", symbol: "subscribe(channel, listener)", equivalent: { glide: "customCommand(['SUBSCRIBE', channel]) + getPubSubMessage()" }, description: "PubSub subscribe." },
-    { category: "scripts", symbol: "eval(script, keys, args)", equivalent: { glide: "invokeScript(script, keys, args)" }, description: "EVAL script." },
-    { category: "lists", symbol: "lpush(key, value|values)", equivalent: { glide: "lpush(key, value|values)" }, description: "List push." },
-    { category: "lists", symbol: "brpop(key, timeout)", equivalent: { glide: "brpop(key, timeout)" }, description: "Blocking list pop." },
-    { category: "geo", symbol: "geoadd(key, items)", equivalent: { glide: "geoadd(key, items)" }, description: "Add geospatial items." },
-    { category: "geo", symbol: "geosearch(key, opts)", equivalent: { glide: "geosearch(key, opts)" }, description: "Search geospatial index." },
-    { category: "bitmaps", symbol: "setbit(key, offset, value)", equivalent: { glide: "setbit(key, offset, value)" }, description: "Set bit." },
-    { category: "bitmaps", symbol: "getbit(key, offset)", equivalent: { glide: "getbit(key, offset)" }, description: "Get bit." },
-    { category: "bitmaps", symbol: "bitcount(key, start?, end?)", equivalent: { glide: "bitcount(key, start?, end?)" }, description: "Count set bits." },
-    { category: "hyperloglog", symbol: "pfadd(key, elements)", equivalent: { glide: "pfadd(key, elements)" }, description: "Add to HyperLogLog." },
-    { category: "hyperloglog", symbol: "pfcount(key|keys)", equivalent: { glide: "pfcount(key|keys)" }, description: "Estimate cardinality." },
-    { category: "hyperloglog", symbol: "pfmerge(destKey, sourceKeys)", equivalent: { glide: "pfmerge(destKey, sourceKeys)" }, description: "Merge HLLs." },
-    { category: "json", symbol: "GlideJson.set(client, key, path, value)", equivalent: { glide: "GlideJson.set(client, key, path, value)" }, description: "Set JSON value." },
-    { category: "json", symbol: "GlideJson.get(client, key, { path })", equivalent: { glide: "GlideJson.get(client, key, { path })" }, description: "Get JSON value." },
-    { category: "strings", symbol: "incr | decr | mGet | mSet | append | strLen", equivalent: { glide: "incr | decr | mGet | mSet | append | strLen" }, description: "Common string operations." },
-    { category: "keys", symbol: "exists | ttl | persist | rename | scan", equivalent: { glide: "exists | ttl | persist | rename | scan" }, description: "Key utilities and scan." },
-    { category: "hashes", symbol: "hGetAll | hMGet | hMSet | hIncrBy | hDel | hExists | hLen | hKeys | hVals | hScan", equivalent: { glide: "hGetAll | hMGet | hMSet | hIncrBy | hDel | hExists | hLen | hKeys | hVals | hScan" }, description: "Hash utilities." },
-    { category: "lists", symbol: "lRange | lLen | lPop | rPop | rPush | lTrim", equivalent: { glide: "lRange | lLen | lPop | rPop | rPush | lTrim" }, description: "List utilities." },
-    { category: "sets", symbol: "sRem | sCard | sPop | sRandMember | sDiff | sInter | sUnion", equivalent: { glide: "sRem | sCard | sPop | sRandMember | sDiff | sInter | sUnion" }, description: "Set utilities." },
-    { category: "zsets", symbol: "zCard | zScore | zIncrBy | zRank | zRevRank | zCount | zRemRangeByScore | zRemRangeByRank | zPopMax | zPopMin", equivalent: { glide: "zCard | zScore | zIncrBy | zRank | zRevRank | zCount | zRemRangeByScore | zRemRangeByRank | zPopMax | zPopMin" }, description: "Sorted set utilities." },
-    { category: "geo", symbol: "geoDist | geoPos | geoHash", equivalent: { glide: "geoDist | geoPos | geoHash" }, description: "Geo utilities." },
-    { category: "bitmaps", symbol: "bitOp | bitPos", equivalent: { glide: "bitOp | bitPos" }, description: "Bitmap ops." },
-    { category: "scripts", symbol: "evalSha | scriptLoad | scriptExists | scriptFlush", equivalent: { glide: "scriptLoad | scriptExists | scriptFlush" }, description: "Scripting helpers." },
-    { category: "pubsub", symbol: "pSubscribe | pUnsubscribe", equivalent: { glide: "customCommand(['PSUBSCRIBE', pattern]) + getPubSubMessage() | customCommand(['PUNSUBSCRIBE', pattern])" }, description: "Pattern Pub/Sub via customCommand and getPubSubMessage." },
+    {
+      category: "strings",
+      symbol: "get(key)",
+      equivalent: { glide: "get(key)" },
+      description: "Get a key.",
+    },
+    {
+      category: "strings",
+      symbol: "set(key, value, options?)",
+      equivalent: { glide: "set(key, value, options?)" },
+      description: "Set a key.",
+    },
+    {
+      category: "keys",
+      symbol: "del(...keys)",
+      equivalent: { glide: "del(...keys)" },
+      description: "Delete keys.",
+    },
+    {
+      category: "keys",
+      symbol: "expire(key, seconds)",
+      equivalent: { glide: "expire(key, seconds)" },
+      description: "Set TTL.",
+    },
+    {
+      category: "hashes",
+      symbol: "hset(key, field, value)|hset(key, object)",
+      equivalent: { glide: "hset(...)" },
+      description: "Hash set.",
+    },
+    {
+      category: "hashes",
+      symbol: "hget(key, field)",
+      equivalent: { glide: "hget(key, field)" },
+      description: "Hash get.",
+    },
+    {
+      category: "pubsub",
+      symbol: "publish(channel, message)",
+      equivalent: { glide: "publish(channel, message)" },
+      description: "PubSub publish.",
+    },
+    {
+      category: "pubsub",
+      symbol: "subscribe(channel, listener)",
+      equivalent: {
+        glide: "customCommand(['SUBSCRIBE', channel]) + getPubSubMessage()",
+      },
+      description: "PubSub subscribe.",
+    },
+    {
+      category: "scripts",
+      symbol: "eval(script, keys, args)",
+      equivalent: { glide: "invokeScript(script, keys, args)" },
+      description: "EVAL script.",
+    },
+    {
+      category: "lists",
+      symbol: "lpush(key, value|values)",
+      equivalent: { glide: "lpush(key, value|values)" },
+      description: "List push.",
+    },
+    {
+      category: "lists",
+      symbol: "brpop(key, timeout)",
+      equivalent: { glide: "brpop(key, timeout)" },
+      description: "Blocking list pop.",
+    },
+    {
+      category: "geo",
+      symbol: "geoadd(key, items)",
+      equivalent: { glide: "geoadd(key, items)" },
+      description: "Add geospatial items.",
+    },
+    {
+      category: "geo",
+      symbol: "geosearch(key, opts)",
+      equivalent: { glide: "geosearch(key, opts)" },
+      description: "Search geospatial index.",
+    },
+    {
+      category: "bitmaps",
+      symbol: "setbit(key, offset, value)",
+      equivalent: { glide: "setbit(key, offset, value)" },
+      description: "Set bit.",
+    },
+    {
+      category: "bitmaps",
+      symbol: "getbit(key, offset)",
+      equivalent: { glide: "getbit(key, offset)" },
+      description: "Get bit.",
+    },
+    {
+      category: "bitmaps",
+      symbol: "bitcount(key, start?, end?)",
+      equivalent: { glide: "bitcount(key, start?, end?)" },
+      description: "Count set bits.",
+    },
+    {
+      category: "hyperloglog",
+      symbol: "pfadd(key, elements)",
+      equivalent: { glide: "pfadd(key, elements)" },
+      description: "Add to HyperLogLog.",
+    },
+    {
+      category: "hyperloglog",
+      symbol: "pfcount(key|keys)",
+      equivalent: { glide: "pfcount(key|keys)" },
+      description: "Estimate cardinality.",
+    },
+    {
+      category: "hyperloglog",
+      symbol: "pfmerge(destKey, sourceKeys)",
+      equivalent: { glide: "pfmerge(destKey, sourceKeys)" },
+      description: "Merge HLLs.",
+    },
+    {
+      category: "json",
+      symbol: "GlideJson.set(client, key, path, value)",
+      equivalent: { glide: "GlideJson.set(client, key, path, value)" },
+      description: "Set JSON value.",
+    },
+    {
+      category: "json",
+      symbol: "GlideJson.get(client, key, { path })",
+      equivalent: { glide: "GlideJson.get(client, key, { path })" },
+      description: "Get JSON value.",
+    },
+    {
+      category: "strings",
+      symbol: "incr | decr | mGet | mSet | append | strLen",
+      equivalent: { glide: "incr | decr | mGet | mSet | append | strLen" },
+      description: "Common string operations.",
+    },
+    {
+      category: "keys",
+      symbol: "exists | ttl | persist | rename | scan",
+      equivalent: { glide: "exists | ttl | persist | rename | scan" },
+      description: "Key utilities and scan.",
+    },
+    {
+      category: "hashes",
+      symbol:
+        "hGetAll | hMGet | hMSet | hIncrBy | hDel | hExists | hLen | hKeys | hVals | hScan",
+      equivalent: {
+        glide:
+          "hGetAll | hMGet | hMSet | hIncrBy | hDel | hExists | hLen | hKeys | hVals | hScan",
+      },
+      description: "Hash utilities.",
+    },
+    {
+      category: "lists",
+      symbol: "lRange | lLen | lPop | rPop | rPush | lTrim",
+      equivalent: { glide: "lRange | lLen | lPop | rPop | rPush | lTrim" },
+      description: "List utilities.",
+    },
+    {
+      category: "sets",
+      symbol: "sRem | sCard | sPop | sRandMember | sDiff | sInter | sUnion",
+      equivalent: {
+        glide: "sRem | sCard | sPop | sRandMember | sDiff | sInter | sUnion",
+      },
+      description: "Set utilities.",
+    },
+    {
+      category: "zsets",
+      symbol:
+        "zCard | zScore | zIncrBy | zRank | zRevRank | zCount | zRemRangeByScore | zRemRangeByRank | zPopMax | zPopMin",
+      equivalent: {
+        glide:
+          "zCard | zScore | zIncrBy | zRank | zRevRank | zCount | zRemRangeByScore | zRemRangeByRank | zPopMax | zPopMin",
+      },
+      description: "Sorted set utilities.",
+    },
+    {
+      category: "geo",
+      symbol: "geoDist | geoPos | geoHash",
+      equivalent: { glide: "geoDist | geoPos | geoHash" },
+      description: "Geo utilities.",
+    },
+    {
+      category: "bitmaps",
+      symbol: "bitOp | bitPos",
+      equivalent: { glide: "bitOp | bitPos" },
+      description: "Bitmap ops.",
+    },
+    {
+      category: "scripts",
+      symbol: "evalSha | scriptLoad | scriptExists | scriptFlush",
+      equivalent: { glide: "scriptLoad | scriptExists | scriptFlush" },
+      description: "Scripting helpers.",
+    },
+    {
+      category: "pubsub",
+      symbol: "pSubscribe | pUnsubscribe",
+      equivalent: {
+        glide:
+          "customCommand(['PSUBSCRIBE', pattern]) + getPubSubMessage() | customCommand(['PUNSUBSCRIBE', pattern])",
+      },
+      description: "Pattern Pub/Sub via customCommand and getPubSubMessage.",
+    },
   ],
 };
 
 export function findEquivalent(
   sourceClient: Exclude<ApiClient, "glide">,
-  symbol: string
+  symbol: string,
 ): ApiMappingEntry[] {
-  const dataset = sourceClient === "ioredis" ? IOREDIS_DATASET : NODE_REDIS_DATASET;
+  const dataset =
+    sourceClient === "ioredis" ? IOREDIS_DATASET : NODE_REDIS_DATASET;
   const norm = symbol.toLowerCase();
   return dataset.entries.filter((e) => e.symbol.toLowerCase().includes(norm));
 }
 
 export function searchAll(keyword: string): ApiMappingEntry[] {
   const kw = keyword.toLowerCase();
-  const all = [...IOREDIS_DATASET.entries, ...NODE_REDIS_DATASET.entries, ...GLIDE_SURFACE.entries];
+  const all = [
+    ...IOREDIS_DATASET.entries,
+    ...NODE_REDIS_DATASET.entries,
+    ...GLIDE_SURFACE.entries,
+  ];
   return all.filter(
     (e) =>
       e.symbol.toLowerCase().includes(kw) ||
       e.category.toLowerCase().includes(kw) ||
-      e.description.toLowerCase().includes(kw)
+      e.description.toLowerCase().includes(kw),
   );
 }
-

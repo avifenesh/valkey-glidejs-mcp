@@ -8,7 +8,9 @@ test("migrate.naive transforms ioredis import", async () => {
   const mcp = new McpServer({ name: "test", version: "0.0.0" });
   registerMigrationTools(mcp);
   const tool = (mcp as any)._registeredTools?.["migrate.naive"];
-  const res = await tool.callback({ from: "ioredis", code: src } as any, {} as any);
+  const res = await tool.callback(
+    { from: "ioredis", code: src } as any,
+    {} as any,
+  );
   assert.match(res.structuredContent.transformed, /@valkey\/glide/);
 });
-

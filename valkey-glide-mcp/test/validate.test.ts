@@ -1,7 +1,7 @@
-import { test } from 'node:test';
-import assert from 'node:assert/strict';
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { registerValidationTools } from '../src/tools/validate.js';
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { registerValidationTools } from "../src/tools/validate.js";
 
 const SAMPLE_TS = `
 export async function createClient(){}
@@ -94,12 +94,14 @@ export function pSubscribe(){}
 export function pUnsubscribe(){}
 `;
 
-test('validate.glideSurface validates against provided TS sources and writes structured results', async () => {
-  const mcp = new McpServer({ name: 'test', version: '0.0.0' });
+test("validate.glideSurface validates against provided TS sources and writes structured results", async () => {
+  const mcp = new McpServer({ name: "test", version: "0.0.0" });
   registerValidationTools(mcp);
-  const tool = (mcp as any)._registeredTools?.['validate.glideSurface'];
-  const res = await tool.callback({ sources: [{ id: 'sample', text: SAMPLE_TS }], writeReport: false } as any, {} as any);
+  const tool = (mcp as any)._registeredTools?.["validate.glideSurface"];
+  const res = await tool.callback(
+    { sources: [{ id: "sample", text: SAMPLE_TS }], writeReport: false } as any,
+    {} as any,
+  );
   assert.ok(res.structuredContent.totalEntries > 0);
   assert.ok(res.structuredContent.validatedCount >= 1);
 });
-

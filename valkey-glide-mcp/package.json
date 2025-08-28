@@ -1,15 +1,47 @@
 {
   "name": "valkey-glide-mcp",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "description": "Model Context Protocol (MCP) server for Valkey Glide Node.js migration, API mapping, and use-case generation",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "valkey",
+    "glide",
+    "redis",
+    "migration",
+    "code-generation",
+    "ai-assistant"
+  ],
+  "homepage": "https://github.com/avifenesh/valkey-glide-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/avifenesh/valkey-glide-mcp.git",
+    "directory": "valkey-glide-mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/avifenesh/valkey-glide-mcp/issues"
+  },
+  "author": "avifenesh",
   "license": "MIT",
+  "main": "dist/server.js",
+  "bin": {
+    "valkey-glide-mcp": "dist/server.js"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "package.json"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsx src/server.ts",
     "start": "node dist/server.js",
     "test": "tsx --test test/*.test.ts",
+    "prepublishOnly": "npm run build && npm test",
     "validate:glide": "tsx scripts/validate.ts",
     "ingest:commands": "tsx scripts/ingest-commands.ts"
   },

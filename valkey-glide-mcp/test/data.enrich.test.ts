@@ -1,7 +1,7 @@
-import { test } from 'node:test';
-import assert from 'node:assert/strict';
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { registerDataTools } from '../src/tools/data.js';
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { registerDataTools } from "../src/tools/data.js";
 
 const SAMPLE_HTML = `
 <html>
@@ -16,13 +16,19 @@ const SAMPLE_HTML = `
   </body>
 </html>`;
 
-test('data.enrich parses sections, code blocks and bullets', async () => {
-  const mcp = new McpServer({ name: 'test', version: '0.0.0' });
+test("data.enrich parses sections, code blocks and bullets", async () => {
+  const mcp = new McpServer({ name: "test", version: "0.0.0" });
   registerDataTools(mcp);
-  const tool = (mcp as any)._registeredTools?.['data.enrich'];
-  const res = await tool.callback({ sources: [{ id: 'test', url: 'https://example.com', html: SAMPLE_HTML }] } as any, {} as any);
-  assert.ok(res.structuredContent.results['test'].sections.length >= 2);
-  const allCode = res.structuredContent.results['test'].sections.flatMap((s: any) => s.codeBlocks);
-  assert.ok(allCode.some((c: string) => c.includes('createClient')));
+  const tool = (mcp as any)._registeredTools?.["data.enrich"];
+  const res = await tool.callback(
+    {
+      sources: [{ id: "test", url: "https://example.com", html: SAMPLE_HTML }],
+    } as any,
+    {} as any,
+  );
+  assert.ok(res.structuredContent.results["test"].sections.length >= 2);
+  const allCode = res.structuredContent.results["test"].sections.flatMap(
+    (s: any) => s.codeBlocks,
+  );
+  assert.ok(allCode.some((c: string) => c.includes("createClient")));
 });
-

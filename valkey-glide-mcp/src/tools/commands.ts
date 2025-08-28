@@ -267,7 +267,14 @@ export function registerCommandsTools(mcp: McpServer) {
   mcp.tool(
     "commands.ingest",
     z
-      .object({ start: z.number().int().min(0).default(0), count: z.number().int().min(1).max(20).default(10), refresh: z.boolean().optional() })
+      .object({
+        start: z.number().int().min(0).default(0),
+        count: z.number().int().min(1).max(20).default(10),
+        refresh: z.boolean().optional(),
+        sources: z
+          .object({ md: z.string().optional(), tsBase: z.string().optional(), tsClient: z.string().optional(), tsCluster: z.string().optional(), tsJson: z.string().optional() })
+          .optional(),
+      })
       .shape,
     async (args) => {
       const mdUrl = "https://raw.githubusercontent.com/wiki/valkey-io/valkey-glide/ValKey-Commands-Implementation-Progress.md";
@@ -277,7 +284,7 @@ export function registerCommandsTools(mcp: McpServer) {
       const glideClusterUrl = "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/GlideClusterClient.ts";
       const glideJsonUrl = "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/server-modules/GlideJson.ts";
 
-      const md = await fetchText(mdUrl);
+      const md = args.sources?.md ?? (await fetchText(mdUrl));
       const wikiCommands = extractWikiCommandsMarkdown(md).sort();
       if (wikiCommands.length === 0) {
         const html = await fetchText(htmlUrl);
@@ -285,10 +292,10 @@ export function registerCommandsTools(mcp: McpServer) {
       }
 
       const [tsBase, tsClient, tsCluster, tsJson] = await Promise.all([
-        fetchText(baseClientUrl),
-        fetchText(glideClientUrl),
-        fetchText(glideClusterUrl),
-        fetchText(glideJsonUrl),
+        args.sources?.tsBase ?? fetchText(baseClientUrl),
+        args.sources?.tsClient ?? fetchText(glideClientUrl),
+        args.sources?.tsCluster ?? fetchText(glideClusterUrl),
+        args.sources?.tsJson ?? fetchText(glideJsonUrl),
       ]);
       const methods = [
         ...extractPublicMethods(tsBase, "BaseClient"),

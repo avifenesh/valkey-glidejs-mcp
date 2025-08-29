@@ -159,7 +159,7 @@ import { GlideClient } from "@valkey/valkey-glide";
 // Create client with smart configuration
 const client = await GlideClient.createClient({
   addresses: [{ host: "localhost", port: 6379 }],
-  // GLIDE automatically handles connection pooling, retries, and optimization
+  // GLIDE automatically handles retries and optimization
 });
 
 // All operations are fully typed and validated

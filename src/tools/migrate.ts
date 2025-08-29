@@ -272,30 +272,30 @@ await client.invokeScript(${scriptVar}, { keys: [${keys.join(", ")}], args: [${s
     // Transform publish (this one is straightforward)
     code = code.replace(/\.publish\s*\(/g, ".publish(");
 
-    // Blocking operations migration
+    // Blocking operations migration - use native GLIDE methods
     code = code.replace(
       /\.brpoplpush\s*\(/g,
-      '/* TODO: Use customCommand for BRPOPLPUSH */ .customCommand(["BRPOPLPUSH"',
+      '.blmove(', // GLIDE uses modern BLMOVE instead of deprecated BRPOPLPUSH
     );
 
     code = code.replace(
       /\.blpop\s*\(/g,
-      '/* TODO: Use customCommand for BLPOP */ .customCommand(["BLPOP"',
+      '.blpop(',
     );
 
     code = code.replace(
       /\.brpop\s*\(/g,
-      '/* TODO: Use customCommand for BRPOP */ .customCommand(["BRPOP"',
+      '.brpop(',
     );
 
     code = code.replace(
       /\.bzpopmin\s*\(/g,
-      '/* TODO: Use customCommand for BZPOPMIN */ .customCommand(["BZPOPMIN"',
+      '.bzpopmin(',
     );
 
     code = code.replace(
       /\.bzpopmax\s*\(/g,
-      '/* TODO: Use customCommand for BZPOPMAX */ .customCommand(["BZPOPMAX"',
+      '.bzpopmax(',
     );
   } else {
     // node-redis transformations (enhanced for real-world patterns)

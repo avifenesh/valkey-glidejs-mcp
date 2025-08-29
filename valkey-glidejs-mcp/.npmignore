@@ -16,10 +16,13 @@ tsconfig.json
 .npmignore
 .prettierrc
 .eslintrc*
+.commitlintrc.json
+.prettierignore
 
-# Documentation files (except README)
+# Documentation files (except README and CHANGELOG)
 *.md
 !README.md
+!CHANGELOG.md
 docs/
 
 # Generated reports and validation files

@@ -40,8 +40,24 @@ glide-api-inventory.json
 # Validation artifacts
 test/validate-*.ts
 test-compile.ts
+examples-validation/
 
 # Development/temporary files
 *.bak
 *.orig
 *~
+RELEASE_SUMMARY.md
+CURRENT_STATUS.md
+PRODUCTION_READY_PLAN.md
+PROGRESS_UPDATE.md
+
+# TypeScript cache
+*.tsbuildinfo
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Package archives
+*.tar.gz
+*.zip

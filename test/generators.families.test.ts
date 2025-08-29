@@ -40,6 +40,15 @@ test("gen.transaction and gen.pipeline return code", async () => {
   const pl = (mcp as any)._registeredTools?.["gen.pipeline"];
   const resTx = await tx.callback({} as any, {} as any);
   const resPl = await pl.callback({} as any, {} as any);
-  assert.match(resTx.structuredContent.code, /Transaction/);
-  assert.match(resPl.structuredContent.code, /Transaction/);
+  assert.match(resTx.structuredContent.code, /Batch\(true\)/); // Transaction now uses Batch(true)
+  assert.match(resPl.structuredContent.code, /Batch\(false\)/); // Pipeline now uses Batch(false)
+});
+
+test("gen.batch returns Batch-based code", async () => {
+  const mcp = new McpServer({ name: "test", version: "0.0.0" });
+  registerGeneratorTools(mcp);
+  const batch = (mcp as any)._registeredTools?.["gen.batch"];
+  const res = await batch.callback({} as any, {} as any);
+  assert.match(res.structuredContent.code, /Batch/);
+  assert.match(res.structuredContent.code, /Non-atomic batch execution/);
 });

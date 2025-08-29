@@ -201,27 +201,43 @@ if (result?.length) {
 `.trim(),
   transactionExample: () =>
     `
-import { GlideClient, Transaction } from '@valkey/valkey-glide';
+import { GlideClient, Batch } from '@valkey/valkey-glide';
 const client = await GlideClient.createClient({ 
   addresses: [{ host: 'localhost', port: 6379 }] 
 });
-const tx = new Transaction();
+// Use Batch with atomic=true for transactional operations
+const tx = new Batch(true);
 tx.set('a', '1');
 tx.incr('a');
 const results = await client.exec(tx);
-console.log(results);
+console.log(results); // Atomic transaction execution
 `.trim(),
   pipelineExample: () =>
     `
-import { GlideClient, Transaction } from '@valkey/valkey-glide';
+import { GlideClient, Batch } from '@valkey/valkey-glide';
 const client = await GlideClient.createClient({ 
   addresses: [{ host: 'localhost', port: 6379 }] 
 });
-const pipeline = new Transaction();
-pipeline.set('p1', 'v1');
-pipeline.get('p1');
-const results = await client.exec(pipeline);
-console.log(results);
+// Pipeline is deprecated, use Batch with atomic=false for non-atomic operations
+const batch = new Batch(false);
+batch.set('p1', 'v1');
+batch.get('p1');
+const results = await client.exec(batch);
+console.log(results); // Non-atomic pipeline execution
+`.trim(),
+  batchExample: () =>
+    `
+import { GlideClient, Batch } from '@valkey/valkey-glide';
+const client = await GlideClient.createClient({ 
+  addresses: [{ host: 'localhost', port: 6379 }] 
+});
+// Use Batch with atomic=false for non-atomic batch operations
+const batch = new Batch(false);
+batch.set('key1', 'value1');
+batch.get('key1');
+batch.incr('counter');
+const results = await client.exec(batch);
+console.log(results); // Non-atomic batch execution
 `.trim(),
   geoExample: () =>
     `
@@ -504,12 +520,31 @@ export function registerGeneratorTools(mcp: McpServer) {
       }) as any,
   );
   mcp.tool(
+    "gen.batch",
+    z.object({}).shape,
+    async () =>
+      ({
+        structuredContent: { code: templates.batchExample() },
+        content: [{ type: "text", text: templates.batchExample() }],
+      }) as any,
+  );
+  mcp.tool(
     "gen.pipeline",
     z.object({}).shape,
     async () =>
       ({
-        structuredContent: { code: templates.pipelineExample() },
-        content: [{ type: "text", text: templates.pipelineExample() }],
+        structuredContent: {
+          code: templates.pipelineExample(),
+          deprecated:
+            "Pipeline is deprecated. Use gen.batch instead. This tool now returns Batch example.",
+        },
+        content: [
+          {
+            type: "text",
+            text: "⚠️  Pipeline is deprecated. Use gen.batch instead.\n\n",
+          },
+          { type: "text", text: templates.pipelineExample() },
+        ],
       }) as any,
   );
   mcp.tool(

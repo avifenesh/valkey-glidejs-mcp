@@ -1,6 +1,6 @@
 {
   "name": "valkey-glidejs-mcp",
-  "version": "0.2.1",
+  "version": "0.4.0",
   "type": "module",
   "description": "Model Context Protocol (MCP) server for Valkey Glide Node.js migration, API mapping, and use-case generation",
   "keywords": [
@@ -45,6 +45,9 @@
     "dev": "tsx src/server.ts",
     "start": "node dist/server.js",
     "test": "tsx --test test/*.test.ts",
+    "lint:check": "prettier --check .",
+    "lint:fix": "prettier --write .",
+    "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build && npm test",
     "validate:glide": "tsx scripts/validate.ts",
     "ingest:commands": "tsx scripts/ingest-commands.ts",

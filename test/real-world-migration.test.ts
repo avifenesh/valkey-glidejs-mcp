@@ -420,7 +420,7 @@ class UserService {
     assert.ok(ioredisCode.includes("pipeline"));
   });
 
-  // Pattern 6: ioredis URL Connection Patterns 
+  // Pattern 6: ioredis URL Connection Patterns
   test("should migrate ioredis URL connection patterns", async () => {
     const ioredisCode = `
 import Redis from 'ioredis';

@@ -11,7 +11,7 @@ import path from "path";
 interface TestCase {
   name: string;
   sourceCode: string;
-  from: 'ioredis' | 'node-redis';
+  from: "ioredis" | "node-redis";
   expectedPatterns: string[];
   shouldMigrate: string[];
 }
@@ -20,7 +20,7 @@ const testCases: TestCase[] = [
   // ioredis test cases
   {
     name: "ioredis: Session Management with Express",
-    from: 'ioredis',
+    from: "ioredis",
     sourceCode: `
 import Redis from 'ioredis';
 const redis = new Redis({
@@ -45,7 +45,7 @@ app.get('/profile', async (req, res) => {
 
   {
     name: "ioredis: Distributed Lock Pattern",
-    from: 'ioredis',
+    from: "ioredis",
     sourceCode: `
 import Redis from 'ioredis';
 
@@ -208,7 +208,7 @@ class JobQueue {
   // node-redis test cases (based on real GitHub patterns)
   {
     name: "node-redis: Basic Connection Pattern",
-    from: 'node-redis',
+    from: "node-redis",
     sourceCode: `
 import { createClient } from 'redis';
 
@@ -228,7 +228,7 @@ client.disconnect();
 
   {
     name: "node-redis: Express Session with connect-redis",
-    from: 'node-redis',
+    from: "node-redis",
     sourceCode: `
 import {RedisStore} from "connect-redis";
 import session from "express-session";
@@ -257,7 +257,7 @@ app.use(
 
   {
     name: "node-redis: Pub/Sub Pattern",
-    from: 'node-redis',
+    from: "node-redis",
     sourceCode: `
 import { createClient } from 'redis';
 
@@ -279,7 +279,7 @@ await client.pUnsubscribe();
 
   {
     name: "node-redis: Transaction/Multi Operations",
-    from: 'node-redis',
+    from: "node-redis",
     sourceCode: `
 import { createClient } from 'redis';
 
@@ -304,7 +304,7 @@ await client.multi()
 
   {
     name: "node-redis: Hash Operations",
-    from: 'node-redis',
+    from: "node-redis",
     sourceCode: `
 import { createClient } from 'redis';
 
@@ -329,7 +329,7 @@ client.disconnect();
 
   {
     name: "node-redis: setEx and Expiration",
-    from: 'node-redis',
+    from: "node-redis",
     sourceCode: `
 import { createClient } from 'redis';
 
@@ -368,7 +368,10 @@ async function testMigrationTool() {
       await fs.writeFile(tempFile, testCase.sourceCode);
 
       // Run MCP migration tool
-      const migratedCode = await runMigrationTool(testCase.sourceCode, testCase.from);
+      const migratedCode = await runMigrationTool(
+        testCase.sourceCode,
+        testCase.from,
+      );
 
       const issues: string[] = [];
 
@@ -454,7 +457,10 @@ async function testMigrationTool() {
   return { successful, total, results };
 }
 
-async function runMigrationTool(code: string, from: 'ioredis' | 'node-redis'): Promise<string> {
+async function runMigrationTool(
+  code: string,
+  from: "ioredis" | "node-redis",
+): Promise<string> {
   return new Promise((resolve, reject) => {
     // Simulate calling our MCP migration tool
     // In reality, this would use the MCP client to call the migrate tool

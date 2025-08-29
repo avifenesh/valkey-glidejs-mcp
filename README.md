@@ -8,8 +8,8 @@
 
 ## ✨ Features at a Glance
 
-🎯 **Complete API Coverage**: **888+ methods** across all GLIDE-supported commands  
-🔄 **Smart Migration**: **100% success rate** on 51+ real-world migration patterns  
+🎯 **Complete API Coverage**: **673 methods** across all GLIDE-supported commands  
+🔄 **Smart Migration**: **100% success rate** on 65+ tested migration patterns  
 ⚡ **Comprehensive Commands**: Support for **296 commands** supported by GLIDE  
 🏗️ **Intelligent Generation**: Context-aware code templates for all use cases  
 ✅ **Runtime Validated**: All migrations tested against live Valkey instances  
@@ -21,7 +21,7 @@ This MCP server transforms AI assistants (Claude, Continue, Cline, Zed, etc.) in
 
 - **🔄 Universal Migration**: Seamlessly convert **any** ioredis/node-redis code to GLIDE
 - **🏗️ Smart Code Generation**: Generate production-ready GLIDE code for **any** pattern
-- **📚 Complete API Knowledge**: Instant access to **all** 888+ GLIDE methods and their usage
+- **📚 Complete API Knowledge**: Instant access to **all** 673 GLIDE methods and their usage
 - **🎯 Pattern Recognition**: Handle complex real-world scenarios (locks, rate limiting, pub/sub, transactions)
 - **✅ Validation Tools**: Verify code correctness and API compliance
 
@@ -124,7 +124,7 @@ Once installed, your AI assistant becomes a Valkey GLIDE expert. Try these promp
 
 ### 🔄 Universal Migration Engine
 
-**Complete Client Support**: Handles **both** ioredis and node-redis with 51+ tested migration patterns
+**Complete Client Support**: Handles **both** ioredis and node-redis with 65+ tested migration patterns
 
 - ✅ **URL Parsing**: Automatic redis:// and rediss:// URL handling with TLS/auth extraction
 - ✅ **Smart Config Mapping**: Intelligent conversion of connection options and retry strategies
@@ -144,7 +144,7 @@ Once installed, your AI assistant becomes a Valkey GLIDE expert. Try these promp
 
 ### 📚 Complete API Coverage
 
-**888+ Methods** with comprehensive documentation:
+**673 Methods** with comprehensive documentation:
 
 - 🔍 **Smart Search**: Find any method by name, category, or functionality
 - 📋 **Category Browsing**: Organized by command families (strings, lists, sets, etc.)
@@ -178,10 +178,10 @@ client.close();
 
 | Metric                 | Value           | Description                     |
 | ---------------------- | --------------- | ------------------------------- |
-| **API Coverage**       | 888+ methods    | Complete GLIDE API surface      |
+| **API Coverage**       | 673 methods     | Complete GLIDE API surface      |
 | **Command Support**    | 296 commands   | GLIDE-supported commands        |
-| **Migration Success**  | 100%            | Tested on 51+ real patterns     |
-| **Test Coverage**      | 51+ patterns    | Real GitHub repository code     |
+| **Migration Success**  | 100%            | Tested on 65+ migration patterns |
+| **Test Coverage**      | 65+ patterns    | Real GitHub repository code     |
 | **Runtime Validation** | ✅ Live testing | Against actual Valkey instances |
 
 ## 🎯 Key Differences from ioredis/node-redis
@@ -205,7 +205,7 @@ cd valkey-glidejs-mcp
 npm install
 npm run build
 
-# Run comprehensive tests (51+ migration patterns)
+# Run comprehensive tests (65+ migration patterns)
 npm test
 
 # Validate API mappings

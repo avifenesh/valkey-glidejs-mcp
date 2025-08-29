@@ -7,6 +7,7 @@ A Model Context Protocol (MCP) server that helps AI assistants work with [Valkey
 ## What it does
 
 This MCP server gives AI assistants (Claude, Continue, Cline, Zed, etc.) the ability to:
+
 - **Enhanced Migration**: Production-ready migration from ioredis/node-redis to GLIDE with 100% success rate on tested patterns
 - **Smart Code Generation**: Generate correct GLIDE client code with proper configuration mapping
 - **Real-world Pattern Support**: Handle complex patterns like distributed locks, rate limiting, pub/sub, transactions
@@ -16,6 +17,7 @@ This MCP server gives AI assistants (Claude, Continue, Cline, Zed, etc.) the abi
 ## Installation
 
 ### Prerequisites
+
 ```bash
 npm install -g valkey-glidejs-mcp
 ```
@@ -23,6 +25,7 @@ npm install -g valkey-glidejs-mcp
 ### For Claude Desktop
 
 Add to your Claude Desktop configuration:
+
 - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 - **Linux**: `~/.config/Claude/claude_desktop_config.json`
@@ -119,20 +122,23 @@ interpreter --mcp valkey-glidejs-mcp
 Connect using stdio transport:
 
 ```javascript
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-import { spawn } from 'child_process';
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { spawn } from "child_process";
 
 const transport = new StdioClientTransport({
-  command: 'npx',
-  args: ['valkey-glidejs-mcp']
+  command: "npx",
+  args: ["valkey-glidejs-mcp"],
 });
 
-const client = new Client({ name: 'my-client', version: '1.0.0' }, { capabilities: {} });
+const client = new Client(
+  { name: "my-client", version: "1.0.0" },
+  { capabilities: {} },
+);
 await client.connect(transport);
 
 // Use the tools
-const result = await client.callTool('gen.clientBasic', {});
+const result = await client.callTool("gen.clientBasic", {});
 console.log(result);
 ```
 
@@ -151,8 +157,9 @@ Once installed, you can ask your AI assistant to:
 The MCP server provides these tools to AI assistants:
 
 ### Enhanced Migration (🆕 v0.2.0)
+
 - **Smart Configuration Mapping**: Automatically converts ioredis connection options to GLIDE format
-- **Transaction Support**: Converts ioredis pipelines to GLIDE Transactions with proper variable tracking  
+- **Transaction Support**: Converts ioredis pipelines to GLIDE Transactions with proper variable tracking
 - **Conditional Operations**: Handles `SET key value PX ttl NX` → GLIDE conditional set options
 - **Script Migration**: Converts `redis.eval()` to GLIDE Script objects with proper key/argument handling
 - **Pub/Sub Guidance**: Provides migration path from ioredis events to GLIDE callback configuration
@@ -160,6 +167,7 @@ The MCP server provides these tools to AI assistants:
 - **Real-world Patterns**: Tested against production patterns like distributed locks, rate limiters, job queues
 
 ### Code Generation
+
 - Basic client setup (standalone & cluster)
 - Pub/Sub patterns
 - Distributed locks
@@ -168,6 +176,7 @@ The MCP server provides these tools to AI assistants:
 - All Valkey data structures (strings, hashes, lists, sets, sorted sets, streams, geo, bitmaps, HyperLogLog)
 
 ### API Information
+
 - Search GLIDE methods
 - Browse by category (strings, hashes, lists, etc.)
 - Get detailed API documentation with 100% GLIDE API coverage (296 methods)
@@ -175,16 +184,16 @@ The MCP server provides these tools to AI assistants:
 ## GLIDE Client Basics
 
 ```typescript
-import { GlideClient } from '@valkey/valkey-glide';
+import { GlideClient } from "@valkey/valkey-glide";
 
 // Create client
 const client = await GlideClient.createClient({
-  addresses: [{ host: 'localhost', port: 6379 }]
+  addresses: [{ host: "localhost", port: 6379 }],
 });
 
 // Basic operations
-await client.set('key', 'value');
-const value = await client.get('key');
+await client.set("key", "value");
+const value = await client.get("key");
 
 // Cleanup
 client.close();
@@ -201,6 +210,7 @@ client.close();
 ## Development
 
 ### Build from source
+
 ```bash
 git clone https://github.com/avifenesh/valkey-glidejs-mcp.git
 cd valkey-glidejs-mcp
@@ -209,6 +219,7 @@ npm run build
 ```
 
 ### Run tests
+
 ```bash
 npm test
 ```

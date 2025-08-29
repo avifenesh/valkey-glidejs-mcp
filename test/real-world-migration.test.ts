@@ -1,15 +1,14 @@
-import { test, describe } from 'node:test';
-import assert from 'node:assert';
+import { test, describe } from "node:test";
+import assert from "node:assert";
 
 /**
  * Real-world migration test cases based on common ioredis/node-redis patterns
  * Found in production applications and popular GitHub repositories
  */
 
-describe('Real-world migration patterns', () => {
-  
+describe("Real-world migration patterns", () => {
   // Pattern 1: Session Management with Express
-  test('should migrate session management pattern', async () => {
+  test("should migrate session management pattern", async () => {
     const ioredisCode = `
 import Redis from 'ioredis';
 import express from 'express';
@@ -51,7 +50,7 @@ app.get('/profile', async (req, res) => {
   res.json(userData);
 });
     `;
-    
+
     const expectedGlide = `
 import { GlideClient } from '@valkey/valkey-glide';
 import express from 'express';
@@ -97,13 +96,13 @@ app.get('/profile', async (req, res) => {
     `;
 
     // Test that the pattern is recognized and can be migrated
-    assert.ok(ioredisCode.includes('new Redis('));
-    assert.ok(ioredisCode.includes('setex'));
+    assert.ok(ioredisCode.includes("new Redis("));
+    assert.ok(ioredisCode.includes("setex"));
     // Migration tool should handle this pattern
   });
 
   // Pattern 2: Distributed Lock (Redlock pattern)
-  test('should migrate distributed lock pattern', async () => {
+  test("should migrate distributed lock pattern", async () => {
     const ioredisCode = `
 import Redis from 'ioredis';
 
@@ -158,11 +157,11 @@ async function processJob(jobId) {
     // This should be migrated to use GLIDE's set with conditional options
     assert.ok(ioredisCode.includes("'PX'"));
     assert.ok(ioredisCode.includes("'NX'"));
-    assert.ok(ioredisCode.includes('eval'));
+    assert.ok(ioredisCode.includes("eval"));
   });
 
   // Pattern 3: Rate Limiting with Sliding Window
-  test('should migrate rate limiting pattern', async () => {
+  test("should migrate rate limiting pattern", async () => {
     const ioredisCode = `
 import Redis from 'ioredis';
 
@@ -227,14 +226,14 @@ class RateLimiter {
 }
     `;
 
-    assert.ok(ioredisCode.includes('pipeline()'));
-    assert.ok(ioredisCode.includes('incr'));
-    assert.ok(ioredisCode.includes('expire'));
-    assert.ok(ioredisCode.includes('HMSET'));
+    assert.ok(ioredisCode.includes("pipeline()"));
+    assert.ok(ioredisCode.includes("incr"));
+    assert.ok(ioredisCode.includes("expire"));
+    assert.ok(ioredisCode.includes("HMSET"));
   });
 
   // Pattern 4: Pub/Sub with Pattern Subscription
-  test('should migrate pub/sub pattern with patterns', async () => {
+  test("should migrate pub/sub pattern with patterns", async () => {
     const ioredisCode = `
 import Redis from 'ioredis';
 
@@ -308,13 +307,13 @@ io.on('connection', (socket) => {
 });
     `;
 
-    assert.ok(ioredisCode.includes('psubscribe'));
-    assert.ok(ioredisCode.includes('pmessage'));
-    assert.ok(ioredisCode.includes('publish'));
+    assert.ok(ioredisCode.includes("psubscribe"));
+    assert.ok(ioredisCode.includes("pmessage"));
+    assert.ok(ioredisCode.includes("publish"));
   });
 
   // Pattern 5: Caching with Cache-Aside Pattern
-  test('should migrate cache-aside pattern', async () => {
+  test("should migrate cache-aside pattern", async () => {
     const ioredisCode = `
 import Redis from 'ioredis';
 
@@ -416,13 +415,13 @@ class UserService {
 }
     `;
 
-    assert.ok(ioredisCode.includes('setex'));
-    assert.ok(ioredisCode.includes('mget'));
-    assert.ok(ioredisCode.includes('pipeline'));
+    assert.ok(ioredisCode.includes("setex"));
+    assert.ok(ioredisCode.includes("mget"));
+    assert.ok(ioredisCode.includes("pipeline"));
   });
 
   // Pattern 6: Queue Management with Bull-like patterns
-  test('should migrate job queue pattern', async () => {
+  test("should migrate job queue pattern", async () => {
     const ioredisCode = `
 import Redis from 'ioredis';
 
@@ -518,8 +517,8 @@ class SimpleQueue {
 }
     `;
 
-    assert.ok(ioredisCode.includes('zadd'));
-    assert.ok(ioredisCode.includes('brpoplpush'));
-    assert.ok(ioredisCode.includes('zrangebyscore'));
+    assert.ok(ioredisCode.includes("zadd"));
+    assert.ok(ioredisCode.includes("brpoplpush"));
+    assert.ok(ioredisCode.includes("zrangebyscore"));
   });
 });

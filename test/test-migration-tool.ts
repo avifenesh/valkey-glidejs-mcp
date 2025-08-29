@@ -1,8 +1,8 @@
 #!/usr/bin/env tsx
 
-import { spawn } from 'child_process';
-import fs from 'fs/promises';
-import path from 'path';
+import { spawn } from "child_process";
+import fs from "fs/promises";
+import path from "path";
 
 /**
  * Test our MCP migration tool with real-world patterns
@@ -17,7 +17,7 @@ interface TestCase {
 
 const testCases: TestCase[] = [
   {
-    name: 'Session Management with Express',
+    name: "Session Management with Express",
     ioredisCode: `
 import Redis from 'ioredis';
 const redis = new Redis({
@@ -36,12 +36,12 @@ app.get('/profile', async (req, res) => {
   res.json(JSON.parse(userData));
 });
     `,
-    expectedPatterns: ['GlideClient.createClient', 'client.get', 'client.set'],
-    shouldMigrate: ['new Redis(', 'setex']
+    expectedPatterns: ["GlideClient.createClient", "client.get", "client.set"],
+    shouldMigrate: ["new Redis(", "setex"],
   },
 
   {
-    name: 'Distributed Lock Pattern',
+    name: "Distributed Lock Pattern",
     ioredisCode: `
 import Redis from 'ioredis';
 
@@ -70,12 +70,12 @@ class DistributedLock {
   }
 }
     `,
-    expectedPatterns: ['conditionalSet', 'expiry', 'invokeScript'],
-    shouldMigrate: ["'PX'", "'NX'", 'eval']
+    expectedPatterns: ["conditionalSet", "expiry", "invokeScript"],
+    shouldMigrate: ["'PX'", "'NX'", "eval"],
   },
 
   {
-    name: 'Rate Limiting with Pipeline',
+    name: "Rate Limiting with Pipeline",
     ioredisCode: `
 import Redis from 'ioredis';
 
@@ -100,12 +100,12 @@ class RateLimiter {
   }
 }
     `,
-    expectedPatterns: ['Transaction', 'tx.incr', 'tx.expire'],
-    shouldMigrate: ['pipeline()', 'pipeline.incr', 'pipeline.expire']
+    expectedPatterns: ["Transaction", "tx.incr", "tx.expire"],
+    shouldMigrate: ["pipeline()", "pipeline.incr", "pipeline.expire"],
   },
 
   {
-    name: 'Pub/Sub with Patterns',
+    name: "Pub/Sub with Patterns",
     ioredisCode: `
 import Redis from 'ioredis';
 
@@ -127,12 +127,12 @@ class EventManager {
   }
 }
     `,
-    expectedPatterns: ['client.publish', 'customCommand'],
-    shouldMigrate: ['psubscribe', 'pmessage']
+    expectedPatterns: ["client.publish", "customCommand"],
+    shouldMigrate: ["psubscribe", "pmessage"],
   },
 
   {
-    name: 'Cache with Multi-get/set',
+    name: "Cache with Multi-get/set",
     ioredisCode: `
 import Redis from 'ioredis';
 
@@ -157,12 +157,12 @@ class CacheManager {
   }
 }
     `,
-    expectedPatterns: ['client.mget', 'Transaction', 'client.set'],
-    shouldMigrate: ['mget(...keys)', 'setex']
+    expectedPatterns: ["client.mget", "Transaction", "client.set"],
+    shouldMigrate: ["mget(...keys)", "setex"],
   },
 
   {
-    name: 'Queue with Sorted Sets',
+    name: "Queue with Sorted Sets",
     ioredisCode: `
 import Redis from 'ioredis';
 
@@ -193,108 +193,114 @@ class JobQueue {
   }
 }
     `,
-    expectedPatterns: ['client.zadd', 'client.zrangeByScore', 'client.zremRangeByScore'],
-    shouldMigrate: ['zadd', 'zrangebyscore', 'brpoplpush']
-  }
+    expectedPatterns: [
+      "client.zadd",
+      "client.zrangeByScore",
+      "client.zremRangeByScore",
+    ],
+    shouldMigrate: ["zadd", "zrangebyscore", "brpoplpush"],
+  },
 ];
 
 async function testMigrationTool() {
-  console.log('🧪 Testing MCP Migration Tool with Real-World Patterns\n');
-  console.log('=' .repeat(80));
-  
-  const results: Array<{name: string, success: boolean, issues: string[]}> = [];
-  
+  console.log("🧪 Testing MCP Migration Tool with Real-World Patterns\n");
+  console.log("=".repeat(80));
+
+  const results: Array<{ name: string; success: boolean; issues: string[] }> =
+    [];
+
   for (const testCase of testCases) {
     console.log(`\n📝 Testing: ${testCase.name}`);
-    
+
     try {
       // Create temporary file with the test code
-      const tempFile = path.join(process.cwd(), 'temp-migration-test.ts');
+      const tempFile = path.join(process.cwd(), "temp-migration-test.ts");
       await fs.writeFile(tempFile, testCase.ioredisCode);
-      
+
       // Run MCP migration tool
       const migratedCode = await runMigrationTool(testCase.ioredisCode);
-      
+
       const issues: string[] = [];
-      
+
       // Check if expected patterns are present in migrated code
       for (const pattern of testCase.expectedPatterns) {
         if (!migratedCode.includes(pattern)) {
           issues.push(`Missing expected pattern: ${pattern}`);
         }
       }
-      
+
       // Check if old patterns were migrated
       for (const oldPattern of testCase.shouldMigrate) {
         if (migratedCode.includes(oldPattern)) {
           issues.push(`Old pattern not migrated: ${oldPattern}`);
         }
       }
-      
+
       // Clean up
       await fs.unlink(tempFile).catch(() => {});
-      
+
       const success = issues.length === 0;
       results.push({ name: testCase.name, success, issues });
-      
+
       if (success) {
-        console.log('  ✅ Migration successful');
+        console.log("  ✅ Migration successful");
       } else {
-        console.log('  ❌ Migration issues found:');
-        issues.forEach(issue => console.log(`    - ${issue}`));
+        console.log("  ❌ Migration issues found:");
+        issues.forEach((issue) => console.log(`    - ${issue}`));
       }
-      
+
       // Show a snippet of the migrated code
-      console.log('  📄 Migrated code snippet:');
-      const lines = migratedCode.split('\n').slice(0, 10);
-      lines.forEach(line => {
+      console.log("  📄 Migrated code snippet:");
+      const lines = migratedCode.split("\n").slice(0, 10);
+      lines.forEach((line) => {
         if (line.trim()) console.log(`    ${line}`);
       });
-      
     } catch (error) {
       console.log(`  ❌ Migration failed: ${error}`);
-      results.push({ 
-        name: testCase.name, 
-        success: false, 
-        issues: [`Migration error: ${error}`] 
+      results.push({
+        name: testCase.name,
+        success: false,
+        issues: [`Migration error: ${error}`],
       });
     }
   }
-  
+
   // Summary
-  console.log('\n' + '=' .repeat(80));
-  console.log('📊 MIGRATION TESTING SUMMARY\n');
-  
-  const successful = results.filter(r => r.success).length;
+  console.log("\n" + "=".repeat(80));
+  console.log("📊 MIGRATION TESTING SUMMARY\n");
+
+  const successful = results.filter((r) => r.success).length;
   const total = results.length;
-  
-  results.forEach(result => {
-    const icon = result.success ? '✅' : '❌';
+
+  results.forEach((result) => {
+    const icon = result.success ? "✅" : "❌";
     console.log(`${icon} ${result.name}`);
     if (!result.success && result.issues.length > 0) {
-      result.issues.forEach(issue => console.log(`    - ${issue}`));
+      result.issues.forEach((issue) => console.log(`    - ${issue}`));
     }
   });
-  
-  console.log(`\n📈 Results: ${successful}/${total} patterns migrated successfully`);
-  
+
+  console.log(
+    `\n📈 Results: ${successful}/${total} patterns migrated successfully`,
+  );
+
   if (successful < total) {
-    console.log('\n🔧 Suggested improvements for migration tool:');
-    
-    const allIssues = results.flatMap(r => r.issues);
+    console.log("\n🔧 Suggested improvements for migration tool:");
+
+    const allIssues = results.flatMap((r) => r.issues);
     const uniqueIssues = [...new Set(allIssues)];
-    
-    uniqueIssues.forEach(issue => {
-      if (issue.includes('Missing expected pattern')) {
-        const pattern = issue.split(': ')[1];
+
+    uniqueIssues.forEach((issue) => {
+      if (issue.includes("Missing expected pattern")) {
+        const pattern = issue.split(": ")[1];
         console.log(`  - Add support for generating: ${pattern}`);
-      } else if (issue.includes('Old pattern not migrated')) {
-        const pattern = issue.split(': ')[1];
+      } else if (issue.includes("Old pattern not migrated")) {
+        const pattern = issue.split(": ")[1];
         console.log(`  - Improve migration of: ${pattern}`);
       }
     });
   }
-  
+
   return { successful, total, results };
 }
 
@@ -302,32 +308,32 @@ async function runMigrationTool(code: string): Promise<string> {
   return new Promise((resolve, reject) => {
     // Simulate calling our MCP migration tool
     // In reality, this would use the MCP client to call the migrate tool
-    
-    const child = spawn('npx', ['tsx', 'scripts/test-mcp-migration.ts'], {
-      stdio: ['pipe', 'pipe', 'pipe']
+
+    const child = spawn("npx", ["tsx", "scripts/test-mcp-migration.ts"], {
+      stdio: ["pipe", "pipe", "pipe"],
     });
-    
-    let output = '';
-    let error = '';
-    
-    child.stdout.on('data', (data) => {
+
+    let output = "";
+    let error = "";
+
+    child.stdout.on("data", (data) => {
       output += data.toString();
     });
-    
-    child.stderr.on('data', (data) => {
+
+    child.stderr.on("data", (data) => {
       error += data.toString();
     });
-    
-    child.on('close', (code) => {
+
+    child.on("close", (code) => {
       if (code === 0) {
         resolve(output);
       } else {
-        reject(new Error(error || 'Migration tool failed'));
+        reject(new Error(error || "Migration tool failed"));
       }
     });
-    
+
     // Send the code to stdin
-    child.stdin.write(JSON.stringify({ code, from: 'ioredis' }));
+    child.stdin.write(JSON.stringify({ code, from: "ioredis" }));
     child.stdin.end();
   });
 }
@@ -336,16 +342,22 @@ async function runMigrationTool(code: string): Promise<string> {
 async function simpleMigration(code: string): Promise<string> {
   // Basic string replacements for testing
   let migrated = code
-    .replace(/import Redis from 'ioredis'/g, "import { GlideClient } from '@valkey/valkey-glide'")
-    .replace(/new Redis\(\)/g, 'await GlideClient.createClient({ addresses: [{ host: "localhost", port: 6379 }] })')
-    .replace(/\.setex\(/g, '.set(')
-    .replace(/\.pipeline\(\)/g, '; const tx = new Transaction(); tx')
-    .replace(/pipeline\./g, 'tx.')
-    .replace(/\.exec\(\)/g, '.exec(tx)')
-    .replace(/\.eval\(/g, '.invokeScript(')
-    .replace(/\.zadd\(/g, '.zadd(')
-    .replace(/\.zrangebyscore\(/g, '.zrangeByScore(');
-    
+    .replace(
+      /import Redis from 'ioredis'/g,
+      "import { GlideClient } from '@valkey/valkey-glide'",
+    )
+    .replace(
+      /new Redis\(\)/g,
+      'await GlideClient.createClient({ addresses: [{ host: "localhost", port: 6379 }] })',
+    )
+    .replace(/\.setex\(/g, ".set(")
+    .replace(/\.pipeline\(\)/g, "; const tx = new Transaction(); tx")
+    .replace(/pipeline\./g, "tx.")
+    .replace(/\.exec\(\)/g, ".exec(tx)")
+    .replace(/\.eval\(/g, ".invokeScript(")
+    .replace(/\.zadd\(/g, ".zadd(")
+    .replace(/\.zrangebyscore\(/g, ".zrangeByScore(");
+
   return migrated;
 }
 
@@ -356,7 +368,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       process.exit(successful === total ? 0 : 1);
     })
     .catch((error) => {
-      console.error('Test execution failed:', error);
+      console.error("Test execution failed:", error);
       process.exit(1);
     });
 }

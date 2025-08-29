@@ -64,7 +64,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
           cache: npm
           cache-dependency-path: package-lock.json
 
@@ -97,4 +97,3 @@ jobs:
             exit 0
           fi
           npm publish --provenance --access public
-

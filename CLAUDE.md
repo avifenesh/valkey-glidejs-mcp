@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 This is a Model Context Protocol (MCP) server for Valkey GLIDE, providing code generation assistance and migration guidance for the high-performance GLIDE client. The project consists of two main parts:
+
 - Root level: Repository management and documentation
 - `valkey-glidejs-mcp/`: The actual MCP server package that gets published to npm
 
@@ -62,6 +63,7 @@ The server follows a modular tool registration pattern:
 ### Tool Registration Pattern
 
 Each tool module follows this pattern:
+
 ```typescript
 export function registerToolType(mcp: McpServer) {
   mcp.tool("tool.name", zodSchema, async (args) => {
@@ -92,6 +94,7 @@ The package is published to npm as `valkey-glidejs-mcp`. The main entry point is
 ## MCP Protocol Integration
 
 The server uses stdio transport for MCP communication. Tools are registered on startup and handle:
+
 - Code migration from other Redis clients
 - API discovery and mapping
 - Code generation for common patterns

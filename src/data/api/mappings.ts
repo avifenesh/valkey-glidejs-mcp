@@ -1,10 +1,10 @@
 // Import comprehensive mappings
-import { 
+import {
   COMPREHENSIVE_IOREDIS_MAPPINGS,
   COMPREHENSIVE_NODE_REDIS_MAPPINGS,
   COMPREHENSIVE_GLIDE_MAPPINGS,
-  getAllGlideMethods 
-} from './comprehensive-mappings.js';
+  getAllGlideMethods,
+} from "./comprehensive-mappings.js";
 
 export type ApiClient = "ioredis" | "node-redis" | "glide";
 
@@ -908,16 +908,21 @@ export function findEquivalent(
   const dataset =
     sourceClient === "ioredis" ? IOREDIS_DATASET : NODE_REDIS_DATASET;
   const norm = symbol.toLowerCase();
-  let results = dataset.entries.filter((e) => e.symbol.toLowerCase().includes(norm));
-  
+  let results = dataset.entries.filter((e) =>
+    e.symbol.toLowerCase().includes(norm),
+  );
+
   // If no results, check comprehensive mappings
   if (results.length === 0) {
-    const comprehensiveDataset = sourceClient === "ioredis" 
-      ? COMPREHENSIVE_IOREDIS_MAPPINGS 
-      : COMPREHENSIVE_NODE_REDIS_MAPPINGS;
-    results = comprehensiveDataset.entries.filter((e) => e.symbol.toLowerCase().includes(norm));
+    const comprehensiveDataset =
+      sourceClient === "ioredis"
+        ? COMPREHENSIVE_IOREDIS_MAPPINGS
+        : COMPREHENSIVE_NODE_REDIS_MAPPINGS;
+    results = comprehensiveDataset.entries.filter((e) =>
+      e.symbol.toLowerCase().includes(norm),
+    );
   }
-  
+
   return results;
 }
 
@@ -931,18 +936,18 @@ export function searchAll(keyword: string): ApiMappingEntry[] {
     ...COMPREHENSIVE_NODE_REDIS_MAPPINGS.entries,
     ...COMPREHENSIVE_GLIDE_MAPPINGS.entries,
   ];
-  
+
   // Deduplicate by symbol
   const seen = new Set<string>();
   const unique: ApiMappingEntry[] = [];
-  
-  all.forEach(entry => {
+
+  all.forEach((entry) => {
     if (!seen.has(entry.symbol)) {
       seen.add(entry.symbol);
       unique.push(entry);
     }
   });
-  
+
   return unique.filter(
     (e) =>
       e.symbol.toLowerCase().includes(kw) ||
@@ -952,4 +957,4 @@ export function searchAll(keyword: string): ApiMappingEntry[] {
 }
 
 // Export all GLIDE methods for validation
-export { getAllGlideMethods } from './comprehensive-mappings.js';
+export { getAllGlideMethods } from "./comprehensive-mappings.js";

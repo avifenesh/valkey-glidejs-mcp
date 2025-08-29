@@ -55,6 +55,7 @@ The scope should be the name of the module affected (e.g., `migrate`, `generator
 ### Subject
 
 The subject contains a succinct description of the change:
+
 - Use the imperative, present tense: "change" not "changed" nor "changes"
 - Don't capitalize the first letter
 - No dot (.) at the end
@@ -62,6 +63,7 @@ The subject contains a succinct description of the change:
 ### Version Bumping
 
 Based on your commit types, versions will be automatically bumped:
+
 - `fix:` → Patch release (0.0.X)
 - `feat:` → Minor release (0.X.0)
 - `feat!:` or `BREAKING CHANGE:` → Major release (X.0.0)
@@ -78,6 +80,7 @@ Based on your commit types, versions will be automatically bumped:
 ## Testing
 
 Before submitting a PR, ensure:
+
 - All tests pass: `npm test`
 - Code is properly formatted: `npm run format`
 - TypeScript compiles: `npm run build`
@@ -85,6 +88,7 @@ Before submitting a PR, ensure:
 ## Release Process
 
 Releases are automated via GitHub Actions:
+
 1. Commits to `main` trigger version bump based on conventional commits
 2. A new tag triggers changelog generation and GitHub release creation
 3. The release triggers automatic npm publication

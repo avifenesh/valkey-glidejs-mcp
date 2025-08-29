@@ -5,13 +5,15 @@ function staticChecks(code: string) {
   const result: { warnings: string[]; errors: string[]; issues: string[] } = {
     warnings: [],
     errors: [],
-    issues: []
+    issues: [],
   };
   if (!code.includes("@valkey/valkey-glide")) {
     result.warnings.push("Code does not import '@valkey/valkey-glide'.");
   }
   if (/import.*from\s+['"]ioredis['"]/.test(code)) {
-    result.issues.push("Found ioredis import - should be migrated to @valkey/valkey-glide");
+    result.issues.push(
+      "Found ioredis import - should be migrated to @valkey/valkey-glide",
+    );
   }
   if (/new\s+Redis\s*\(/.test(code)) {
     result.errors.push(

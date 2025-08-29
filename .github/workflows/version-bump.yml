@@ -24,22 +24,22 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Conventional Changelog Action
         id: changelog
         uses: TriPSs/conventional-changelog-action@v5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          git-message: 'chore(release): {version} [skip ci]'
-          git-user-name: 'github-actions[bot]'
-          git-user-email: 'github-actions[bot]@users.noreply.github.com'
-          preset: 'conventionalcommits'
-          tag-prefix: 'v'
-          output-file: 'CHANGELOG.md'
+          git-message: "chore(release): {version} [skip ci]"
+          git-user-name: "github-actions[bot]"
+          git-user-email: "github-actions[bot]@users.noreply.github.com"
+          preset: "conventionalcommits"
+          tag-prefix: "v"
+          output-file: "CHANGELOG.md"
           release-count: 0
-          version-file: './package.json'
+          version-file: "./package.json"
           create-summary: true
           skip-on-empty: true
           skip-version-file: false

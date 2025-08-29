@@ -229,9 +229,17 @@ import { GlideClient } from '@valkey/valkey-glide';
 const client = await GlideClient.createClient({ 
   addresses: [{ host: 'localhost', port: 6379 }] 
 });
-await client.geoadd('places', { Palermo: { longitude: 13.361389, latitude: 38.115556 } });
-const near = await client.geosearchstore('places_result', 'places', 
-  { position: { longitude: 13.361389, latitude: 38.115556 }, radius: 200, unit: 'km' }
+// GLIDE geoadd expects a Map, not an object
+const locations = new Map([
+  ['Palermo', { longitude: 13.361389, latitude: 38.115556 }],
+  ['Catania', { longitude: 15.087269, latitude: 37.502669 }]
+]);
+await client.geoadd('places', locations);
+
+// Search nearby locations
+const near = await client.geosearch('places', 
+  { member: 'Palermo' }, 
+  { radius: 200, unit: 'km' }
 );
 console.log(near);
 `.trim(),

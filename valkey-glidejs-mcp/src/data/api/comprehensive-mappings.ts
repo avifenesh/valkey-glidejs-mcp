@@ -2198,10 +2198,10 @@ export const COMPREHENSIVE_IOREDIS_MAPPINGS: ApiDataset = {
       "equivalent": {
         "glide": "client.geoadd(...)"
       },
-      "description": "Execute geoadd command",
+      "description": "Execute geoadd command - NOTE: GLIDE expects a Map, not array/object",
       "examples": {
-        "source": "await redis.geoadd(...)",
-        "glide": "await client.geoadd(...)"
+        "source": "await redis.geoadd('key', { long: 13.361, lat: 38.115, member: 'Palermo' })",
+        "glide": "await client.geoadd('key', new Map([['Palermo', { longitude: 13.361, latitude: 38.115 }]]))"
       }
     },
     {
@@ -3050,10 +3050,10 @@ export const COMPREHENSIVE_IOREDIS_MAPPINGS: ApiDataset = {
       "equivalent": {
         "glide": "client.scan(...)"
       },
-      "description": "Execute scan command",
+      "description": "Execute scan command - NOTE: GLIDE returns [cursor, keys[]] array",
       "examples": {
-        "source": "await redis.scan(...)",
-        "glide": "await client.scan(...)"
+        "source": "const result = await redis.scan(cursor); // returns {cursor, keys}",
+        "glide": "const [newCursor, keys] = await client.scan(cursor); // returns [cursor, keys[]]"
       }
     },
     {

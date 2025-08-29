@@ -1,3 +1,13 @@
+## [v0.4.3] - 2025-08-29
+### :white_check_mark: Tests
+- [`c5a69f9`](https://github.com/avifenesh/valkey-glidejs-mcp/commit/c5a69f92f13dab8c812cc669256e51c6fae2b67d) - add comprehensive validation test suite *(commit by [@avifenesh](https://github.com/avifenesh))*
+
+### :flying_saucer: Other Changes
+- [`dc7626a`](https://github.com/avifenesh/valkey-glidejs-mcp/commit/dc7626aab143aee3f83a74d205da3e572c421526) - Add README.md file
+
+Signed-off-by: Avi Fenesh <55848801+avifenesh@users.noreply.github.com> *(commit by [@avifenesh](https://github.com/avifenesh))*
+
+
 ## [v0.4.1] - 2025-08-29
 
 ### :sparkles: New Features
@@ -104,3 +114,4 @@
 
 - correct import path to @valkey/valkey-glide instead of @valkey/glide ([7e2ae81](https://github.com/avifenesh/valkey-glidejs-mcp/commit/7e2ae8112379c748afff80a885f5a0bf4d27080e))
   [v0.4.1]: https://github.com/avifenesh/valkey-glidejs-mcp/compare/v0.4.0...v0.4.1
+[v0.4.3]: https://github.com/avifenesh/valkey-glidejs-mcp/compare/v0.4.2...v0.4.3

@@ -13,10 +13,31 @@ function naiveTransform(source: string, from: "ioredis" | "node-redis") {
       "import { GlideClient, GlideClusterClient, Transaction, Script } from '@valkey/valkey-glide';",
     );
 
+    // Handle URL-based connections first
+    code = code.replace(/new\s+Redis\s*\(\s*['"]([^'"]+)['"]\s*\)/g, (_, url) => {
+      // Parse common Redis URL patterns
+      if (url.startsWith('redis://') || url.startsWith('rediss://')) {
+        return `await GlideClient.createClient({ addresses: [{ host: 'localhost', port: 6379 }] })
+          /* TODO: Parse URL "${url}" and configure addresses/TLS */`;
+      }
+      return `await GlideClient.createClient({ addresses: [{ host: 'localhost', port: 6379 }] })`;
+    });
+
+    // Handle environment variable URLs
+    code = code.replace(/new\s+Redis\s*\(\s*(process\.env\.[A-Z_]+[^)]*)\)/g, (_, envVar) => {
+      return `await GlideClient.createClient({ addresses: [{ host: 'localhost', port: 6379 }] })
+        /* TODO: Parse URL from ${envVar} and configure addresses */`;
+    });
+
     // Client creation transformations with configuration mapping
     code = code.replace(/new\s+Redis\s*\(([^)]*)\)/g, (_, configStr) => {
       if (!configStr.trim()) {
         return "await GlideClient.createClient({ addresses: [{ host: 'localhost', port: 6379 }] })";
+      }
+
+      // Skip if it's a URL pattern (already handled above)
+      if (configStr.includes('redis://') || configStr.includes('rediss://') || configStr.includes('process.env')) {
+        return `new Redis(${configStr})`; // Let the URL handlers above catch it
       }
 
       // Try to extract common ioredis config patterns

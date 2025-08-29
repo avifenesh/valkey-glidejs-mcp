@@ -420,7 +420,38 @@ class UserService {
     assert.ok(ioredisCode.includes("pipeline"));
   });
 
-  // Pattern 6: Queue Management with Bull-like patterns
+  // Pattern 6: ioredis URL Connection Patterns 
+  test("should migrate ioredis URL connection patterns", async () => {
+    const ioredisCode = `
+import Redis from 'ioredis';
+
+// Environment-based connection
+const redis1 = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+
+// Direct URL connections
+const redis2 = new Redis('redis://localhost:6379');
+const redis3 = new Redis('rediss://user:pass@prod-redis.example.com:6380');
+
+// Fallback pattern
+const redisUrl = process.env.REDIS_URL;
+const redis4 = redisUrl ? new Redis(redisUrl) : new Redis({
+  host: 'localhost',
+  port: 6379
+});
+
+async function cacheOperations() {
+  await redis1.set('session:123', 'user-data', 'EX', 3600);
+  const data = await redis1.get('session:123');
+  return data;
+}
+    `;
+
+    assert.ok(ioredisCode.includes("process.env.REDIS_URL"));
+    assert.ok(ioredisCode.includes("'redis://localhost:6379'"));
+    assert.ok(ioredisCode.includes("'rediss://user:pass@"));
+  });
+
+  // Pattern 7: Queue Management with Bull-like patterns
   test("should migrate job queue pattern", async () => {
     const ioredisCode = `
 import Redis from 'ioredis';

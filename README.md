@@ -8,7 +8,7 @@ A Model Context Protocol (MCP) server that helps AI assistants work with [Valkey
 
 This MCP server gives AI assistants (Claude, Continue, Cline, Zed, etc.) the ability to:
 
-- **Enhanced Migration**: Production-ready migration from ioredis/node-redis to GLIDE with 100% success rate on tested patterns
+- **Enhanced Migration**: Production-ready migration from ioredis/node-redis to GLIDE with 100% success rate on 51 tested patterns
 - **Smart Code Generation**: Generate correct GLIDE client code with proper configuration mapping
 - **Real-world Pattern Support**: Handle complex patterns like distributed locks, rate limiting, pub/sub, transactions
 - **Complete API Coverage**: Answer questions about GLIDE APIs with 100% coverage (296 methods)
@@ -22,8 +22,15 @@ This MCP server gives AI assistants (Claude, Continue, Cline, Zed, etc.) the abi
 npm install -g valkey-glidejs-mcp
 ```
 
-### For Claude Desktop
+### For Claude Desktop / Claude Code
 
+**Option 1: Using Claude Code CLI (Recommended)**
+
+```bash
+claude mcp add --scope user valkey-glidejs-mcp valkey-glidejs-mcp
+```
+
+**Option 2: Manual Configuration**
 Add to your Claude Desktop configuration:
 
 - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
@@ -43,104 +50,17 @@ Add to your Claude Desktop configuration:
 
 Then restart Claude Desktop.
 
-### For Continue (VS Code/JetBrains)
+### For Other MCP-Compatible Tools
 
-Add to your Continue configuration (`~/.continue/config.json`):
+Most MCP-compatible tools support adding servers. Use this configuration:
 
-```json
-{
-  "models": [
-    // Your model configuration
-  ],
-  "mcpServers": [
-    {
-      "name": "valkey-glide",
-      "command": "npx",
-      "args": ["valkey-glidejs-mcp"]
-    }
-  ]
-}
-```
-
-### For Cline (VS Code Extension)
-
-1. Open VS Code Settings (Cmd/Ctrl + ,)
-2. Search for "Cline MCP"
-3. Add to MCP Servers configuration:
-
-```json
-{
-  "valkey-glide": {
-    "command": "npx",
-    "args": ["valkey-glidejs-mcp"]
-  }
-}
-```
-
-### For Zed Editor
-
-Add to your Zed settings (`~/.config/zed/settings.json`):
-
-```json
-{
-  "assistant": {
-    "version": "2",
-    "mcp_servers": {
-      "valkey-glide": {
-        "command": "npx",
-        "args": ["valkey-glidejs-mcp"]
-      }
-    }
-  }
-}
-```
-
-### For Cursor
-
-Add to your Cursor settings (`~/.cursor/settings.json` or through Settings UI):
-
-```json
-{
-  "mcpServers": {
-    "valkey-glide": {
-      "command": "npx",
-      "args": ["valkey-glidejs-mcp"]
-    }
-  }
-}
-```
-
-### For Open Interpreter
-
-```bash
-# Start with MCP support
-interpreter --mcp valkey-glidejs-mcp
-```
+- **Command**: `npx` or `valkey-glidejs-mcp` (if globally installed)
+- **Args**: `["valkey-glidejs-mcp"]` (only if using `npx`)
+- **Transport**: `stdio`
 
 ### For Custom MCP Clients
 
-Connect using stdio transport:
-
-```javascript
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
-import { spawn } from "child_process";
-
-const transport = new StdioClientTransport({
-  command: "npx",
-  args: ["valkey-glidejs-mcp"],
-});
-
-const client = new Client(
-  { name: "my-client", version: "1.0.0" },
-  { capabilities: {} },
-);
-await client.connect(transport);
-
-// Use the tools
-const result = await client.callTool("gen.clientBasic", {});
-console.log(result);
-```
+Connect using stdio transport with the MCP SDK. See [MCP documentation](https://modelcontextprotocol.io) for implementation details.
 
 ## What you can ask
 
@@ -156,15 +76,16 @@ Once installed, you can ask your AI assistant to:
 
 The MCP server provides these tools to AI assistants:
 
-### Enhanced Migration (🆕 v0.2.0)
+### Enhanced Migration (🆕 v0.4.0)
 
-- **Smart Configuration Mapping**: Automatically converts ioredis connection options to GLIDE format
-- **Transaction Support**: Converts ioredis pipelines to GLIDE Transactions with proper variable tracking
-- **Conditional Operations**: Handles `SET key value PX ttl NX` → GLIDE conditional set options
-- **Script Migration**: Converts `redis.eval()` to GLIDE Script objects with proper key/argument handling
-- **Pub/Sub Guidance**: Provides migration path from ioredis events to GLIDE callback configuration
-- **Blocking Operations**: Maps blocking commands like `brpoplpush` to GLIDE custom commands
-- **Real-world Patterns**: Tested against production patterns like distributed locks, rate limiters, job queues
+- **Dual Client Support**: Migrates both ioredis and node-redis to GLIDE with 51 comprehensive test patterns
+- **URL Connection Parsing**: Handles redis:// and rediss:// URLs with automatic TLS and auth extraction
+- **Smart Configuration Mapping**: Converts connection options to GLIDE format with retry strategies
+- **Transaction Support**: Converts pipelines to GLIDE Transactions with proper variable tracking
+- **Native Blocking Operations**: Uses GLIDE's native `blpop`, `brpop`, `bzpopmin`, `bzpopmax`, `blmove` methods
+- **Script Migration**: Converts `redis.eval()` to GLIDE Script objects with module-level definitions
+- **Comprehensive Pub/Sub Guidance**: Complete migration examples with before/after patterns
+- **Real-world Patterns**: Based on actual GitHub repository patterns, not assumptions
 
 ### Code Generation
 

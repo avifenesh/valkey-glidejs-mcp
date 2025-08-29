@@ -28,6 +28,7 @@ const redis2 = new Redis(process.env.REDIS_URL);`;
   );
   const transformed = res.structuredContent.transformed;
   assert.match(transformed, /GlideClient\.createClient/);
-  assert.match(transformed, /TODO: Parse URL.*redis:\/\/localhost:6379/);
-  assert.match(transformed, /TODO: Parse URL from process\.env\.REDIS_URL/);
+  assert.match(transformed, /'host': 'localhost'/); // URL is now parsed
+  assert.match(transformed, /parseRedisUrlRuntime/); // Environment URL helper
+  assert.match(transformed, /Helper function to add to your codebase/);
 });

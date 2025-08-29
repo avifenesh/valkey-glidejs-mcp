@@ -4,6 +4,36 @@ import { z } from "zod";
 // Minimal, regex-based migration scaffolding for quick suggestions.
 // Future work: integrate ts-morph or recast for AST-level transforms.
 
+function parseRedisUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    const config = {
+      addresses: [{
+        host: parsed.hostname || 'localhost',
+        port: parsed.port ? parseInt(parsed.port) : 6379
+      }]
+    };
+    
+    // Add TLS configuration for rediss://
+    if (parsed.protocol === 'rediss:') {
+      (config as any).useTLS = true;
+    }
+    
+    // Add authentication if present
+    if (parsed.username || parsed.password) {
+      (config as any).credentials = {
+        username: parsed.username || undefined,
+        password: parsed.password || undefined
+      };
+    }
+    
+    return JSON.stringify(config, null, 2).replace(/"/g, "'");
+  } catch (error) {
+    return `{ addresses: [{ host: 'localhost', port: 6379 }] }
+      /* URL parsing failed for: ${url} */`;
+  }
+}
+
 function naiveTransform(source: string, from: "ioredis" | "node-redis") {
   let code = source;
   if (from === "ioredis") {
@@ -19,8 +49,8 @@ function naiveTransform(source: string, from: "ioredis" | "node-redis") {
       (_, url) => {
         // Parse common Redis URL patterns
         if (url.startsWith("redis://") || url.startsWith("rediss://")) {
-          return `await GlideClient.createClient({ addresses: [{ host: 'localhost', port: 6379 }] })
-          /* TODO: Parse URL "${url}" and configure addresses/TLS */`;
+          const parsedConfig = parseRedisUrl(url);
+          return `await GlideClient.createClient(${parsedConfig})`;
         }
         return `await GlideClient.createClient({ addresses: [{ host: 'localhost', port: 6379 }] })`;
       },
@@ -30,8 +60,25 @@ function naiveTransform(source: string, from: "ioredis" | "node-redis") {
     code = code.replace(
       /new\s+Redis\s*\(\s*(process\.env\.[A-Z_]+[^)]*)\)/g,
       (_, envVar) => {
-        return `await GlideClient.createClient({ addresses: [{ host: 'localhost', port: 6379 }] })
-        /* TODO: Parse URL from ${envVar} and configure addresses */`;
+        return `/* Parse URL from environment variable */
+const redisUrl = ${envVar};
+const client = await GlideClient.createClient(
+  redisUrl ? parseRedisUrlRuntime(redisUrl) : { addresses: [{ host: 'localhost', port: 6379 }] }
+);
+
+/* Helper function to add to your codebase:
+function parseRedisUrlRuntime(url: string) {
+  const parsed = new URL(url);
+  const config = {
+    addresses: [{ host: parsed.hostname || 'localhost', port: parseInt(parsed.port) || 6379 }]
+  };
+  if (parsed.protocol === 'rediss:') config.useTLS = true;
+  if (parsed.username || parsed.password) {
+    config.credentials = { username: parsed.username, password: parsed.password };
+  }
+  return config;
+}
+*/`;
       },
     );
 
@@ -146,17 +193,20 @@ function naiveTransform(source: string, from: "ioredis" | "node-redis") {
     // MGET spread arguments -> array
     code = code.replace(/\.mget\s*\(\s*\.\.\.([^)]+)\)/g, ".mget($1)");
 
-    // Lua Script migration (eval -> Script object)
+    // Lua Script migration (eval -> Script object) - improved with proper structure
     code = code.replace(
       /\.eval\s*\(\s*`([^`]+)`,\s*(\d+),\s*([^)]+)\)/g,
       (_, scriptCode, numKeys, argsStr) => {
-        const scriptVar = `script_${Math.random().toString(36).substring(2, 11)}`;
+        const scriptVar = `${scriptCode.match(/\w+/)?.[0] || 'script'}_script`.toLowerCase();
         const args = argsStr.split(",").map((arg: string) => arg.trim());
         const keys = args.slice(0, parseInt(numKeys));
         const scriptArgs = args.slice(parseInt(numKeys));
 
-        return `/* TODO: Define script outside function */
+        return `
+/* Define this script at module level for reuse */
 const ${scriptVar} = new Script(\`${scriptCode}\`);
+
+/* Then use it in your function */
 await client.invokeScript(${scriptVar}, { keys: [${keys.join(", ")}], args: [${scriptArgs.join(", ")}] })`;
       },
     );
@@ -165,13 +215,16 @@ await client.invokeScript(${scriptVar}, { keys: [${keys.join(", ")}], args: [${s
     code = code.replace(
       /\.eval\s*\(\s*['"]([^'"]+)['"],\s*(\d+),\s*([^)]+)\)/g,
       (_, scriptCode, numKeys, argsStr) => {
-        const scriptVar = `script_${Math.random().toString(36).substring(2, 11)}`;
+        const scriptVar = `${scriptCode.match(/\w+/)?.[0] || 'script'}_script`.toLowerCase();
         const args = argsStr.split(",").map((arg: string) => arg.trim());
         const keys = args.slice(0, parseInt(numKeys));
         const scriptArgs = args.slice(parseInt(numKeys));
 
-        return `/* TODO: Define script outside function */
+        return `
+/* Define this script at module level for reuse */
 const ${scriptVar} = new Script("${scriptCode}");
+
+/* Then use it in your function */
 await client.invokeScript(${scriptVar}, { keys: [${keys.join(", ")}], args: [${scriptArgs.join(", ")}] })`;
       },
     );
@@ -179,14 +232,28 @@ await client.invokeScript(${scriptVar}, { keys: [${keys.join(", ")}], args: [${s
     // Pub/Sub pattern migration - detect and suggest client callback approach
     if (code.includes(".subscribe(") || code.includes(".psubscribe(")) {
       code =
-        `/* TODO: GLIDE Pub/Sub requires callback configuration during client creation
- * Instead of: redis.subscribe('channel'); redis.on('message', handler)
- * Use: GlideClient.createClient({ 
- *   addresses: [...],
+        `/* GLIDE Pub/Sub Migration Guide:
+ * 
+ * OLD PATTERN (ioredis):
+ * redis.subscribe('channel');
+ * redis.on('message', (channel, message) => { ... });
+ * 
+ * NEW PATTERN (GLIDE):
+ * const client = await GlideClient.createClient({
+ *   addresses: [{ host: 'localhost', port: 6379 }],
  *   pubsubSubscriptions: {
- *     channels: { channelPatterns: { [channel]: handler } }
+ *     channels: {
+ *       'channel-name': (message, channel) => {
+ *         console.log(\`Received from \${channel}: \${message}\`);
+ *       }
+ *     },
+ *     patterns: {
+ *       'news.*': (message, channel) => {
+ *         console.log(\`Pattern match from \${channel}: \${message}\`);
+ *       }
+ *     }
  *   }
- * })
+ * });
  */
 ` + code;
     }
@@ -255,10 +322,17 @@ await client.invokeScript(${scriptVar}, { keys: [${keys.join(", ")}], args: [${s
       /createClient\s*\(\s*{\s*url:\s*([^}]+)\s*}\s*\)/g,
       (_, urlExpr) => {
         if (urlExpr.includes("process.env") || urlExpr.includes("||")) {
-          return `await GlideClient.createClient({ 
-            addresses: [{ host: 'localhost', port: 6379 }] 
-            /* TODO: Parse URL from ${urlExpr} and configure addresses */
-          })`;
+          return `/* Parse URL from environment variable */
+const redisUrl = ${urlExpr};
+const client = await GlideClient.createClient(
+  redisUrl ? parseRedisUrlRuntime(redisUrl) : { addresses: [{ host: 'localhost', port: 6379 }] }
+);`;
+        }
+        // Try to parse if it's a direct URL string
+        const urlMatch = urlExpr.match(/['"]([^'"]+)['"]/);
+        if (urlMatch) {
+          const parsedConfig = parseRedisUrl(urlMatch[1]);
+          return `await GlideClient.createClient(${parsedConfig})`;
         }
         return "await GlideClient.createClient({ addresses: [{ host: 'localhost', port: 6379 }] })";
       },

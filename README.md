@@ -1,6 +1,6 @@
 # 🚀 Valkey GLIDE MCP Server
 
-[![npm version](https://badge.fury.io/js/valkey-glidejs-mcp.svg)](https://www.npmjs.com/package/valkey-glidejs-mcp)
+[![npm version](https://badge.fury.io/js/valkey-glidejs-mcp.svg)](https://npm.im/valkey-glidejs-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
 
@@ -235,7 +235,7 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
 **Resources:**
 
-- 📦 [NPM Package](https://www.npmjs.com/package/valkey-glidejs-mcp)
+- 📦 [NPM Package](https://npm.im/valkey-glidejs-mcp)
 - 📖 [Valkey GLIDE Documentation](https://github.com/valkey-io/valkey-glide)
 - 🔗 [Model Context Protocol](https://modelcontextprotocol.io)
 - 🐛 [Issues & Feedback](https://github.com/avifenesh/valkey-glidejs-mcp/issues)

@@ -91,6 +91,21 @@ Add to your Zed settings (`~/.config/zed/settings.json`):
 }
 ```
 
+### For Cursor
+
+Add to your Cursor settings (`~/.cursor/settings.json` or through Settings UI):
+
+```json
+{
+  "mcpServers": {
+    "valkey-glide": {
+      "command": "npx",
+      "args": ["valkey-glidejs-mcp"]
+    }
+  }
+}
+```
+
 ### For Open Interpreter
 
 ```bash
@@ -204,8 +219,8 @@ This MCP server works with any AI tool that supports the Model Context Protocol:
 | Cline | ✅ Supported | VS Code extension |
 | Zed Editor | ✅ Supported | Built-in AI assistant |
 | Open Interpreter | ✅ Supported | Command-line interface |
-| Cursor | 🔄 Coming Soon | MCP support planned |
-| GitHub Copilot | 🔄 Coming Soon | MCP support in development |
+| Cursor | ✅ Supported | Via MCP configuration |
+| GitHub Copilot | ✅ Supported | Via extension/custom setup |
 | Custom Clients | ✅ Supported | Any MCP-compatible client |
 
 ## Contributing

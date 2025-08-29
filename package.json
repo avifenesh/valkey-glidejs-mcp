@@ -1,0 +1,65 @@
+{
+  "name": "valkey-glidejs-mcp",
+  "version": "0.2.0",
+  "type": "module",
+  "description": "Model Context Protocol (MCP) server for Valkey Glide Node.js migration, API mapping, and use-case generation",
+  "keywords": [
+    "valkey-glide",
+    "valkey client",
+    "mcp",
+    "model-context-protocol",
+    "valkey",
+    "glide",
+    "redis",
+    "migration",
+    "code-generation",
+    "ai-assistant",
+    "AI-agent",
+    "valkey-glide-mcp"
+  ],
+  "homepage": "https://github.com/avifenesh/valkey-glidejs-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/avifenesh/valkey-glidejs-mcp.git",
+    "directory": "valkey-glidejs-mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/avifenesh/valkey-glidejs-mcp/issues"
+  },
+  "author": "avifenesh",
+  "license": "MIT",
+  "main": "dist/server.js",
+  "bin": {
+    "valkey-glidejs-mcp": "dist/server.js"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "package.json"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx src/server.ts",
+    "start": "node dist/server.js",
+    "test": "tsx --test test/*.test.ts",
+    "prepublishOnly": "npm run build && npm test",
+    "validate:glide": "tsx scripts/validate.ts",
+    "ingest:commands": "tsx scripts/ingest-commands.ts",
+    "commitlint": "commitlint --edit",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.1.4",
+    "zod": "4.1.5"
+  },
+  "devDependencies": {
+    "@types/node": "24.3.0",
+    "@valkey/valkey-glide": "^2.0.1",
+    "prettier": "^3.3.3",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.2"
+  }
+}

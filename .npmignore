@@ -1,0 +1,66 @@
+# Source TypeScript files (dist/ has compiled JS)
+src/
+*.ts
+!*.d.ts
+
+# Scripts and development tools
+scripts/
+test/
+examples-validation/
+test-compile.ts
+test-results.txt
+
+# Configuration files
+tsconfig.json
+.gitignore
+.npmignore
+.prettierrc
+.eslintrc*
+.commitlintrc.json
+.prettierignore
+
+# Documentation files (except README and CHANGELOG)
+*.md
+!README.md
+!CHANGELOG.md
+docs/
+
+# Generated reports and validation files
+api-coverage-report.json
+behavior-differences.json
+glide-api-inventory.json
+VALIDATION_REPORT.*
+COMPREHENSIVE_VALIDATION_REPORT.*
+DEPLOYMENT_PLAN.*
+FINAL_VALIDATION_REPORT.*
+CURRENT_STATUS.md
+PRODUCTION_READY_PLAN.md
+PROGRESS_UPDATE.md
+
+# Git and CI
+.git/
+.github/
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Temporary and log files
+*.tmp
+*.log
+*.bak
+*.orig
+*~
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test coverage
+coverage/
+
+# Package artifacts
+*.tgz

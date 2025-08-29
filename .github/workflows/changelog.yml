@@ -1,0 +1,72 @@
+name: Changelog and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  changelog:
+    name: Generate Changelog and Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate Changelog
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ github.token }}
+          tag: ${{ github.ref_name }}
+          excludeTypes: 'chore,style,docs'
+          includeInvalidCommits: true
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          draft: false
+          makeLatest: true
+          name: ${{ github.ref_name }}
+          body: |
+            ## What's Changed
+            
+            ${{ steps.changelog.outputs.changes }}
+            
+            ## Installation
+            
+            ```bash
+            npm install valkey-glidejs-mcp@latest
+            ```
+            
+            ## MCP Configuration
+            
+            Add to your Claude Desktop config:
+            ```json
+            {
+              "mcpServers": {
+                "valkey-glide": {
+                  "command": "npx",
+                  "args": ["valkey-glidejs-mcp"]
+                }
+              }
+            }
+            ```
+            
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.changelog.outputs.previousTag }}...${{ github.ref_name }}
+          token: ${{ github.token }}
+
+      - name: Update CHANGELOG.md
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: main
+          commit_message: 'docs: update CHANGELOG.md for ${{ github.ref_name }} [skip ci]'
+          file_pattern: CHANGELOG.md
+          create_branch: false

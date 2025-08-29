@@ -223,16 +223,19 @@ export const IOREDIS_DATASET: ApiDataset = {
     {
       category: "transactions",
       symbol: "multi()...exec()",
-      equivalent: { glide: "new Batch(client).command(...).exec()" },
-      description: "Transactional execution of multiple commands.",
+      equivalent: { glide: "new Transaction().command(...) → client.exec(tx)" },
+      description: "Atomic transactional execution of multiple commands.",
       quirks:
-        "Ensure errors are handled; Glide returns array of results/errors.",
+        "Use Transaction class for atomic operations. Ensure errors are handled; GLIDE returns array of results/errors.",
     },
     {
-      category: "pipeline",
+      category: "batch",
       symbol: "pipeline()...exec()",
-      equivalent: { glide: "new Batch(client).command(...).exec()" },
-      description: "Batch multiple commands without transactional guarantees.",
+      equivalent: { glide: "new Batch().command(...) → client.exec(batch)" },
+      description:
+        "Non-atomic batch execution of multiple commands (replaces deprecated pipeline).",
+      quirks:
+        "Use Batch class for non-atomic operations. Pipeline is deprecated, use batch instead.",
     },
     {
       category: "geo",

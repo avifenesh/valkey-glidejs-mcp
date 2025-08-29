@@ -213,15 +213,29 @@ console.log(results);
 `.trim(),
   pipelineExample: () =>
     `
-import { GlideClient, Transaction } from '@valkey/valkey-glide';
+import { GlideClient, Batch } from '@valkey/valkey-glide';
 const client = await GlideClient.createClient({ 
   addresses: [{ host: 'localhost', port: 6379 }] 
 });
-const pipeline = new Transaction();
-pipeline.set('p1', 'v1');
-pipeline.get('p1');
-const results = await client.exec(pipeline);
+// Pipeline is deprecated, use Batch instead
+const batch = new Batch();
+batch.set('p1', 'v1');
+batch.get('p1');
+const results = await client.exec(batch);
 console.log(results);
+`.trim(),
+  batchExample: () =>
+    `
+import { GlideClient, Batch } from '@valkey/valkey-glide';
+const client = await GlideClient.createClient({ 
+  addresses: [{ host: 'localhost', port: 6379 }] 
+});
+const batch = new Batch();
+batch.set('key1', 'value1');
+batch.get('key1');
+batch.incr('counter');
+const results = await client.exec(batch);
+console.log(results); // Non-atomic batch execution
 `.trim(),
   geoExample: () =>
     `
@@ -504,12 +518,31 @@ export function registerGeneratorTools(mcp: McpServer) {
       }) as any,
   );
   mcp.tool(
+    "gen.batch",
+    z.object({}).shape,
+    async () =>
+      ({
+        structuredContent: { code: templates.batchExample() },
+        content: [{ type: "text", text: templates.batchExample() }],
+      }) as any,
+  );
+  mcp.tool(
     "gen.pipeline",
     z.object({}).shape,
     async () =>
       ({
-        structuredContent: { code: templates.pipelineExample() },
-        content: [{ type: "text", text: templates.pipelineExample() }],
+        structuredContent: {
+          code: templates.pipelineExample(),
+          deprecated:
+            "Pipeline is deprecated. Use gen.batch instead. This tool now returns Batch example.",
+        },
+        content: [
+          {
+            type: "text",
+            text: "⚠️  Pipeline is deprecated. Use gen.batch instead.\n\n",
+          },
+          { type: "text", text: templates.pipelineExample() },
+        ],
       }) as any,
   );
   mcp.tool(

@@ -67,6 +67,7 @@ test("Comprehensive MCP Server Validation", async (t) => {
       "gen.zsets",
       "gen.streams",
       "gen.transaction",
+      "gen.batch",
       "gen.pipeline",
       "gen.geo",
       "gen.bitmaps",
@@ -260,6 +261,7 @@ const redis = new Redis();
       "gen.zsets",
       "gen.streams",
       "gen.transaction",
+      "gen.batch",
       "gen.pipeline",
       "gen.geo",
       "gen.bitmaps",
@@ -274,23 +276,27 @@ const redis = new Redis();
 
       const result = await tool!.handler({});
       assert.ok(result.content, `${toolName} should return content`);
-      const code = result.content[0].text;
+
+      // For tools with multiple content items (like deprecated gen.pipeline),
+      // check all content for GLIDE imports
+      const allContent = result.content.map((c) => c.text).join("\n");
 
       // Validate generated code
       assert.ok(
-        code.includes("@valkey/valkey-glide"),
+        allContent.includes("@valkey/valkey-glide"),
         `${toolName} should import GLIDE`,
       );
       assert.ok(
-        code.includes("GlideClient") || code.includes("GlideClusterClient"),
+        allContent.includes("GlideClient") ||
+          allContent.includes("GlideClusterClient"),
         `${toolName} should use GLIDE client`,
       );
       assert.ok(
-        !code.includes("new Redis"),
+        !allContent.includes("new Redis"),
         `${toolName} should not use ioredis constructor`,
       );
       assert.ok(
-        !code.includes("createClient()"),
+        !allContent.includes("createClient()"),
         `${toolName} should not use node-redis pattern`,
       );
     }

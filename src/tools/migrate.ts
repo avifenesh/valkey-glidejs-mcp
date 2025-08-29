@@ -42,7 +42,7 @@ function naiveTransform(source: string, from: "ioredis" | "node-redis") {
     // Import transformations
     code = code.replace(
       /import\s+Redis\s+from\s+['"]ioredis['"];?/g,
-      "import { GlideClient, GlideClusterClient, Transaction, Script } from '@valkey/valkey-glide';",
+      "import { GlideClient, GlideClusterClient, Transaction, Batch, Script } from '@valkey/valkey-glide';",
     );
 
     // Handle URL-based connections first
@@ -146,7 +146,7 @@ function parseRedisUrlRuntime(url: string) {
       ".set($1, $3, { expiry: { type: 'EX', count: $2 } })",
     );
 
-    // Pipeline -> Transaction (improved variable tracking)
+    // Pipeline -> Batch (non-atomic batching, replaces deprecated pipeline)
     const pipelineVariables = new Set();
 
     // Track pipeline variable declarations
@@ -154,16 +154,16 @@ function parseRedisUrlRuntime(url: string) {
       /const\s+(\w+)\s*=\s*(\w+)\.pipeline\(\);/g,
       (_, varName) => {
         pipelineVariables.add(varName);
-        return `const ${varName} = new Transaction();`;
+        return `const ${varName} = new Batch();`;
       },
     );
 
     // Handle direct pipeline calls without variable assignment
     code = code.replace(/(\w+)\.pipeline\(\);/g, () => {
-      return "const tx = new Transaction();";
+      return "const batch = new Batch();";
     });
 
-    // Fix transaction execution to use the correct client variable
+    // Fix batch execution to use the correct client variable
     // First extract client variable name from the code
     const clientVarMatch = code.match(
       /const\s+(\w+)\s*=\s*await\s+GlideClient\.createClient/,
@@ -296,7 +296,7 @@ await client.invokeScript(${scriptVar}, { keys: [${keys.join(", ")}], args: [${s
     code = code.replace(/from\s+['"]redis['"]/g, "from '@valkey/valkey-glide'");
     code = code.replace(
       /import\s*{\s*createClient\s*}\s*from/g,
-      "import { GlideClient, GlideClusterClient, Transaction, Script } from",
+      "import { GlideClient, GlideClusterClient, Transaction, Batch, Script } from",
     );
     code = code.replace(
       /import\s*{\s*(RedisStore)\s*}\s*from\s*['"]connect-redis['"]/g,
@@ -392,7 +392,7 @@ const client = await GlideClient.createClient(
     // Handle pipeline executions
     code = code.replace(
       /\.execAsPipeline\(\)/g,
-      "/* TODO: Use Transaction instead of pipeline */ .exec(tx)",
+      "/* TODO: Use Batch instead of pipeline */ .exec(batch)",
     );
 
     // Pub/Sub transformations

@@ -25,45 +25,73 @@ console.log(await cluster.get('hello'));
   pubsubAdvanced: ({ channel }: { channel: string }) =>
     `
 import { GlideClient } from '@valkey/valkey-glide';
-// Use dedicated clients for subscriber and publisher
+// GLIDE handles pub/sub with dedicated clients
+// Publisher client
 const publisher = await GlideClient.createClient({ 
   addresses: [{ host: 'localhost', port: 6379 }] 
 });
+
+// Subscriber client with callback configuration
 const subscriber = await GlideClient.createClient({ 
-  addresses: [{ host: 'localhost', port: 6379 }] 
+  addresses: [{ host: 'localhost', port: 6379 }],
+  pubsubSubscriptions: {
+    channelsAndPatterns: {
+      channels: ['${channel}']
+    },
+    callback: (message) => {
+      console.log('Received:', message);
+    }
+  }
 });
 
-// Async iterator style
+// Note: GLIDE doesn't support async iterators for pub/sub yet
+// Messages are handled via the callback provided at connection time
+// For await pattern could be simulated with an async queue:
+const messages = [];
+const messageQueue = {
+  async *[Symbol.asyncIterator]() {
+    while (true) {
+      if (messages.length > 0) {
+        yield messages.shift();
+      } else {
+        await new Promise(r => setTimeout(r, 100));
+      }
+    }
+  }
+};
+
+// Simulated for await pattern (for compatibility)
 (async () => {
-  for await (const message of subscriber.subscribe('${channel}')) {
-    console.log('received', message);
+  for await (const msg of messageQueue) {
+    console.log('Processing:', msg);
   }
 })();
 
+// Publish message
 await publisher.publish('${channel}', JSON.stringify({ type: 'greeting', payload: 'hello' }));
 `.trim(),
   cache: ({ key, ttlSeconds }: { key: string; ttlSeconds: number }) =>
     `
-import { GlideClient } from '@valkey/valkey-glide';
+import { GlideClient, TimeUnit } from '@valkey/valkey-glide';
 const client = await GlideClient.createClient({ 
   addresses: [{ host: 'localhost', port: 6379 }] 
 });
 const cached = await client.get('${key}');
 if (cached !== null) { return cached; }
 const fresh = await fetchData();
-await client.set('${key}', JSON.stringify(fresh), { expiry: { type: 'EX', count: ${ttlSeconds} } });
+await client.set('${key}', JSON.stringify(fresh), { expiry: { type: TimeUnit.Seconds, count: ${ttlSeconds} } });
 return fresh;
 `.trim(),
   lock: ({ lockKey, ttlMs }: { lockKey: string; ttlMs: number }) =>
     `
-import { GlideClient, Script } from '@valkey/valkey-glide';
+import { GlideClient, Script, TimeUnit } from '@valkey/valkey-glide';
 const client = await GlideClient.createClient({ 
   addresses: [{ host: 'localhost', port: 6379 }] 
 });
 const token = crypto.randomUUID();
 const acquired = await client.set('${lockKey}', token, { 
   conditionalSet: 'onlyIfDoesNotExist',
-  expiry: { type: 'EX', count: Math.floor(${ttlMs} / 1000) }
+  expiry: { type: TimeUnit.Seconds, count: Math.floor(${ttlMs} / 1000) }
 });
 if (!acquired) throw new Error('lock busy');
 try {
@@ -88,11 +116,17 @@ await client.publish('${channel}', JSON.stringify({ hello: 'world' }));
     `
 import { GlideClient } from '@valkey/valkey-glide';
 const client = await GlideClient.createClient({ 
-  addresses: [{ host: 'localhost', port: 6379 }] 
+  addresses: [{ host: 'localhost', port: 6379 }],
+  pubsubSubscriptions: {
+    channelsAndPatterns: {
+      channels: ['${channel}']
+    },
+    callback: (message) => {
+      console.log('Message received:', message);
+    }
+  }
 });
-for await (const msg of client.subscribe('${channel}')) {
-  console.log('message', msg);
-}
+// The callback will be invoked for each message
 `.trim(),
   fastify: () =>
     `
@@ -164,9 +198,35 @@ import { GlideClient } from '@valkey/valkey-glide';
 const client = await GlideClient.createClient({ 
   addresses: [{ host: 'localhost', port: 6379 }] 
 });
-await client.zadd('lb', { alice: 10, bob: 20 });
-console.log(await client.zrangeWithScores('lb', { start: 0, stop: -1 }));
-await client.zrem('lb', ['alice']);
+
+// Add members with scores (using Record<string, Score>)
+await client.zadd('leaderboard', { alice: 100, bob: 85, charlie: 92 });
+
+// Get score for a member
+const aliceScore = await client.zscore('leaderboard', 'alice');
+console.log('Alice score:', aliceScore);
+
+// Get rank (0-based, lowest score first)
+const bobRank = await client.zrank('leaderboard', 'bob');
+console.log('Bob rank:', bobRank);
+
+// Get reverse rank (highest score first)
+const bobRevRank = await client.zrevrank('leaderboard', 'bob');
+console.log('Bob reverse rank:', bobRevRank);
+
+// Range with scores (ascending by score) - note: uses 'end' not 'stop'
+const ascending = await client.zrangeWithScores('leaderboard', { start: 0, end: -1 });
+console.log('Ascending:', ascending);
+
+// Remove members
+await client.zrem('leaderboard', ['alice']);
+
+// Pop minimum and maximum (returns null or [member, score])
+const minMember = await client.zpopmin('leaderboard');
+console.log('Popped min:', minMember);
+
+const maxMember = await client.zpopmax('leaderboard');
+console.log('Popped max:', maxMember);
 `.trim(),
   streamExample: () =>
     `
@@ -241,7 +301,7 @@ console.log(results); // Non-atomic batch execution
 `.trim(),
   geoExample: () =>
     `
-import { GlideClient } from '@valkey/valkey-glide';
+import { GlideClient, GeoUnit } from '@valkey/valkey-glide';
 const client = await GlideClient.createClient({ 
   addresses: [{ host: 'localhost', port: 6379 }] 
 });
@@ -255,7 +315,7 @@ await client.geoadd('places', locations);
 // Search nearby locations
 const near = await client.geosearch('places', 
   { member: 'Palermo' }, 
-  { radius: 200, unit: 'km' }
+  { radius: 200, unit: GeoUnit.KILOMETERS }
 );
 console.log(near);
 `.trim(),
@@ -294,7 +354,7 @@ const client = await GlideClient.createClient({
   addresses: [{ host: 'localhost', port: 6379 }] 
 });
 await client.hset('user:1', { name: 'Avi', age: '30' });
-await client.hincrby('user:1', 'age', 1);
+await client.hincrBy('user:1', 'age', 1);
 console.log(await client.hgetall('user:1'));
 `.trim(),
   listsAdvanced: () =>
@@ -309,13 +369,57 @@ await client.ltrim('jobs', 1, -1);
 `.trim(),
   zsetRankings: () =>
     `
-import { GlideClient } from '@valkey/valkey-glide';
+import { GlideClient, InfBoundary } from '@valkey/valkey-glide';
 const client = await GlideClient.createClient({ 
   addresses: [{ host: 'localhost', port: 6379 }] 
 });
-await client.zadd('lb', { alice: 100, bob: 120 });
-console.log('rank alice', await client.zrank('lb', 'alice'));
-console.log('top', await client.zrevrangeWithScores('lb', 0, 2));
+
+// Create leaderboard with multiple players
+await client.zadd('rankings', { 
+  alice: 2500, 
+  bob: 1800, 
+  charlie: 3200,
+  diana: 2100,
+  eve: 2900
+});
+
+// Get player rank (0-based, ascending)
+const aliceRank = await client.zrank('rankings', 'alice');
+console.log('Alice rank (ascending):', aliceRank);
+
+// Get player reverse rank (0-based, descending)
+const aliceRevRank = await client.zrevrank('rankings', 'alice');
+console.log('Alice rank (descending):', aliceRevRank);
+
+// Get top 3 players with scores (using reverse option)
+const top3 = await client.zrangeWithScores('rankings', { start: 0, end: 2 }, { reverse: true });
+console.log('Top 3 players:', top3);
+
+// Count players in score range (using Boundary objects)
+const midRange = await client.zcount('rankings', 
+  { value: 2000, isInclusive: true }, 
+  { value: 2600, isInclusive: true }
+);
+console.log('Players with 2000-2600 score:', midRange);
+
+// Increment player score
+const newScore = await client.zaddIncr('rankings', 'bob', 150);
+console.log('Bob new score:', newScore);
+
+// Remove players below threshold
+await client.zremRangeByScore('rankings', 
+  InfBoundary.NegativeInfinity, 
+  { value: 2000, isInclusive: false }
+);
+console.log('Remaining players:', await client.zrange('rankings', { start: 0, end: -1 }));
+
+// Union multiple leaderboards (using KeyWeight array)
+await client.zadd('weekly_rankings', { alice: 500, frank: 600 });
+await client.zunionstore('combined', [
+  ['rankings', 1],
+  ['weekly_rankings', 0.1]  // Weekly scores count 10%
+]);
+console.log('Combined:', await client.zrangeWithScores('combined', { start: 0, end: -1 }));
 `.trim(),
   jsonAdvanced: () =>
     `

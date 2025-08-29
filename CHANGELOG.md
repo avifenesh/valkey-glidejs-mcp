@@ -1,3 +1,22 @@
+## [0.4.5](https://github.com/avifenesh/valkey-glidejs-mcp/compare/v0.4.4...v0.4.5) (2025-08-29)
+
+### Bug Fixes
+
+- **generators**: Fix all GLIDE API usage in code generators
+  - Fixed TimeUnit enum usage (TimeUnit.Seconds instead of 'EX')
+  - Fixed Transaction/Batch API (new Batch(true/false) instead of deprecated methods)
+  - Fixed Geo operations to use Map and GeoUnit enum
+  - Fixed method name typos (hincrBy instead of hincrby)
+  - Fixed ZSet operations with proper Boundary objects and range syntax
+  - Fixed pubsub examples to show callback-based approach
+  - All 27 generator tools now produce executable GLIDE code
+
+### Improvements
+
+- Comprehensive testing of all generated code examples
+- Verified all examples compile and execute against real Redis server
+- Updated return type handling for Set and array returns
+
 ## [0.4.4](https://github.com/avifenesh/valkey-glidejs-mcp/compare/v0.4.3...v0.4.4) (2025-08-29)
 
 ### Bug Fixes

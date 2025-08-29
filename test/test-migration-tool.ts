@@ -10,15 +10,18 @@ import path from "path";
 
 interface TestCase {
   name: string;
-  ioredisCode: string;
+  sourceCode: string;
+  from: 'ioredis' | 'node-redis';
   expectedPatterns: string[];
   shouldMigrate: string[];
 }
 
 const testCases: TestCase[] = [
+  // ioredis test cases
   {
-    name: "Session Management with Express",
-    ioredisCode: `
+    name: "ioredis: Session Management with Express",
+    from: 'ioredis',
+    sourceCode: `
 import Redis from 'ioredis';
 const redis = new Redis({
   host: 'localhost',
@@ -41,8 +44,9 @@ app.get('/profile', async (req, res) => {
   },
 
   {
-    name: "Distributed Lock Pattern",
-    ioredisCode: `
+    name: "ioredis: Distributed Lock Pattern",
+    from: 'ioredis',
+    sourceCode: `
 import Redis from 'ioredis';
 
 class DistributedLock {
@@ -200,6 +204,152 @@ class JobQueue {
     ],
     shouldMigrate: ["zadd", "zrangebyscore", "brpoplpush"],
   },
+
+  // node-redis test cases (based on real GitHub patterns)
+  {
+    name: "node-redis: Basic Connection Pattern",
+    from: 'node-redis',
+    sourceCode: `
+import { createClient } from 'redis';
+
+const client = createClient();
+client.on('error', err => console.log('Redis Client Error', err));
+
+await client.connect();
+
+const value = await client.get('key');
+const reply = await client.set('key', 'value');
+
+client.disconnect();
+    `,
+    expectedPatterns: ["GlideClient.createClient", "client.get", "client.set"],
+    shouldMigrate: ["createClient()", "client.connect()", "disconnect"],
+  },
+
+  {
+    name: "node-redis: Express Session with connect-redis",
+    from: 'node-redis',
+    sourceCode: `
+import {RedisStore} from "connect-redis";
+import session from "express-session";
+import {createClient} from "redis";
+
+let redisClient = createClient();
+redisClient.connect().catch(console.error);
+
+let redisStore = new RedisStore({
+  client: redisClient,
+  prefix: "myapp:",
+});
+
+app.use(
+  session({
+    store: redisStore,
+    resave: false,
+    saveUninitialized: false,
+    secret: "keyboard cat",
+  }),
+);
+    `,
+    expectedPatterns: ["GlideClient.createClient", "RedisStore"],
+    shouldMigrate: ["createClient()", "redisClient.connect()"],
+  },
+
+  {
+    name: "node-redis: Pub/Sub Pattern",
+    from: 'node-redis',
+    sourceCode: `
+import { createClient } from 'redis';
+
+const client = createClient();
+await client.connect();
+
+await client.publish('channel', 'message');
+
+const listener = (message, channel) => console.log(message, channel);
+await client.subscribe('channel', listener);
+await client.pSubscribe('channe*', listener);
+
+await client.unsubscribe();
+await client.pUnsubscribe();
+    `,
+    expectedPatterns: ["client.publish", "GlideClient.createClient"],
+    shouldMigrate: ["subscribe('channel'", "pSubscribe", "unsubscribe"],
+  },
+
+  {
+    name: "node-redis: Transaction/Multi Operations",
+    from: 'node-redis',
+    sourceCode: `
+import { createClient } from 'redis';
+
+const client = createClient();
+await client.connect();
+
+const [setKeyReply, otherKeyValue] = await client
+  .multi()
+  .set("key", "value")
+  .get("another-key")
+  .exec();
+
+await client.multi()
+  .set('seat:3', '#3')
+  .set('seat:4', '#4')
+  .set('seat:5', '#5')
+  .execAsPipeline();
+    `,
+    expectedPatterns: ["Transaction", "client.exec"],
+    shouldMigrate: ["multi()", ".exec()", "execAsPipeline"],
+  },
+
+  {
+    name: "node-redis: Hash Operations",
+    from: 'node-redis',
+    sourceCode: `
+import { createClient } from 'redis';
+
+const client = createClient();
+await client.connect();
+
+await client.hSet('user-session:123', {
+  name: 'John',
+  surname: 'Smith', 
+  company: 'Redis',
+  age: 29
+});
+
+let userSession = await client.hGetAll('user-session:123');
+const name = await client.hGet('user-session:123', 'name');
+
+client.disconnect();
+    `,
+    expectedPatterns: ["client.hset", "client.hgetAll", "client.hget"],
+    shouldMigrate: ["hSet", "hGetAll", "hGet"],
+  },
+
+  {
+    name: "node-redis: setEx and Expiration",
+    from: 'node-redis',
+    sourceCode: `
+import { createClient } from 'redis';
+
+const client = createClient();
+await client.connect();
+
+await client.setEx('cache:user:123', 3600, JSON.stringify({
+  name: 'John Doe',
+  email: 'john@example.com'
+}));
+
+await client.set('session:abc123', 'session-data', {
+  EX: 1800
+});
+
+client.disconnect();
+    `,
+    expectedPatterns: ["client.set", "expiry"],
+    shouldMigrate: ["setEx", "EX: 1800"],
+  },
 ];
 
 async function testMigrationTool() {
@@ -215,10 +365,10 @@ async function testMigrationTool() {
     try {
       // Create temporary file with the test code
       const tempFile = path.join(process.cwd(), "temp-migration-test.ts");
-      await fs.writeFile(tempFile, testCase.ioredisCode);
+      await fs.writeFile(tempFile, testCase.sourceCode);
 
       // Run MCP migration tool
-      const migratedCode = await runMigrationTool(testCase.ioredisCode);
+      const migratedCode = await runMigrationTool(testCase.sourceCode, testCase.from);
 
       const issues: string[] = [];
 
@@ -304,7 +454,7 @@ async function testMigrationTool() {
   return { successful, total, results };
 }
 
-async function runMigrationTool(code: string): Promise<string> {
+async function runMigrationTool(code: string, from: 'ioredis' | 'node-redis'): Promise<string> {
   return new Promise((resolve, reject) => {
     // Simulate calling our MCP migration tool
     // In reality, this would use the MCP client to call the migrate tool
@@ -333,7 +483,7 @@ async function runMigrationTool(code: string): Promise<string> {
     });
 
     // Send the code to stdin
-    child.stdin.write(JSON.stringify({ code, from: "ioredis" }));
+    child.stdin.write(JSON.stringify({ code, from }));
     child.stdin.end();
   });
 }

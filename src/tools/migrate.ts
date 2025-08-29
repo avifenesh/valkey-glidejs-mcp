@@ -200,17 +200,131 @@ await client.invokeScript(${scriptVar}, { keys: [${keys.join(", ")}], args: [${s
       '/* TODO: Use customCommand for BZPOPMAX */ .customCommand(["BZPOPMAX"',
     );
   } else {
-    // node-redis transformations
+    // node-redis transformations (enhanced for real-world patterns)
+    
+    // Import transformations
     code = code.replace(/from\s+['"]redis['"]/g, "from '@valkey/valkey-glide'");
     code = code.replace(
       /import\s*{\s*createClient\s*}\s*from/g,
-      "import { GlideClient } from",
+      "import { GlideClient, GlideClusterClient, Transaction, Script } from",
     );
-    code = code.replace(/createClient\s*\(/g, "GlideClient.createClient(");
     code = code.replace(
-      /client\.connect\(\);?/g,
-      "// Connection is automatic in GLIDE",
+      /import\s*{\s*(RedisStore)\s*}\s*from\s*['"]connect-redis['"]/g,
+      "import { $1 } from 'connect-redis'",
     );
+
+    // Client creation with configuration mapping
+    code = code.replace(/createClient\s*\(\s*\)/g, 
+      "await GlideClient.createClient({ addresses: [{ host: 'localhost', port: 6379 }] })");
+    
+    // Handle URL-based connections
+    code = code.replace(/createClient\s*\(\s*{\s*url:\s*([^}]+)\s*}\s*\)/g, 
+      (_, urlExpr) => {
+        if (urlExpr.includes('process.env') || urlExpr.includes('||')) {
+          return `await GlideClient.createClient({ 
+            addresses: [{ host: 'localhost', port: 6379 }] 
+            /* TODO: Parse URL from ${urlExpr} and configure addresses */
+          })`;
+        }
+        return "await GlideClient.createClient({ addresses: [{ host: 'localhost', port: 6379 }] })";
+      });
+
+    // Handle socket configuration (reconnection strategies)
+    code = code.replace(/createClient\s*\(\s*{\s*socket:\s*{[^}]*reconnectStrategy[^}]*}\s*}\s*\)/g,
+      `await GlideClient.createClient({ 
+        addresses: [{ host: 'localhost', port: 6379 }],
+        connectionRetryStrategy: { numberOfRetries: 10, baseDelay: 100, factor: 2 }
+      })`);
+
+    // Connection handling
+    code = code.replace(/(\w+)\.connect\(\)\.catch\(console\.error\);?/g, 
+      "// Connection is automatic in GLIDE");
+    code = code.replace(/await\s+(\w+)\.connect\(\);?/g, 
+      "// Connection is automatic in GLIDE");
+    code = code.replace(/(\w+)\.connect\(\);?/g, 
+      "// Connection is automatic in GLIDE");
+
+    // Disconnection
+    code = code.replace(/(\w+)\.disconnect\(\);?/g, "$1.close();");
+
+    // Hash operations (node-redis uses different casing)
+    code = code.replace(/\.hSet\(/g, ".hset(");
+    code = code.replace(/\.hGet\(/g, ".hget(");
+    code = code.replace(/\.hGetAll\(/g, ".hgetAll(");
+
+    // SetEx operations
+    code = code.replace(/\.setEx\s*\(\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/g,
+      ".set($1, $3, { expiry: { type: 'EX', count: $2 } })");
+
+    // SET with options (node-redis v4 style)
+    code = code.replace(/\.set\s*\(\s*([^,]+),\s*([^,]+),\s*{\s*EX:\s*([^}]+)\s*}\)/g,
+      ".set($1, $2, { expiry: { type: 'EX', count: $3 } })");
+
+    // Transaction handling (multi/exec)
+    const multiVariables = new Set();
+    
+    // Track multi variable declarations and chained multi calls
+    code = code.replace(/const\s+\[([^\]]+)\]\s*=\s*await\s+(\w+)\s*\.multi\(\)/g, 
+      (match, destructure, clientVar) => {
+        return `const tx = new Transaction();\n    // TODO: Chain your commands to tx, then:\n    const [${destructure}] = await ${clientVar}.exec(tx)`;
+      });
+
+    // Handle direct multi chains
+    code = code.replace(/await\s+(\w+)\.multi\(\)/g, (_, clientVar) => {
+      return `const tx = new Transaction();\n    // TODO: Chain your commands to tx, then:\n    await ${clientVar}.exec(tx)`;
+    });
+
+    // Handle pipeline executions
+    code = code.replace(/\.execAsPipeline\(\)/g, 
+      "/* TODO: Use Transaction instead of pipeline */ .exec(tx)");
+
+    // Pub/Sub transformations
+    code = code.replace(/await\s+(\w+)\.subscribe\s*\(\s*['"]([^'"]+)['"],\s*([^)]+)\)/g,
+      "/* TODO: GLIDE Pub/Sub requires callback configuration during client creation\n" +
+      " * Configure pubsubSubscriptions in GlideClient.createClient() options\n" +
+      " */ // $1.subscribe('$2', $3)");
+
+    code = code.replace(/await\s+(\w+)\.pSubscribe\s*\(\s*['"]([^'"]+)['"],\s*([^)]+)\)/g,
+      "/* TODO: Use pattern-based pubsubSubscriptions in client config */ // $1.pSubscribe('$2', $3)");
+
+    code = code.replace(/await\s+(\w+)\.unsubscribe\(\)/g, 
+      "/* TODO: Unsubscribe not directly supported - recreate client if needed */ // $1.unsubscribe()");
+
+    code = code.replace(/await\s+(\w+)\.pUnsubscribe\(\)/g, 
+      "/* TODO: Pattern unsubscribe not directly supported */ // $1.pUnsubscribe()");
+
+    // JSON operations (if present)
+    code = code.replace(/\.json\.set\(/g, ".json.set(");
+    code = code.replace(/\.json\.get\(/g, ".json.get(");
+    code = code.replace(/\.json\.numIncrBy\(/g, ".json.numIncrBy(");
+    code = code.replace(/\.json\.arrAppend\(/g, ".json.arrAppend(");
+
+    // Lua scripting
+    code = code.replace(/await\s+(\w+)\.eval\s*\(\s*([^,]+),\s*{\s*keys:\s*\[([^\]]*)\],\s*arguments:\s*\[([^\]]*)\]\s*}\)/g,
+      (_, clientVar, scriptVar, keys, args) => {
+        return `/* TODO: Create Script object */\n` +
+               `const script = new Script(${scriptVar});\n` +
+               `await ${clientVar}.invokeScript(script, { keys: [${keys}], args: [${args}] })`;
+      });
+
+    code = code.replace(/await\s+(\w+)\.scriptLoad\s*\(\s*([^)]+)\)/g,
+      "/* TODO: Scripts are loaded automatically in GLIDE */ // scriptLoad($2)");
+
+    code = code.replace(/await\s+(\w+)\.evalSha\s*\(/g,
+      "/* TODO: Use invokeScript with Script object */ // $1.evalSha(");
+
+    // Error event handlers
+    code = code.replace(/(\w+)\.on\s*\(\s*['"]error['"],\s*([^)]+)\)/g,
+      "// TODO: GLIDE handles errors differently - use try/catch around operations");
+
+    code = code.replace(/(\w+)\.on\s*\(\s*['"]connect['"],\s*([^)]+)\)/g,
+      "// Connection events not available in GLIDE");
+
+    code = code.replace(/(\w+)\.on\s*\(\s*['"]ready['"],\s*([^)]+)\)/g,
+      "// Ready events not available in GLIDE");
+
+    code = code.replace(/(\w+)\.on\s*\(\s*['"]end['"],\s*([^)]+)\)/g,
+      "// End events not available in GLIDE");
   }
   return code;
 }

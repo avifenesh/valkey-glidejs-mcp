@@ -1,3 +1,24 @@
+## [0.5.0](https://github.com/avifenesh/valkey-glidejs-mcp/compare/v0.4.5...v0.5.0) (2025-08-29)
+
+### Features
+
+- **generators**: Add enterprise-grade GLIDE features and configurations
+  - Added AZ affinity client configuration (`gen.azAffinityClient`)
+  - Added read preference routing strategies (`gen.readPreferenceClient`)
+  - Added advanced cluster scanning with routing (`gen.clusterScanAdvanced`)
+  - Added comprehensive routing patterns (`gen.routingStrategies`)
+  - Added telemetry and performance monitoring (`gen.telemetryClient`)
+  - Added connection resilience with backoff and circuit breaker (`gen.connectionBackoff`)
+  - Total generators expanded from 27 to 33 tools
+  - All new generators support production-grade cluster deployments
+
+### Improvements
+
+- Enhanced client configuration examples with protocol versions
+- Added circuit breaker pattern for fault tolerance
+- Improved hash tag usage for multi-key operations
+- All 66 tests continue to pass with new functionality
+
 ## [0.4.5](https://github.com/avifenesh/valkey-glidejs-mcp/compare/v0.4.4...v0.4.5) (2025-08-29)
 
 ### Bug Fixes

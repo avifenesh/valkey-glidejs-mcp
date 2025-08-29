@@ -79,6 +79,12 @@ test("Comprehensive MCP Server Validation", async (t) => {
       "gen.jsonAdvanced",
       "gen.scan",
       "gen.clientAdvanced",
+      "gen.azAffinityClient",
+      "gen.readPreferenceClient",
+      "gen.clusterScanAdvanced",
+      "gen.routingStrategies",
+      "gen.telemetryClient",
+      "gen.connectionBackoff",
       // Verify
       "verify.static",
       // Data

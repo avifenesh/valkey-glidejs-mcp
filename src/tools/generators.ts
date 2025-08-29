@@ -474,6 +474,338 @@ const cluster = await GlideClusterClient.createClient({
   requestTimeout: 2000,
 });
 `.trim(),
+  azAffinityClient: () =>
+    `
+import { GlideClusterClient, ReadFrom } from '@valkey/valkey-glide';
+
+// Client with AZ affinity configuration
+const azAwareClient = await GlideClusterClient.createClient({
+  addresses: [
+    { host: 'node1.us-east-1a.cluster.local', port: 6379 },
+    { host: 'node2.us-east-1b.cluster.local', port: 6379 },
+    { host: 'node3.us-east-1c.cluster.local', port: 6379 },
+  ],
+  // Set the client's availability zone
+  clientAz: 'us-east-1a',
+  // Configure read preference for AZ affinity
+  readFrom: ReadFrom.AZAffinity,
+  requestTimeout: 3000,
+  credentials: {
+    username: process.env.VALKEY_USERNAME,
+    password: process.env.VALKEY_PASSWORD,
+  },
+});
+
+// Example: Reading with AZ affinity
+// Reads will prefer replicas in the same AZ (us-east-1a)
+const value = await azAwareClient.get('user:123');
+console.log('Value read from AZ-local replica:', value);
+
+// Writes always go to primary
+await azAwareClient.set('user:123', JSON.stringify({ name: 'John', region: 'us-east-1a' }));
+`.trim(),
+  readPreferenceClient: () =>
+    `
+import { GlideClusterClient, ReadFrom, Routes } from '@valkey/valkey-glide';
+
+// Client with different read strategies
+const readOptimizedClient = await GlideClusterClient.createClient({
+  addresses: [
+    { host: 'primary.cluster.local', port: 6379 },
+    { host: 'replica1.cluster.local', port: 6379 },
+    { host: 'replica2.cluster.local', port: 6379 },
+  ],
+  // Read preference strategies:
+  // ReadFrom.Primary - Always read from primary (strong consistency)
+  // ReadFrom.PreferReplica - Prefer replicas for reads (better read scaling)
+  // ReadFrom.AZAffinity - Prefer same AZ (lower latency)
+  readFrom: ReadFrom.PreferReplica,
+  requestTimeout: 2000,
+});
+
+// Example: Explicit routing for reads
+// Force read from primary for consistency-critical operations
+const criticalData = await readOptimizedClient.get('critical:key', {
+  route: Routes.primaryNodeRoute(),
+});
+
+// Allow reading from replicas for scale
+const cachedData = await readOptimizedClient.get('cache:key', {
+  route: Routes.replicaNodeRoute(),
+});
+
+// Route by hash slot for specific key patterns
+const userData = await readOptimizedClient.get('user:123', {
+  route: Routes.keyRoute('user:123'),
+});
+`.trim(),
+  clusterScanAdvanced: () =>
+    `
+import { GlideClusterClient, Routes } from '@valkey/valkey-glide';
+
+const cluster = await GlideClusterClient.createClient({
+  addresses: [
+    { host: 'localhost', port: 7000 },
+    { host: 'localhost', port: 7001 },
+  ],
+});
+
+// Advanced cluster scanning with options
+const scanOptions = {
+  match: 'user:*',           // Pattern to match keys
+  count: 100,                 // Suggested batch size
+  type: 'string',            // Only scan string keys
+};
+
+// Scan across all cluster nodes
+let cursor = '0';
+const allKeys = [];
+
+do {
+  const result = await cluster.scan(cursor, scanOptions);
+  cursor = result[0];
+  const keys = result[1];
+  allKeys.push(...keys);
+  
+  console.log('Found', keys.length, 'keys in this batch');
+  
+  // Process keys in batches to avoid memory issues
+  if (keys.length > 0) {
+    const values = await Promise.all(
+      keys.map(key => cluster.get(key))
+    );
+    console.log('Batch processed:', keys.length);
+  }
+} while (cursor !== '0');
+
+console.log('Total keys found:', allKeys.length);
+
+// Scan with routing to specific nodes
+const primaryScan = await cluster.scan('0', {
+  match: 'session:*',
+  count: 50,
+  route: Routes.primaryNodeRoute(), // Scan only primary nodes
+});
+
+const replicaScan = await cluster.scan('0', {
+  match: 'cache:*',
+  count: 50,
+  route: Routes.replicaNodeRoute(), // Scan only replica nodes
+});
+`.trim(),
+  routingStrategies: () =>
+    `
+import { GlideClusterClient, Routes, SlotType, Batch } from '@valkey/valkey-glide';
+
+const cluster = await GlideClusterClient.createClient({
+  addresses: [
+    { host: 'localhost', port: 7000 },
+    { host: 'localhost', port: 7001 },
+  ],
+});
+
+// Different routing strategies for cluster operations
+
+// 1. Route by key - automatically determines the slot
+await cluster.set('user:123', 'data', {
+  route: Routes.keyRoute('user:123'),
+});
+
+// 2. Route by slot - explicitly specify the slot number
+const slot = 12345;
+await cluster.get('some:key', {
+  route: Routes.slotRoute(slot, SlotType.Primary),
+});
+
+// 3. Route to all primaries - for broadcast operations
+await cluster.flushall({
+  route: Routes.allPrimaries(),
+});
+
+// 4. Route to all nodes - for monitoring/info commands
+const info = await cluster.info({
+  route: Routes.allNodes(),
+});
+
+// 5. Route to random node - for load distribution
+await cluster.ping({
+  route: Routes.randomRoute(),
+});
+
+// 6. Multi-key operations with same slot
+// Use hash tags to ensure keys are in the same slot
+const hashTag = '{user:123}';
+await cluster.mset([
+  [hashTag + ':profile', JSON.stringify({ name: 'John' })],
+  [hashTag + ':settings', JSON.stringify({ theme: 'dark' })],
+  [hashTag + ':activity', JSON.stringify({ lastLogin: Date.now() })],
+]);
+
+// Transaction with routing
+const transaction = new Batch(true);
+transaction.get(hashTag + ':profile');
+transaction.get(hashTag + ':settings');
+const results = await cluster.exec(transaction, {
+  route: Routes.keyRoute(hashTag),
+});
+`.trim(),
+  telemetryClient: () =>
+    `
+import { GlideClient, TimeUnit } from '@valkey/valkey-glide';
+
+// Simple telemetry wrapper for GLIDE client
+class TelemetryGlideClient {
+  private client: GlideClient;
+  private metrics: Map<string, { count: number; totalMs: number }>;
+  
+  constructor(client: GlideClient) {
+    this.client = client;
+    this.metrics = new Map();
+  }
+  
+  private recordMetric(operation: string, durationMs: number) {
+    const metric = this.metrics.get(operation) || { count: 0, totalMs: 0 };
+    metric.count++;
+    metric.totalMs += durationMs;
+    this.metrics.set(operation, metric);
+  }
+  
+  async get(key: string): Promise<string | null> {
+    const startTime = Date.now();
+    try {
+      const result = await this.client.get(key);
+      const duration = Date.now() - startTime;
+      this.recordMetric('GET', duration);
+      console.log('GET', key, 'took', duration + 'ms, cache_hit=' + (result !== null));
+      return result;
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      this.recordMetric('GET_ERROR', duration);
+      throw error;
+    }
+  }
+  
+  async set(key: string, value: string, ttl?: number): Promise<void> {
+    const startTime = Date.now();
+    try {
+      await this.client.set(key, value, ttl ? { 
+        expiry: { type: TimeUnit.Seconds, count: ttl } 
+      } : undefined);
+      const duration = Date.now() - startTime;
+      this.recordMetric('SET', duration);
+      console.log('SET', key, 'took', duration + 'ms');
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      this.recordMetric('SET_ERROR', duration);
+      throw error;
+    }
+  }
+  
+  getMetrics() {
+    const report: any = {};
+    for (const [op, stats] of this.metrics.entries()) {
+      report[op] = {
+        count: stats.count,
+        avgMs: Math.round(stats.totalMs / stats.count),
+        totalMs: stats.totalMs,
+      };
+    }
+    return report;
+  }
+}
+
+// Usage
+const baseClient = await GlideClient.createClient({
+  addresses: [{ host: 'localhost', port: 6379 }],
+  clientName: 'telemetry-app',
+});
+
+const client = new TelemetryGlideClient(baseClient);
+
+// All operations are now tracked
+await client.set('user:123', JSON.stringify({ name: 'John' }), 3600);
+const user = await client.get('user:123');
+
+// Get metrics report
+console.log('Metrics:', client.getMetrics());
+`.trim(),
+  connectionBackoff: () =>
+    `
+import { GlideClient } from '@valkey/valkey-glide';
+
+// Client with custom connection backoff strategy
+const resilientClient = await GlideClient.createClient({
+  addresses: [{ host: 'localhost', port: 6379 }],
+  
+  // Connection backoff configuration for resilience
+  connectionBackoff: {
+    numberOfRetries: 5,        // Max retry attempts
+    factor: 2,                  // Backoff multiplier
+    exponentBase: 2,           // Exponential base for delays
+  },
+  
+  // Other resilience settings
+  requestTimeout: 5000,        // 5 second timeout per request
+  inflightRequestsLimit: 500,  // Limit concurrent requests
+});
+
+// Example: Graceful degradation with fallback
+async function getWithFallback(key: string, fallback: any) {
+  try {
+    const value = await resilientClient.get(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch (error) {
+    console.error('Failed to get from Valkey, using fallback:', error);
+    return fallback;
+  }
+}
+
+// Usage with resilience
+const userData = await getWithFallback('user:123', { 
+  name: 'Guest', 
+  cached: false 
+});
+
+// Implement circuit breaker pattern
+class CircuitBreaker {
+  private failures = 0;
+  private lastFailTime = 0;
+  private readonly threshold = 5;
+  private readonly timeout = 60000; // 1 minute
+  
+  async execute<T>(fn: () => Promise<T>): Promise<T> {
+    if (this.isOpen()) {
+      throw new Error('Circuit breaker is open');
+    }
+    
+    try {
+      const result = await fn();
+      this.onSuccess();
+      return result;
+    } catch (error) {
+      this.onFailure();
+      throw error;
+    }
+  }
+  
+  private isOpen(): boolean {
+    return this.failures >= this.threshold && 
+           (Date.now() - this.lastFailTime) < this.timeout;
+  }
+  
+  private onSuccess() {
+    this.failures = 0;
+  }
+  
+  private onFailure() {
+    this.failures++;
+    this.lastFailTime = Date.now();
+  }
+}
+
+const breaker = new CircuitBreaker();
+await breaker.execute(() => resilientClient.get('key'));
+`.trim(),
 };
 
 export function registerGeneratorTools(mcp: McpServer) {
@@ -739,6 +1071,60 @@ export function registerGeneratorTools(mcp: McpServer) {
       ({
         structuredContent: { code: templates.clientAdvanced() },
         content: [{ type: "text", text: templates.clientAdvanced() }],
+      }) as any,
+  );
+  mcp.tool(
+    "gen.azAffinityClient",
+    z.object({}).shape,
+    async () =>
+      ({
+        structuredContent: { code: templates.azAffinityClient() },
+        content: [{ type: "text", text: templates.azAffinityClient() }],
+      }) as any,
+  );
+  mcp.tool(
+    "gen.readPreferenceClient",
+    z.object({}).shape,
+    async () =>
+      ({
+        structuredContent: { code: templates.readPreferenceClient() },
+        content: [{ type: "text", text: templates.readPreferenceClient() }],
+      }) as any,
+  );
+  mcp.tool(
+    "gen.clusterScanAdvanced",
+    z.object({}).shape,
+    async () =>
+      ({
+        structuredContent: { code: templates.clusterScanAdvanced() },
+        content: [{ type: "text", text: templates.clusterScanAdvanced() }],
+      }) as any,
+  );
+  mcp.tool(
+    "gen.routingStrategies",
+    z.object({}).shape,
+    async () =>
+      ({
+        structuredContent: { code: templates.routingStrategies() },
+        content: [{ type: "text", text: templates.routingStrategies() }],
+      }) as any,
+  );
+  mcp.tool(
+    "gen.telemetryClient",
+    z.object({}).shape,
+    async () =>
+      ({
+        structuredContent: { code: templates.telemetryClient() },
+        content: [{ type: "text", text: templates.telemetryClient() }],
+      }) as any,
+  );
+  mcp.tool(
+    "gen.connectionBackoff",
+    z.object({}).shape,
+    async () =>
+      ({
+        structuredContent: { code: templates.connectionBackoff() },
+        content: [{ type: "text", text: templates.connectionBackoff() }],
       }) as any,
   );
 }

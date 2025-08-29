@@ -2,14 +2,14 @@
 
 [![npm version](https://badge.fury.io/js/valkey-glidejs-mcp.svg)](https://www.npmjs.com/package/valkey-glidejs-mcp)
 
-A Model Context Protocol (MCP) server that helps AI assistants work with [Valkey GLIDE](https://github.com/valkey-io/valkey-glide), the high-performance Redis/Valkey client.
+A Model Context Protocol (MCP) server that helps AI assistants work with [Valkey GLIDE](https://github.com/valkey-io/valkey-glide), the high-performance Valkey/Redis-compatible client.
 
 ## What it does
 
 This MCP server gives AI assistants like Claude the ability to:
 - Generate correct GLIDE client code
 - Migrate code from ioredis/node-redis to GLIDE
-- Provide working examples for Redis data structures
+- Provide working examples for Valkey data structures
 - Answer questions about GLIDE APIs with 100% coverage (296 methods)
 
 ## Installation
@@ -41,7 +41,7 @@ Once installed, you can ask Claude to:
 
 - **"Create a Valkey GLIDE client"** - Get basic connection code
 - **"Migrate this ioredis code to GLIDE"** - Convert existing code
-- **"Show me how to use Redis streams with GLIDE"** - Get specific examples
+- **"Show me how to use Valkey streams with GLIDE"** - Get specific examples
 - **"Create a distributed lock with GLIDE"** - Generate pattern implementations
 - **"Set up a rate limiter using GLIDE"** - Build common patterns
 
@@ -55,7 +55,7 @@ The MCP server provides these tools to AI assistants:
 - Distributed locks
 - Rate limiters
 - Caching patterns
-- All Redis data structures (strings, hashes, lists, sets, sorted sets, streams, geo, bitmaps, HyperLogLog)
+- All Valkey data structures (strings, hashes, lists, sets, sorted sets, streams, geo, bitmaps, HyperLogLog)
 
 ### Migration
 - Convert ioredis/node-redis code to GLIDE
@@ -82,7 +82,7 @@ await client.set('key', 'value');
 const value = await client.get('key');
 
 // Cleanup
-await client.close();
+client.close();
 ```
 
 ## Important Notes

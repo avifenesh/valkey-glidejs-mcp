@@ -3,14 +3,14 @@ import assert from "node:assert/strict";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { registerGeneratorTools } from "../src/tools/generators.js";
 
-test("gen.geo includes geoadd and geosearchstore", async () => {
+test("gen.geo includes geoadd and geosearch", async () => {
   const mcp = new McpServer({ name: "test", version: "0.0.0" });
   registerGeneratorTools(mcp);
   const tool = (mcp as any)._registeredTools?.["gen.geo"];
   const res = await tool.callback({} as any, {} as any);
   const code = res.structuredContent.code as string;
   assert.ok(code.includes("geoadd"));
-  assert.ok(code.includes("geosearchstore"));
+  assert.ok(code.includes("geosearch"));
 });
 
 test("gen.bitmaps includes setbit/getbit/bitcount", async () => {

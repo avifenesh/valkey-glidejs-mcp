@@ -8,10 +8,10 @@ A Model Context Protocol (MCP) server that helps AI assistants work with [Valkey
 
 This MCP server gives AI assistants (Claude, Continue, Cline, Zed, etc.) the ability to:
 
-- **Enhanced Migration**: Production-ready migration from ioredis/node-redis to GLIDE with 100% success rate on 51 tested patterns
+- **Enhanced Migration**: Production-ready migration from ioredis/node-redis to GLIDE with 100% success rate on comprehensive test patterns
 - **Smart Code Generation**: Generate correct GLIDE client code with proper configuration mapping
 - **Real-world Pattern Support**: Handle complex patterns like distributed locks, rate limiting, pub/sub, transactions
-- **Complete API Coverage**: Answer questions about GLIDE APIs with 100% coverage (296 methods)
+- **Complete API Coverage**: Answer questions about GLIDE APIs with comprehensive method coverage
 - **Runtime Validation**: All migrations tested against real Valkey instances
 
 ## Installation
@@ -76,9 +76,9 @@ Once installed, you can ask your AI assistant to:
 
 The MCP server provides these tools to AI assistants:
 
-### Enhanced Migration (🆕 v0.4.0)
+### Enhanced Migration
 
-- **Dual Client Support**: Migrates both ioredis and node-redis to GLIDE with 51 comprehensive test patterns
+- **Dual Client Support**: Migrates both ioredis and node-redis to GLIDE with comprehensive test coverage
 - **URL Connection Parsing**: Handles redis:// and rediss:// URLs with automatic TLS and auth extraction
 - **Smart Configuration Mapping**: Converts connection options to GLIDE format with retry strategies
 - **Transaction Support**: Converts pipelines to GLIDE Transactions with proper variable tracking
@@ -100,7 +100,7 @@ The MCP server provides these tools to AI assistants:
 
 - Search GLIDE methods
 - Browse by category (strings, hashes, lists, etc.)
-- Get detailed API documentation with 100% GLIDE API coverage (296 methods)
+- Get detailed API documentation with comprehensive GLIDE API coverage
 
 ## GLIDE Client Basics
 

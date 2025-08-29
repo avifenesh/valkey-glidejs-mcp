@@ -8,25 +8,27 @@ function parseRedisUrl(url: string): string {
   try {
     const parsed = new URL(url);
     const config = {
-      addresses: [{
-        host: parsed.hostname || 'localhost',
-        port: parsed.port ? parseInt(parsed.port) : 6379
-      }]
+      addresses: [
+        {
+          host: parsed.hostname || "localhost",
+          port: parsed.port ? parseInt(parsed.port) : 6379,
+        },
+      ],
     };
-    
+
     // Add TLS configuration for rediss://
-    if (parsed.protocol === 'rediss:') {
+    if (parsed.protocol === "rediss:") {
       (config as any).useTLS = true;
     }
-    
+
     // Add authentication if present
     if (parsed.username || parsed.password) {
       (config as any).credentials = {
         username: parsed.username || undefined,
-        password: parsed.password || undefined
+        password: parsed.password || undefined,
       };
     }
-    
+
     return JSON.stringify(config, null, 2).replace(/"/g, "'");
   } catch (error) {
     return `{ addresses: [{ host: 'localhost', port: 6379 }] }
@@ -197,7 +199,8 @@ function parseRedisUrlRuntime(url: string) {
     code = code.replace(
       /\.eval\s*\(\s*`([^`]+)`,\s*(\d+),\s*([^)]+)\)/g,
       (_, scriptCode, numKeys, argsStr) => {
-        const scriptVar = `${scriptCode.match(/\w+/)?.[0] || 'script'}_script`.toLowerCase();
+        const scriptVar =
+          `${scriptCode.match(/\w+/)?.[0] || "script"}_script`.toLowerCase();
         const args = argsStr.split(",").map((arg: string) => arg.trim());
         const keys = args.slice(0, parseInt(numKeys));
         const scriptArgs = args.slice(parseInt(numKeys));
@@ -215,7 +218,8 @@ await client.invokeScript(${scriptVar}, { keys: [${keys.join(", ")}], args: [${s
     code = code.replace(
       /\.eval\s*\(\s*['"]([^'"]+)['"],\s*(\d+),\s*([^)]+)\)/g,
       (_, scriptCode, numKeys, argsStr) => {
-        const scriptVar = `${scriptCode.match(/\w+/)?.[0] || 'script'}_script`.toLowerCase();
+        const scriptVar =
+          `${scriptCode.match(/\w+/)?.[0] || "script"}_script`.toLowerCase();
         const args = argsStr.split(",").map((arg: string) => arg.trim());
         const keys = args.slice(0, parseInt(numKeys));
         const scriptArgs = args.slice(parseInt(numKeys));
@@ -275,28 +279,16 @@ await client.invokeScript(${scriptVar}, { keys: [${keys.join(", ")}], args: [${s
     // Blocking operations migration - use native GLIDE methods
     code = code.replace(
       /\.brpoplpush\s*\(/g,
-      '.blmove(', // GLIDE uses modern BLMOVE instead of deprecated BRPOPLPUSH
+      ".blmove(", // GLIDE uses modern BLMOVE instead of deprecated BRPOPLPUSH
     );
 
-    code = code.replace(
-      /\.blpop\s*\(/g,
-      '.blpop(',
-    );
+    code = code.replace(/\.blpop\s*\(/g, ".blpop(");
 
-    code = code.replace(
-      /\.brpop\s*\(/g,
-      '.brpop(',
-    );
+    code = code.replace(/\.brpop\s*\(/g, ".brpop(");
 
-    code = code.replace(
-      /\.bzpopmin\s*\(/g,
-      '.bzpopmin(',
-    );
+    code = code.replace(/\.bzpopmin\s*\(/g, ".bzpopmin(");
 
-    code = code.replace(
-      /\.bzpopmax\s*\(/g,
-      '.bzpopmax(',
-    );
+    code = code.replace(/\.bzpopmax\s*\(/g, ".bzpopmax(");
   } else {
     // node-redis transformations (enhanced for real-world patterns)
 

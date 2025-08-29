@@ -176,13 +176,13 @@ client.close();
 
 ## 📊 Performance & Quality Metrics
 
-| Metric                 | Value           | Description                     |
-| ---------------------- | --------------- | ------------------------------- |
-| **API Coverage**       | 673 methods     | Complete GLIDE API surface      |
-| **Command Support**    | 296 commands   | GLIDE-supported commands        |
+| Metric                 | Value           | Description                      |
+| ---------------------- | --------------- | -------------------------------- |
+| **API Coverage**       | 673 methods     | Complete GLIDE API surface       |
+| **Command Support**    | 296 commands    | GLIDE-supported commands         |
 | **Migration Success**  | 100%            | Tested on 65+ migration patterns |
-| **Test Coverage**      | 65+ patterns    | Real GitHub repository code     |
-| **Runtime Validation** | ✅ Live testing | Against actual Valkey instances |
+| **Test Coverage**      | 65+ patterns    | Real GitHub repository code      |
+| **Runtime Validation** | ✅ Live testing | Against actual Valkey instances  |
 
 ## 🎯 Key Differences from ioredis/node-redis
 

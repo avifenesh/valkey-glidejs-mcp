@@ -6,7 +6,7 @@ A Model Context Protocol (MCP) server that helps AI assistants work with [Valkey
 
 ## What it does
 
-This MCP server gives AI assistants like Claude the ability to:
+This MCP server gives AI assistants (Claude, Continue, Cline, Zed, etc.) the ability to:
 - Generate correct GLIDE client code
 - Migrate code from ioredis/node-redis to GLIDE
 - Provide working examples for Valkey data structures
@@ -14,14 +14,18 @@ This MCP server gives AI assistants like Claude the ability to:
 
 ## Installation
 
-### For Claude Desktop
-
-1. Install the package globally:
+### Prerequisites
 ```bash
 npm install -g valkey-glidejs-mcp
 ```
 
-2. Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+### For Claude Desktop
+
+Add to your Claude Desktop configuration:
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+- **Linux**: `~/.config/Claude/claude_desktop_config.json`
+
 ```json
 {
   "mcpServers": {
@@ -33,11 +37,92 @@ npm install -g valkey-glidejs-mcp
 }
 ```
 
-3. Restart Claude Desktop
+Then restart Claude Desktop.
+
+### For Continue (VS Code/JetBrains)
+
+Add to your Continue configuration (`~/.continue/config.json`):
+
+```json
+{
+  "models": [
+    // Your model configuration
+  ],
+  "mcpServers": [
+    {
+      "name": "valkey-glide",
+      "command": "npx",
+      "args": ["valkey-glidejs-mcp"]
+    }
+  ]
+}
+```
+
+### For Cline (VS Code Extension)
+
+1. Open VS Code Settings (Cmd/Ctrl + ,)
+2. Search for "Cline MCP"
+3. Add to MCP Servers configuration:
+
+```json
+{
+  "valkey-glide": {
+    "command": "npx",
+    "args": ["valkey-glidejs-mcp"]
+  }
+}
+```
+
+### For Zed Editor
+
+Add to your Zed settings (`~/.config/zed/settings.json`):
+
+```json
+{
+  "assistant": {
+    "version": "2",
+    "mcp_servers": {
+      "valkey-glide": {
+        "command": "npx",
+        "args": ["valkey-glidejs-mcp"]
+      }
+    }
+  }
+}
+```
+
+### For Open Interpreter
+
+```bash
+# Start with MCP support
+interpreter --mcp valkey-glidejs-mcp
+```
+
+### For Custom MCP Clients
+
+Connect using stdio transport:
+
+```javascript
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { spawn } from 'child_process';
+
+const transport = new StdioClientTransport({
+  command: 'npx',
+  args: ['valkey-glidejs-mcp']
+});
+
+const client = new Client({ name: 'my-client', version: '1.0.0' }, { capabilities: {} });
+await client.connect(transport);
+
+// Use the tools
+const result = await client.callTool('gen.clientBasic', {});
+console.log(result);
+```
 
 ## What you can ask
 
-Once installed, you can ask Claude to:
+Once installed, you can ask your AI assistant to:
 
 - **"Create a Valkey GLIDE client"** - Get basic connection code
 - **"Migrate this ioredis code to GLIDE"** - Convert existing code
@@ -107,6 +192,21 @@ npm run build
 ```bash
 npm test
 ```
+
+## Compatibility
+
+This MCP server works with any AI tool that supports the Model Context Protocol:
+
+| Tool | Status | Notes |
+|------|--------|-------|
+| Claude Desktop | ✅ Supported | Official Anthropic client |
+| Continue | ✅ Supported | VS Code & JetBrains IDEs |
+| Cline | ✅ Supported | VS Code extension |
+| Zed Editor | ✅ Supported | Built-in AI assistant |
+| Open Interpreter | ✅ Supported | Command-line interface |
+| Cursor | 🔄 Coming Soon | MCP support planned |
+| GitHub Copilot | 🔄 Coming Soon | MCP support in development |
+| Custom Clients | ✅ Supported | Any MCP-compatible client |
 
 ## Contributing
 

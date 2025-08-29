@@ -1,10 +1,12 @@
 ## [v0.4.1] - 2025-08-29
+
 ### :sparkles: New Features
-- [`8d45a48`](https://github.com/avifenesh/valkey-glidejs-mcp/commit/8d45a480eac2a7104dea64e66a904e4ea16b37ae) - significantly improve migration tool TODO handling *(commit by [@avifenesh](https://github.com/avifenesh))*
+
+- [`8d45a48`](https://github.com/avifenesh/valkey-glidejs-mcp/commit/8d45a480eac2a7104dea64e66a904e4ea16b37ae) - significantly improve migration tool TODO handling _(commit by [@avifenesh](https://github.com/avifenesh))_
 
 ### :bug: Bug Fixes
-- [`9cdbb84`](https://github.com/avifenesh/valkey-glidejs-mcp/commit/9cdbb8490336581af1d6a7643c2a4bc68c6b93b9) - use native GLIDE methods for blocking operations instead of customCommand *(commit by [@avifenesh](https://github.com/avifenesh))*
 
+- [`9cdbb84`](https://github.com/avifenesh/valkey-glidejs-mcp/commit/9cdbb8490336581af1d6a7643c2a4bc68c6b93b9) - use native GLIDE methods for blocking operations instead of customCommand _(commit by [@avifenesh](https://github.com/avifenesh))_
 
 ## [0.2.1](https://github.com/avifenesh/valkey-glidejs-mcp/compare/v0.2.0...v0.2.1) (2025-08-29)
 
@@ -101,4 +103,4 @@
 ### Bug Fixes
 
 - correct import path to @valkey/valkey-glide instead of @valkey/glide ([7e2ae81](https://github.com/avifenesh/valkey-glidejs-mcp/commit/7e2ae8112379c748afff80a885f5a0bf4d27080e))
-[v0.4.1]: https://github.com/avifenesh/valkey-glidejs-mcp/compare/v0.4.0...v0.4.1
+  [v0.4.1]: https://github.com/avifenesh/valkey-glidejs-mcp/compare/v0.4.0...v0.4.1

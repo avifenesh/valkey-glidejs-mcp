@@ -213,6 +213,11 @@ npm run validate:glide
 
 # Ingest latest command documentation
 npm run ingest:commands
+
+# Check package tags and versions
+npm run tag:list      # List distribution tags
+npm run tag:view      # View package info
+npm run tag:versions  # List all published versions
 ```
 
 ### Contributing

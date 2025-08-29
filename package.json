@@ -52,7 +52,10 @@
     "validate:glide": "tsx scripts/validate.ts",
     "ingest:commands": "tsx scripts/ingest-commands.ts",
     "commitlint": "commitlint --edit",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "tag:list": "npm dist-tag ls valkey-glidejs-mcp",
+    "tag:view": "npm view valkey-glidejs-mcp",
+    "tag:versions": "npm view valkey-glidejs-mcp versions --json"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.1.4",

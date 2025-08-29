@@ -8,9 +8,9 @@
 
 ## ✨ Features at a Glance
 
-🎯 **Complete API Coverage**: **888+ methods** across all Valkey/Redis commands  
+🎯 **Complete API Coverage**: **888+ methods** across all GLIDE-supported commands  
 🔄 **Smart Migration**: **100% success rate** on 51+ real-world migration patterns  
-⚡ **Comprehensive Commands**: Support for **270+ commands** from strings to streams  
+⚡ **Comprehensive Commands**: Support for **296 commands** supported by GLIDE  
 🏗️ **Intelligent Generation**: Context-aware code templates for all use cases  
 ✅ **Runtime Validated**: All migrations tested against live Valkey instances  
 🔧 **Production Ready**: Based on actual GitHub repositories, not toy examples
@@ -179,7 +179,7 @@ client.close();
 | Metric                 | Value           | Description                     |
 | ---------------------- | --------------- | ------------------------------- |
 | **API Coverage**       | 888+ methods    | Complete GLIDE API surface      |
-| **Command Support**    | 270+ commands   | All Redis/Valkey commands       |
+| **Command Support**    | 296 commands   | GLIDE-supported commands        |
 | **Migration Success**  | 100%            | Tested on 51+ real patterns     |
 | **Test Coverage**      | 51+ patterns    | Real GitHub repository code     |
 | **Runtime Validation** | ✅ Live testing | Against actual Valkey instances |

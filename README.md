@@ -208,21 +208,6 @@ npm run build
 npm test
 ```
 
-## Compatibility
-
-This MCP server works with any AI tool that supports the Model Context Protocol:
-
-| Tool | Status | Notes |
-|------|--------|-------|
-| Claude Desktop | ✅ Supported | Official Anthropic client |
-| Continue | ✅ Supported | VS Code & JetBrains IDEs |
-| Cline | ✅ Supported | VS Code extension |
-| Zed Editor | ✅ Supported | Built-in AI assistant |
-| Open Interpreter | ✅ Supported | Command-line interface |
-| Cursor | ✅ Supported | Via MCP configuration |
-| GitHub Copilot | ✅ Supported | Via extension/custom setup |
-| Custom Clients | ✅ Supported | Any MCP-compatible client |
-
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on commits and development workflow.

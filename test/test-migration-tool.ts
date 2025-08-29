@@ -104,7 +104,7 @@ class RateLimiter {
   }
 }
     `,
-    expectedPatterns: ["Transaction", "tx.incr", "tx.expire"],
+    expectedPatterns: ["Batch(true)", "tx.incr", "tx.expire"],
     shouldMigrate: ["pipeline()", "pipeline.incr", "pipeline.expire"],
   },
 
@@ -161,7 +161,7 @@ class CacheManager {
   }
 }
     `,
-    expectedPatterns: ["client.mget", "Transaction", "client.set"],
+    expectedPatterns: ["client.mget", "Batch(true)", "client.set"],
     shouldMigrate: ["mget(...keys)", "setex"],
   },
 
@@ -298,7 +298,7 @@ await client.multi()
   .set('seat:5', '#5')
   .execAsPipeline();
     `,
-    expectedPatterns: ["Transaction", "client.exec"],
+    expectedPatterns: ["Batch(true)", "client.exec"],
     shouldMigrate: ["multi()", ".exec()", "execAsPipeline"],
   },
 
@@ -507,7 +507,7 @@ async function simpleMigration(code: string): Promise<string> {
       'await GlideClient.createClient({ addresses: [{ host: "localhost", port: 6379 }] })',
     )
     .replace(/\.setex\(/g, ".set(")
-    .replace(/\.pipeline\(\)/g, "; const tx = new Transaction(); tx")
+    .replace(/\.pipeline\(\)/g, "; const tx = new Batch(true); tx")
     .replace(/pipeline\./g, "tx.")
     .replace(/\.exec\(\)/g, ".exec(tx)")
     .replace(/\.eval\(/g, ".invokeScript(")

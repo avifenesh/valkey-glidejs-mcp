@@ -129,7 +129,7 @@ Once installed, your AI assistant becomes a Valkey GLIDE expert. Try these promp
 - ✅ **URL Parsing**: Automatic redis:// and rediss:// URL handling with TLS/auth extraction
 - ✅ **Smart Config Mapping**: Intelligent conversion of connection options and retry strategies
 - ✅ **Batch Processing**: Converts deprecated pipelines to GLIDE Batch with non-atomic execution
-- ✅ **Transaction Translation**: Converts multi/exec to GLIDE Transaction with atomic guarantees
+- ✅ **Transaction Translation**: Converts multi/exec to GLIDE Batch with atomic guarantees
 - ✅ **Script Migration**: Transforms `redis.eval()` to GLIDE Script objects with proper scoping
 - ✅ **Pub/Sub Conversion**: Complete event-driven pattern migration with examples
 - ✅ **Native Operations**: Direct mapping to GLIDE's native blocking and atomic operations
@@ -191,8 +191,8 @@ client.close();
 | ---------------- | ------------------ | -------------------- | ------------------- |
 | **Geo Commands** | Arrays             | Maps                 | ✅ Auto-converted   |
 | **Scan Results** | Objects            | `[cursor, keys[]]`   | ✅ Format adjusted  |
-| **Batching**     | Pipeline chains    | Batch class          | ✅ Non-atomic exec  |
-| **Transactions** | Multi/exec         | Transaction class    | ✅ Atomic execution |
+| **Batching**     | Pipeline chains    | Batch(false)         | ✅ Non-atomic exec  |
+| **Transactions** | Multi/exec         | Batch(true)          | ✅ Atomic execution |
 | **Clustering**   | Same client        | `GlideClusterClient` | ✅ Auto-detected    |
 | **Scripts**      | Direct eval        | Script objects       | ✅ Properly scoped  |
 

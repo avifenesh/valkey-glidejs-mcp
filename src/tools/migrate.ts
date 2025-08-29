@@ -42,7 +42,7 @@ function naiveTransform(source: string, from: "ioredis" | "node-redis") {
     // Import transformations
     code = code.replace(
       /import\s+Redis\s+from\s+['"]ioredis['"];?/g,
-      "import { GlideClient, GlideClusterClient, Transaction, Batch, Script } from '@valkey/valkey-glide';",
+      "import { GlideClient, GlideClusterClient, Batch, Script } from '@valkey/valkey-glide';",
     );
 
     // Handle URL-based connections first
@@ -154,13 +154,13 @@ function parseRedisUrlRuntime(url: string) {
       /const\s+(\w+)\s*=\s*(\w+)\.pipeline\(\);/g,
       (_, varName) => {
         pipelineVariables.add(varName);
-        return `const ${varName} = new Batch();`;
+        return `const ${varName} = new Batch(false);`;
       },
     );
 
     // Handle direct pipeline calls without variable assignment
     code = code.replace(/(\w+)\.pipeline\(\);/g, () => {
-      return "const batch = new Batch();";
+      return "const batch = new Batch(false);";
     });
 
     // Fix batch execution to use the correct client variable
@@ -296,7 +296,7 @@ await client.invokeScript(${scriptVar}, { keys: [${keys.join(", ")}], args: [${s
     code = code.replace(/from\s+['"]redis['"]/g, "from '@valkey/valkey-glide'");
     code = code.replace(
       /import\s*{\s*createClient\s*}\s*from/g,
-      "import { GlideClient, GlideClusterClient, Transaction, Batch, Script } from",
+      "import { GlideClient, GlideClusterClient, Batch, Script } from",
     );
     code = code.replace(
       /import\s*{\s*(RedisStore)\s*}\s*from\s*['"]connect-redis['"]/g,
@@ -380,13 +380,13 @@ const client = await GlideClient.createClient(
     code = code.replace(
       /const\s+\[([^\]]+)\]\s*=\s*await\s+(\w+)\s*\.multi\(\)/g,
       (match, destructure, clientVar) => {
-        return `const tx = new Transaction();\n    // TODO: Chain your commands to tx, then:\n    const [${destructure}] = await ${clientVar}.exec(tx)`;
+        return `const tx = new Batch(true);\n    // TODO: Chain your commands to tx, then:\n    const [${destructure}] = await ${clientVar}.exec(tx)`;
       },
     );
 
     // Handle direct multi chains
     code = code.replace(/await\s+(\w+)\.multi\(\)/g, (_, clientVar) => {
-      return `const tx = new Transaction();\n    // TODO: Chain your commands to tx, then:\n    await ${clientVar}.exec(tx)`;
+      return `const tx = new Batch(true);\n    // TODO: Chain your commands to tx, then:\n    await ${clientVar}.exec(tx)`;
     });
 
     // Handle pipeline executions

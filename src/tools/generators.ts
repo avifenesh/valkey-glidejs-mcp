@@ -201,15 +201,16 @@ if (result?.length) {
 `.trim(),
   transactionExample: () =>
     `
-import { GlideClient, Transaction } from '@valkey/valkey-glide';
+import { GlideClient, Batch } from '@valkey/valkey-glide';
 const client = await GlideClient.createClient({ 
   addresses: [{ host: 'localhost', port: 6379 }] 
 });
-const tx = new Transaction();
+// Use Batch with atomic=true for transactional operations
+const tx = new Batch(true);
 tx.set('a', '1');
 tx.incr('a');
 const results = await client.exec(tx);
-console.log(results);
+console.log(results); // Atomic transaction execution
 `.trim(),
   pipelineExample: () =>
     `
@@ -217,12 +218,12 @@ import { GlideClient, Batch } from '@valkey/valkey-glide';
 const client = await GlideClient.createClient({ 
   addresses: [{ host: 'localhost', port: 6379 }] 
 });
-// Pipeline is deprecated, use Batch instead
-const batch = new Batch();
+// Pipeline is deprecated, use Batch with atomic=false for non-atomic operations
+const batch = new Batch(false);
 batch.set('p1', 'v1');
 batch.get('p1');
 const results = await client.exec(batch);
-console.log(results);
+console.log(results); // Non-atomic pipeline execution
 `.trim(),
   batchExample: () =>
     `
@@ -230,7 +231,8 @@ import { GlideClient, Batch } from '@valkey/valkey-glide';
 const client = await GlideClient.createClient({ 
   addresses: [{ host: 'localhost', port: 6379 }] 
 });
-const batch = new Batch();
+// Use Batch with atomic=false for non-atomic batch operations
+const batch = new Batch(false);
 batch.set('key1', 'value1');
 batch.get('key1');
 batch.incr('counter');

@@ -1,190 +1,123 @@
-# Valkey GLIDE JavaScript MCP
+# valkey-glidejs-mcp
 
-[![npm version](https://badge.fury.io/js/valkey-glidejs-mcp.svg)](https://badge.fury.io/js/valkey-glidejs-mcp)
-[![Node.js CI](https://github.com/avifenesh/valkey-glidejs-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/avifenesh/valkey-glidejs-mcp/actions/workflows/ci.yml)
+[![npm version](https://badge.fury.io/js/valkey-glidejs-mcp.svg)](https://www.npmjs.com/package/valkey-glidejs-mcp)
 
-A Model Context Protocol (MCP) server that provides expert knowledge and code generation assistance for [Valkey GLIDE](https://valkey.io/valkey-glide/), the high-performance Valkey client.
+A Model Context Protocol (MCP) server that helps AI assistants work with [Valkey GLIDE](https://github.com/valkey-io/valkey-glide), the high-performance Redis/Valkey client.
 
-## Overview
+## What it does
 
-This MCP server helps AI assistants generate code and provide migration guidance for Valkey GLIDE applications. Whether you're migrating from other Redis/Valkey clients or building new applications from scratch, this server provides expert knowledge about GLIDE APIs, best practices, and code patterns through the MCP protocol.
-
-## Features
-
-- **🔄 Migration Assistance**: Migrate from ioredis/node-redis to Valkey GLIDE with automated code transformations
-- **🧠 API Knowledge**: Complete knowledge of GLIDE APIs, methods, and configuration options
-- **🏗️ Code Generation**: Generate GLIDE client code for various use cases and patterns
-- **📚 Documentation**: Curated documentation sources and recommendations
-- **✅ Validation**: Static verification of migrated code
-- **🔍 API Discovery**: Search and explore GLIDE command families and categories
+This MCP server gives AI assistants like Claude the ability to:
+- Generate correct GLIDE client code
+- Migrate code from ioredis/node-redis to GLIDE
+- Provide working examples for Redis data structures
+- Answer questions about GLIDE APIs with 100% coverage (296 methods)
 
 ## Installation
 
-### Via npm
+### For Claude Desktop
 
+1. Install the package globally:
 ```bash
 npm install -g valkey-glidejs-mcp
 ```
 
-### From Source
-
-```bash
-git clone https://github.com/avifenesh/valkey-glidejs-mcp.git
-cd valkey-glidejs-mcp/valkey-glidejs-mcp
-npm install
-npm run build
-```
-
-## Usage
-
-### As MCP Server
-
-Add to your MCP client configuration (e.g., Claude Desktop):
-
+2. Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
 ```json
 {
   "mcpServers": {
     "valkey-glide": {
-      "command": "valkey-glidejs-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["valkey-glidejs-mcp"]
     }
   }
 }
 ```
 
-### Development Mode
+3. Restart Claude Desktop
 
-```bash
-npm run dev
-```
+## What you can ask
 
-The server uses stdio transport and registers tools on startup.
+Once installed, you can ask Claude to:
+
+- **"Create a Valkey GLIDE client"** - Get basic connection code
+- **"Migrate this ioredis code to GLIDE"** - Convert existing code
+- **"Show me how to use Redis streams with GLIDE"** - Get specific examples
+- **"Create a distributed lock with GLIDE"** - Generate pattern implementations
+- **"Set up a rate limiter using GLIDE"** - Build common patterns
 
 ## Available Tools
 
-### Migration Tools
+The MCP server provides these tools to AI assistants:
 
-- `migrate.naive { from, code }` - Transform ioredis/node-redis code to GLIDE
-- `verify.static { code }` - Validate migrated code
+### Code Generation
+- Basic client setup (standalone & cluster)
+- Pub/Sub patterns
+- Distributed locks
+- Rate limiters
+- Caching patterns
+- All Redis data structures (strings, hashes, lists, sets, sorted sets, streams, geo, bitmaps, HyperLogLog)
 
-### API Discovery
+### Migration
+- Convert ioredis/node-redis code to GLIDE
+- Validate migrated code
+- Find GLIDE equivalents for other client methods
 
-- `api.search { query }` - Search for GLIDE methods and commands
-- `api.findEquivalent { source, symbol }` - Find GLIDE equivalent for other client methods
-- `api.categories {}` - List all command categories
-- `api.byCategory { category }` - Get commands by category
-- `api.families {}` - List all command families
-- `api.byFamily { family }` - Get commands by family
+### API Information
+- Search GLIDE methods
+- Browse by category (strings, hashes, lists, etc.)
+- Get detailed API documentation
 
-### Code Generators
-
-- `gen.clientBasic {}` - Generate basic GLIDE client setup
-- `gen.clientCluster {}` - Generate cluster client setup
-- `gen.cache { key, ttlSeconds }` - Generate caching patterns
-- `gen.lock { lockKey, ttlMs }` - Generate distributed lock patterns
-- `gen.rateLimiter { key, points, duration }` - Generate rate limiting patterns
-- `gen.pubsubPublisher { channel }` - Generate Pub/Sub publisher
-- `gen.pubsubSubscriber { channel }` - Generate Pub/Sub subscriber
-- `gen.pubsubAdvanced { channel }` - Generate advanced Pub/Sub patterns
-- `gen.fastify {}` - Generate Fastify integration code
-
-### Data Structure Generators
-
-- `gen.sets {}` - Generate Redis Sets examples
-- `gen.zsets {}` - Generate Sorted Sets examples
-- `gen.streams {}` - Generate Redis Streams examples
-- `gen.hashes {}` - Generate Hash examples
-- `gen.lists {}` - Generate List examples
-- `gen.geo {}` - Generate Geospatial examples
-- `gen.bitmaps {}` - Generate Bitmap examples
-- `gen.hll {}` - Generate HyperLogLog examples
-- `gen.json {}` - Generate JSON examples
-
-### Documentation
-
-- `docs.listSources` - List curated documentation sources
-- `docs.recommend { topic }` - Get topic-specific documentation
-- `docs.fetch { url, refresh? }` - Fetch and cache documentation content
-- `data.enrich { sources? }` - Parse and enrich documentation data
-
-### Utilities
-
-- `health` - Check server health status
-
-## Quick Start Example
-
-### 1. Create a Basic Client
+## GLIDE Client Basics
 
 ```typescript
-import { GlideClient } from "@valkey/valkey-glide";
+import { GlideClient } from '@valkey/valkey-glide';
 
+// Create client
 const client = await GlideClient.createClient({
-  addresses: [{ host: "localhost", port: 6379 }],
+  addresses: [{ host: 'localhost', port: 6379 }]
 });
 
-// Use the client
-await client.set("key", "value");
-const value = await client.get("key");
-console.log(value); // 'value'
+// Basic operations
+await client.set('key', 'value');
+const value = await client.get('key');
+
+// Cleanup
+await client.close();
 ```
 
-### 2. Pub/Sub with Dedicated Connections
+## Important Notes
 
-```typescript
-import { GlideClient } from "@valkey/valkey-glide";
-
-const publisher = await GlideClient.createClient({
-  addresses: [{ host: "localhost", port: 6379 }],
-});
-const subscriber = await GlideClient.createClient({
-  addresses: [{ host: "localhost", port: 6379 }],
-});
-
-// Subscribe to messages
-(async () => {
-  for await (const msg of subscriber.subscribe("news")) {
-    console.log("Received:", msg);
-  }
-})();
-
-// Publish a message
-await publisher.publish("news", JSON.stringify({ hello: "world" }));
-```
+- GLIDE uses different API patterns than ioredis/node-redis
+- `geoadd` expects a Map, not an array
+- `scan` returns `[cursor, keys[]]` not an object
+- Transactions use a Transaction class
+- Cluster requires `GlideClusterClient`
 
 ## Development
 
-### Prerequisites
+### Build from source
+```bash
+git clone https://github.com/avifenesh/valkey-glidejs-mcp.git
+cd valkey-glidejs-mcp
+npm install
+npm run build
+```
 
-- Node.js 18+
-- npm or yarn
-
-### Running Tests
-
+### Run tests
 ```bash
 npm test
 ```
 
-### Building
-
-```bash
-npm run build
-```
-
-### Linting and Formatting
-
-```bash
-npm run prettier
-```
-
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on commits and development workflow.
 
 ## License
 
 MIT
 
-## Related Projects
+## Links
 
-- [Valkey GLIDE](https://github.com/valkey-io/valkey-glide) - High-performance Valkey client
-- [Model Context Protocol](https://github.com/modelcontextprotocol/python-sdk) - Protocol for AI assistant integrations
+- [Valkey GLIDE Documentation](https://github.com/valkey-io/valkey-glide)
+- [Model Context Protocol](https://modelcontextprotocol.io)
+- [NPM Package](https://www.npmjs.com/package/valkey-glidejs-mcp)

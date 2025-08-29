@@ -1,0 +1,47 @@
+# Configuration for GitHub's automated release notes
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+    authors:
+      - dependabot
+  categories:
+    - title: 🚀 Features
+      labels:
+        - feat
+        - feature
+        - enhancement
+    - title: 🐛 Bug Fixes
+      labels:
+        - fix
+        - bugfix
+        - bug
+    - title: ⚡ Performance Improvements
+      labels:
+        - perf
+        - performance
+    - title: 🔨 Refactoring
+      labels:
+        - refactor
+        - refactoring
+    - title: 📚 Documentation
+      labels:
+        - docs
+        - documentation
+    - title: 🧪 Tests
+      labels:
+        - test
+        - tests
+        - testing
+    - title: 🔧 Maintenance
+      labels:
+        - chore
+        - maintenance
+        - ci
+    - title: ⚠️ Breaking Changes
+      labels:
+        - breaking
+        - breaking-change
+    - title: Other Changes
+      labels:
+        - "*"

@@ -47,7 +47,9 @@
     "test": "tsx --test test/*.test.ts",
     "prepublishOnly": "npm run build && npm test",
     "validate:glide": "tsx scripts/validate.ts",
-    "ingest:commands": "tsx scripts/ingest-commands.ts"
+    "ingest:commands": "tsx scripts/ingest-commands.ts",
+    "commitlint": "commitlint --edit",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.1.4",

@@ -67,13 +67,13 @@ function extractGlideMethodTokens(
 export function registerValidationTools(mcp: McpServer) {
   mcp.tool(
     "validate.glideSurface",
-    z.object({
+    {
       urls: z.array(z.string().url()).optional(),
       sources: z
         .array(z.object({ id: z.string(), text: z.string() }))
         .optional(),
       writeReport: z.boolean().optional().default(true),
-    }).shape,
+    },
     async (args) => {
       const defaultUrls = args.urls ?? [
         "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/index.ts",

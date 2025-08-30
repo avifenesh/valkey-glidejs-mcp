@@ -74,7 +74,7 @@ function htmlDecode(input: string): string {
 export function registerDataTools(mcp: McpServer) {
   mcp.tool(
     "data.enrich",
-    z.object({
+    {
       sources: z
         .array(
           z.object({
@@ -85,7 +85,7 @@ export function registerDataTools(mcp: McpServer) {
         )
         .optional()
         .describe("Optional override of sources and HTML to parse (for tests)"),
-    }).shape,
+    },
     async (args) => {
       const defaultSources = [
         {

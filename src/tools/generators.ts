@@ -811,7 +811,7 @@ await breaker.execute(() => resilientClient.get('key'));
 export function registerGeneratorTools(mcp: McpServer) {
   mcp.tool(
     "gen.clientBasic",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.clientBasic() },
@@ -820,7 +820,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.clientCluster",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.clientCluster() },
@@ -829,8 +829,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.cache",
-    z.object({ key: z.string(), ttlSeconds: z.number().int().positive() })
-      .shape,
+    { key: z.string(), ttlSeconds: z.number().int().positive() },
     async (args) =>
       ({
         structuredContent: { code: templates.cache(args as any) },
@@ -839,7 +838,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.lock",
-    z.object({ lockKey: z.string(), ttlMs: z.number().int().positive() }).shape,
+    { lockKey: z.string(), ttlMs: z.number().int().positive() },
     async (args) =>
       ({
         structuredContent: { code: templates.lock(args as any) },
@@ -848,7 +847,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.pubsubPublisher",
-    z.object({ channel: z.string() }).shape,
+    { channel: z.string() },
     async (args) =>
       ({
         structuredContent: { code: templates.pubsubPublisher(args as any) },
@@ -859,7 +858,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.pubsubSubscriber",
-    z.object({ channel: z.string() }).shape,
+    { channel: z.string() },
     async (args) =>
       ({
         structuredContent: { code: templates.pubsubSubscriber(args as any) },
@@ -870,7 +869,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.pubsubAdvanced",
-    z.object({ channel: z.string() }).shape,
+    { channel: z.string() },
     async (args) =>
       ({
         structuredContent: { code: templates.pubsubAdvanced(args as any) },
@@ -881,7 +880,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.fastify",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.fastify() },
@@ -890,11 +889,11 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.rateLimiter",
-    z.object({
+    {
       key: z.string(),
       points: z.number().int().positive(),
       duration: z.number().int().positive(),
-    }).shape,
+    },
     async (args) =>
       ({
         structuredContent: { code: templates.rateLimiter(args as any) },
@@ -903,7 +902,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.queueProducer",
-    z.object({ queue: z.string() }).shape,
+    { queue: z.string() },
     async (args) =>
       ({
         structuredContent: { code: templates.queueProducer(args as any) },
@@ -912,7 +911,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.queueConsumer",
-    z.object({ queue: z.string() }).shape,
+    { queue: z.string() },
     async (args) =>
       ({
         structuredContent: { code: templates.queueConsumer(args as any) },
@@ -921,7 +920,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.sets",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.setExample() },
@@ -930,7 +929,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.zsets",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.zsetExample() },
@@ -939,7 +938,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.streams",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.streamExample() },
@@ -948,7 +947,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.transaction",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.transactionExample() },
@@ -957,7 +956,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.batch",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.batchExample() },
@@ -966,7 +965,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.pipeline",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: {
@@ -985,7 +984,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.geo",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.geoExample() },
@@ -994,7 +993,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.bitmaps",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.bitmapsExample() },
@@ -1003,7 +1002,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.hll",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.hllExample() },
@@ -1012,7 +1011,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.json",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.jsonExample() },
@@ -1021,7 +1020,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.hashesAdvanced",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.hashesAdvanced() },
@@ -1030,7 +1029,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.listsAdvanced",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.listsAdvanced() },
@@ -1039,7 +1038,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.zsetRankings",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.zsetRankings() },
@@ -1048,7 +1047,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.jsonAdvanced",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.jsonAdvanced() },
@@ -1057,7 +1056,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.scan",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.scanExample() },
@@ -1066,7 +1065,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.clientAdvanced",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.clientAdvanced() },
@@ -1075,7 +1074,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.azAffinityClient",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.azAffinityClient() },
@@ -1084,7 +1083,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.readPreferenceClient",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.readPreferenceClient() },
@@ -1093,7 +1092,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.clusterScanAdvanced",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.clusterScanAdvanced() },
@@ -1102,7 +1101,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.routingStrategies",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.routingStrategies() },
@@ -1111,7 +1110,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.telemetryClient",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.telemetryClient() },
@@ -1120,7 +1119,7 @@ export function registerGeneratorTools(mcp: McpServer) {
   );
   mcp.tool(
     "gen.connectionBackoff",
-    z.object({}).shape,
+    {},
     async () =>
       ({
         structuredContent: { code: templates.connectionBackoff() },

@@ -10,12 +10,12 @@ import {
 export function registerApiTools(mcp: McpServer) {
   mcp.tool(
     "api.findEquivalent",
-    z.object({
+    {
       source: z.enum(["ioredis", "node-redis"]).describe("Source client"),
       symbol: z
         .string()
         .describe("Function or usage, e.g., set(key,value,{EX:10})"),
-    }).shape,
+    },
     async (args) => {
       const results = findEquivalent(args.source as any, args.symbol);
       return {
@@ -30,9 +30,9 @@ export function registerApiTools(mcp: McpServer) {
 
   mcp.tool(
     "api.search",
-    z.object({
+    {
       query: z.string().describe("Keyword to search across datasets"),
-    }).shape,
+    },
     async (args) => {
       const results = searchAll(args.query);
       return {
@@ -47,10 +47,10 @@ export function registerApiTools(mcp: McpServer) {
 
   mcp.tool(
     "api.diff",
-    z.object({
+    {
       from: z.enum(["ioredis", "node-redis"]).describe("Source client"),
       symbol: z.string(),
-    }).shape,
+    },
     async (args) => {
       const results = findEquivalent(args.from as any, args.symbol);
       const diff = results.map((r) => ({
@@ -67,7 +67,7 @@ export function registerApiTools(mcp: McpServer) {
   );
 
   // Browse by category
-  mcp.tool("api.categories", z.object({}).shape, async () => {
+  mcp.tool("api.categories", {}, async () => {
     const categories = new Set<string>();
     [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE].forEach((ds) =>
       ds.entries.forEach((e) => categories.add(e.category)),
@@ -81,7 +81,9 @@ export function registerApiTools(mcp: McpServer) {
 
   mcp.tool(
     "api.byCategory",
-    z.object({ category: z.string() }).shape,
+    {
+      category: z.string(),
+    },
     async (args) => {
       const cat = args.category.toLowerCase();
       const entries = [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE]
@@ -95,7 +97,7 @@ export function registerApiTools(mcp: McpServer) {
   );
 
   // Aliases: families
-  mcp.tool("api.families", z.object({}).shape, async () => {
+  mcp.tool("api.families", {}, async () => {
     const families = new Set<string>();
     [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE].forEach((ds) =>
       ds.entries.forEach((e) => families.add(e.category)),
@@ -108,7 +110,9 @@ export function registerApiTools(mcp: McpServer) {
   });
   mcp.tool(
     "api.byFamily",
-    z.object({ family: z.string() }).shape,
+    {
+      family: z.string(),
+    },
     async (args) => {
       const fam = args.family.toLowerCase();
       const entries = [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE]

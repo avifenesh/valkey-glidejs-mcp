@@ -32,7 +32,7 @@ function staticChecks(code: string) {
 export function registerVerifyTools(mcp: McpServer) {
   mcp.tool(
     "verify.static",
-    z.object({ code: z.string() }).shape,
+    { code: z.string() },
     async (args) => {
       const res = staticChecks(args.code);
       return {

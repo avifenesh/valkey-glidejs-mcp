@@ -274,7 +274,7 @@ function pickFamily(command: string): string {
 export function registerCommandsTools(mcp: McpServer) {
   mcp.tool(
     "commands.ingest",
-    z.object({
+    {
       start: z.number().int().min(0).default(0),
       count: z.number().int().min(1).max(20).default(10),
       refresh: z.boolean().optional(),
@@ -287,7 +287,7 @@ export function registerCommandsTools(mcp: McpServer) {
           tsJson: z.string().optional(),
         })
         .optional(),
-    }).shape,
+    },
     async (args) => {
       const mdUrl =
         "https://raw.githubusercontent.com/wiki/valkey-io/valkey-glide/ValKey-Commands-Implementation-Progress.md";
@@ -397,7 +397,7 @@ export function registerCommandsTools(mcp: McpServer) {
     },
   );
 
-  mcp.tool("commands.listFamilies", z.object({}).shape, async () => {
+  mcp.tool("commands.listFamilies", {}, async () => {
     const outDir = new URL("../../..", import.meta.url).pathname;
     const raw = await fs.readFile(`${outDir}/COMMANDS_BY_FAMILY.json`, "utf8");
     const data = JSON.parse(raw) as Record<string, CommandEntry[]>;
@@ -410,7 +410,7 @@ export function registerCommandsTools(mcp: McpServer) {
 
   mcp.tool(
     "commands.getByFamily",
-    z.object({ family: z.string() }).shape,
+    { family: z.string() },
     async (args) => {
       const outDir = new URL("../../..", import.meta.url).pathname;
       const raw = await fs.readFile(

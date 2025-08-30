@@ -92,7 +92,7 @@ const SOURCES = [
 
 export function registerDocsTools(mcp: McpServer) {
   // List curated sources
-  mcp.tool("docs.listSources", z.object({}).shape, async () => {
+  mcp.tool("docs.listSources", {}, async () => {
     return {
       structuredContent: { sources: SOURCES },
       content: [
@@ -104,13 +104,13 @@ export function registerDocsTools(mcp: McpServer) {
   // Return helpful starting points for a topic
   mcp.tool(
     "docs.recommend",
-    z.object({
+    {
       topic: z
         .string()
         .describe(
           "What you want to implement/migrate, e.g., caching, lock, pubsub, fastify, ioredis migrate",
         ),
-    }).shape,
+    },
     async (args) => {
       const t = args.topic.toLowerCase();
       const hits = SOURCES.filter((s) =>
@@ -146,7 +146,7 @@ export function registerDocsTools(mcp: McpServer) {
   // Fetch content of a URL (uses global fetch in Node >=18)
   mcp.tool(
     "docs.fetch",
-    z.object({ url: z.string().url(), refresh: z.boolean().optional() }).shape,
+    { url: z.string().url(), refresh: z.boolean().optional() },
     async (args) => {
       if (!args.refresh && CACHE.has(args.url)) {
         const cached = CACHE.get(args.url)!;

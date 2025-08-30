@@ -473,10 +473,10 @@ const client = await GlideClient.createClient(
 export function registerMigrationTools(mcp: McpServer) {
   mcp.tool(
     "migrate.naive",
-    z.object({
+    {
       from: z.enum(["ioredis", "node-redis"]),
       code: z.string(),
-    }).shape,
+    },
     async (args) => {
       const transformed = naiveTransform(args.code, args.from as any);
       return {

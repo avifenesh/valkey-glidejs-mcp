@@ -10,9 +10,11 @@ import { registerVerifyTools } from "./tools/verify.js";
 import { registerDataTools } from "./tools/data.js";
 import { registerValidationTools } from "./tools/validate.js";
 import { registerCommandsTools } from "./tools/commands.js";
+import { registerDebugTools } from "./tools/debug.js";
 
 const mcp = new McpServer({ name: "valkey-glidejs-mcp", version: "0.1.0" });
 
+registerDebugTools(mcp);
 registerHealthTool(mcp);
 registerDocsTools(mcp);
 registerApiTools(mcp);

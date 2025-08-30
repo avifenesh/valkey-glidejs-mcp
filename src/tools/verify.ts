@@ -32,11 +32,13 @@ function staticChecks(code: string) {
 export function registerVerifyTools(mcp: McpServer) {
   mcp.tool(
     "verify.static",
-    { code: z.string() },
-    async (args) => {
-      const res = staticChecks(args.code);
+    "Perform static verification checks on code",
+    {
+      code: z.string(),
+    },
+    async ({ code }) => {
+      const res = staticChecks(code);
       return {
-        structuredContent: res,
         content: [
           {
             type: "text",
@@ -44,7 +46,8 @@ export function registerVerifyTools(mcp: McpServer) {
           },
           { type: "text", text: JSON.stringify(res, null, 2) },
         ],
-      } as any;
+        structuredContent: { errors: res.errors, warnings: res.warnings, issues: res.issues },
+      };
     },
   );
 }

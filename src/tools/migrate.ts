@@ -473,16 +473,17 @@ const client = await GlideClient.createClient(
 export function registerMigrationTools(mcp: McpServer) {
   mcp.tool(
     "migrate.naive",
+    "Perform naive migration from ioredis or node-redis to GLIDE",
     {
       from: z.enum(["ioredis", "node-redis"]),
       code: z.string(),
     },
-    async (args) => {
-      const transformed = naiveTransform(args.code, args.from as any);
+    async ({ from, code }) => {
+      const migratedCode = naiveTransform(code, from as any);
       return {
-        structuredContent: { transformed },
-        content: [{ type: "text", text: transformed }],
-      } as any;
+        content: [{ type: "text", text: migratedCode }],
+        structuredContent: { migratedCode, transformed: migratedCode },
+      };
     },
   );
 }

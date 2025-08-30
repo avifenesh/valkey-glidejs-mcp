@@ -92,18 +92,24 @@ const SOURCES = [
 
 export function registerDocsTools(mcp: McpServer) {
   // List curated sources
-  mcp.tool("docs.listSources", {}, async () => {
-    return {
-      structuredContent: { sources: SOURCES },
-      content: [
-        { type: "text", text: JSON.stringify({ sources: SOURCES }, null, 2) },
-      ],
-    } as any;
-  });
+  mcp.tool(
+    "docs.listSources",
+    "Get all available documentation sources",
+    {},
+    async () => {
+      return {
+        content: [
+          { type: "text", text: JSON.stringify({ sources: SOURCES }, null, 2) },
+        ],
+        structuredContent: { sources: SOURCES },
+      };
+    },
+  );
 
   // Return helpful starting points for a topic
   mcp.tool(
     "docs.recommend",
+    "Get recommended documentation sources for a specific topic",
     {
       topic: z
         .string()
@@ -111,8 +117,8 @@ export function registerDocsTools(mcp: McpServer) {
           "What you want to implement/migrate, e.g., caching, lock, pubsub, fastify, ioredis migrate",
         ),
     },
-    async (args) => {
-      const t = args.topic.toLowerCase();
+    async ({ topic }) => {
+      const t = topic.toLowerCase();
       const hits = SOURCES.filter((s) =>
         [
           "glide",
@@ -128,15 +134,15 @@ export function registerDocsTools(mcp: McpServer) {
         ].some((k) => s.id.includes(k)),
       );
       return {
-        structuredContent: { topic: args.topic, recommended: hits },
         content: [
-          { type: "text", text: `Recommended sources for ${args.topic}:` },
+          { type: "text", text: `Recommended sources for ${topic}:` },
           {
             type: "text",
             text: hits.map((h) => `- ${h.id}: ${h.url}`).join("\n"),
           },
         ],
-      } as any;
+        structuredContent: { topic, recommendations: hits, recommended: hits },
+      };
     },
   );
 
@@ -146,30 +152,32 @@ export function registerDocsTools(mcp: McpServer) {
   // Fetch content of a URL (uses global fetch in Node >=18)
   mcp.tool(
     "docs.fetch",
-    { url: z.string().url(), refresh: z.boolean().optional() },
-    async (args) => {
-      if (!args.refresh && CACHE.has(args.url)) {
-        const cached = CACHE.get(args.url)!;
+    "Fetch content from a documentation URL with caching",
+    {
+      url: z.string().url(),
+      refresh: z.boolean().optional(),
+    },
+    async ({ url, refresh }) => {
+      if (!refresh && CACHE.has(url)) {
+        const cached = CACHE.get(url)!;
         return {
-          structuredContent: {
-            url: args.url,
-            length: cached.length,
-            cached: true,
-          },
-          content: [{ type: "text", text: cached.slice(0, 20000) }],
-        } as any;
+          content: [
+            { type: "text", text: `Cached content from ${url} (${cached.length} chars)` },
+            { type: "text", text: cached.slice(0, 20000) },
+          ],
+          structuredContent: { url, content: cached, cached: true, length: cached.length },
+        };
       }
-      const res = await fetch(args.url);
+      const res = await fetch(url);
       const text = await res.text();
-      CACHE.set(args.url, text);
+      CACHE.set(url, text);
       return {
-        structuredContent: {
-          url: args.url,
-          length: text.length,
-          cached: false,
-        },
-        content: [{ type: "text", text: text.slice(0, 20000) }],
-      } as any;
+        content: [
+          { type: "text", text: `Fresh content from ${url} (${text.length} chars)` },
+          { type: "text", text: text.slice(0, 20000) },
+        ],
+        structuredContent: { url, content: text, cached: false, length: text.length },
+      };
     },
   );
 }

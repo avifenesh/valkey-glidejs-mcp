@@ -74,6 +74,7 @@ function htmlDecode(input: string): string {
 export function registerDataTools(mcp: McpServer) {
   mcp.tool(
     "data.enrich",
+    "Parse and enrich HTML content from documentation sources",
     {
       sources: z
         .array(
@@ -86,7 +87,7 @@ export function registerDataTools(mcp: McpServer) {
         .optional()
         .describe("Optional override of sources and HTML to parse (for tests)"),
     },
-    async (args) => {
+    async ({ sources }) => {
       const defaultSources = [
         {
           id: "wiki-migration-ioredis",
@@ -98,20 +99,19 @@ export function registerDataTools(mcp: McpServer) {
         },
       ];
 
-      const sources = args.sources ?? defaultSources;
+      const sourcesArray = sources ?? defaultSources;
 
       const results: Record<
         string,
         { sections: EnrichedSection[]; length: number }
       > = {};
-      for (const src of sources) {
+      for (const src of sourcesArray) {
         const html = (src as any).html ?? (await (await fetch(src.url)).text());
         const sections = extractSectionsFromHtml(html);
         results[src.id] = { sections, length: html.length };
       }
 
       return {
-        structuredContent: { results },
         content: [
           {
             type: "text",
@@ -120,7 +120,8 @@ export function registerDataTools(mcp: McpServer) {
               .join("\n"),
           },
         ],
-      } as any;
+        structuredContent: { results },
+      };
     },
   );
 }

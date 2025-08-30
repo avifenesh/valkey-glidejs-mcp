@@ -67,6 +67,7 @@ function extractGlideMethodTokens(
 export function registerValidationTools(mcp: McpServer) {
   mcp.tool(
     "validate.glideSurface",
+    "Validate GLIDE API surface against mapping datasets",
     {
       urls: z.array(z.string().url()).optional(),
       sources: z
@@ -74,8 +75,8 @@ export function registerValidationTools(mcp: McpServer) {
         .optional(),
       writeReport: z.boolean().optional().default(true),
     },
-    async (args) => {
-      const defaultUrls = args.urls ?? [
+    async ({ urls, sources, writeReport = true }) => {
+      const defaultUrls = urls ?? [
         "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/index.ts",
         "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/BaseClient.ts",
         "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/GlideClient.ts",
@@ -85,22 +86,22 @@ export function registerValidationTools(mcp: McpServer) {
         "https://raw.githubusercontent.com/valkey-io/valkey-glide/main/node/src/server-modules/GlideFt.ts",
       ];
 
-      const sources: { id: string; text: string }[] = [];
-      if (args.sources && args.sources.length) {
-        sources.push(...args.sources);
+      const sourcesArray: { id: string; text: string }[] = [];
+      if (sources && sources.length) {
+        sourcesArray.push(...sources);
       } else {
         for (const url of defaultUrls) {
           try {
             const res = await fetch(url);
             if (!res.ok) continue;
             const text = await res.text();
-            sources.push({ id: url, text });
+            sourcesArray.push({ id: url, text });
           } catch {}
         }
       }
 
       const extracted = new Set<string>();
-      for (const s of sources) {
+      for (const s of sourcesArray) {
         for (const name of extractMethodCandidatesFromTs(s.text))
           extracted.add(name);
       }
@@ -136,7 +137,7 @@ export function registerValidationTools(mcp: McpServer) {
       const validatedCount = results.filter((r) => r.validated).length;
       const unvalidated = results.filter((r) => !r.validated);
 
-      if (args.writeReport) {
+      if (writeReport) {
         const outDir = new URL("../../..", import.meta.url).pathname; // project root
         const reportJsonPath = `${outDir}/VALIDATION_REPORT.json`;
         const reportMdPath = `${outDir}/VALIDATION_REPORT.md`;
@@ -180,19 +181,20 @@ export function registerValidationTools(mcp: McpServer) {
       }
 
       return {
-        structuredContent: {
-          extractedMethodCount: extracted.size,
-          validatedCount,
-          totalEntries: results.length,
-          results,
-        },
         content: [
           {
             type: "text",
             text: `validated ${validatedCount}/${results.length} entries; extracted ${extracted.size} methods`,
           },
         ],
-      } as any;
+        structuredContent: { 
+          totalEntries: results.length,
+          validatedCount,
+          extractedMethodCount: extracted.size,
+          results,
+          unvalidated
+        },
+      };
     },
   );
 }

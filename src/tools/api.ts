@@ -10,49 +10,52 @@ import {
 export function registerApiTools(mcp: McpServer) {
   mcp.tool(
     "api.findEquivalent",
+    "Find GLIDE equivalent for ioredis or node-redis methods",
     {
       source: z.enum(["ioredis", "node-redis"]).describe("Source client"),
       symbol: z
         .string()
         .describe("Function or usage, e.g., set(key,value,{EX:10})"),
     },
-    async (args) => {
-      const results = findEquivalent(args.source as any, args.symbol);
+    async ({ source, symbol }) => {
+      const results = findEquivalent(source as any, symbol);
       return {
-        structuredContent: { results },
         content: [
           { type: "text", text: `Found ${results.length} mapping(s)` },
           { type: "text", text: JSON.stringify(results, null, 2) },
         ],
-      } as any;
+        structuredContent: { results },
+      };
     },
   );
 
   mcp.tool(
     "api.search",
+    "Search for keywords across all datasets",
     {
       query: z.string().describe("Keyword to search across datasets"),
     },
-    async (args) => {
-      const results = searchAll(args.query);
+    async ({ query }) => {
+      const results = searchAll(query);
       return {
-        structuredContent: { results },
         content: [
           { type: "text", text: `Found ${results.length} result(s)` },
           { type: "text", text: JSON.stringify(results, null, 2) },
         ],
-      } as any;
+        structuredContent: { results },
+      };
     },
   );
 
   mcp.tool(
     "api.diff",
+    "Compare API differences between source client and GLIDE",
     {
       from: z.enum(["ioredis", "node-redis"]).describe("Source client"),
       symbol: z.string(),
     },
-    async (args) => {
-      const results = findEquivalent(args.from as any, args.symbol);
+    async ({ from, symbol }) => {
+      const results = findEquivalent(from as any, symbol);
       const diff = results.map((r) => ({
         symbol: r.symbol,
         paramsDiff: r.paramsDiff,
@@ -60,68 +63,80 @@ export function registerApiTools(mcp: McpServer) {
         quirks: r.quirks,
       }));
       return {
-        structuredContent: { diff },
         content: [{ type: "text", text: JSON.stringify(diff, null, 2) }],
-      } as any;
+        structuredContent: { diff },
+      };
     },
   );
 
   // Browse by category
-  mcp.tool("api.categories", {}, async () => {
-    const categories = new Set<string>();
-    [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE].forEach((ds) =>
-      ds.entries.forEach((e) => categories.add(e.category)),
-    );
-    const list = Array.from(categories).sort();
-    return {
-      structuredContent: { categories: list },
-      content: [{ type: "text", text: JSON.stringify(list) }],
-    } as any;
-  });
+  mcp.tool(
+    "api.categories",
+    "Get all available API categories",
+    {},
+    async () => {
+      const categories = new Set<string>();
+      [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE].forEach((ds) =>
+        ds.entries.forEach((e) => categories.add(e.category)),
+      );
+      const list = Array.from(categories).sort();
+      return {
+        content: [{ type: "text", text: JSON.stringify(list) }],
+        structuredContent: { categories: list },
+      };
+    },
+  );
 
   mcp.tool(
     "api.byCategory",
+    "Get all APIs in a specific category",
     {
       category: z.string(),
     },
-    async (args) => {
-      const cat = args.category.toLowerCase();
+    async ({ category }) => {
+      const cat = category.toLowerCase();
       const entries = [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE]
         .flatMap((ds) => ds.entries)
         .filter((e) => e.category.toLowerCase() === cat);
       return {
-        structuredContent: { category: args.category, entries },
         content: [{ type: "text", text: JSON.stringify(entries, null, 2) }],
-      } as any;
+        structuredContent: { category: category, entries },
+      };
     },
   );
 
   // Aliases: families
-  mcp.tool("api.families", {}, async () => {
-    const families = new Set<string>();
-    [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE].forEach((ds) =>
-      ds.entries.forEach((e) => families.add(e.category)),
-    );
-    const list = Array.from(families).sort();
-    return {
-      structuredContent: { families: list },
-      content: [{ type: "text", text: JSON.stringify(list) }],
-    } as any;
-  });
+  mcp.tool(
+    "api.families",
+    "Get all available API families (alias for categories)",
+    {},
+    async () => {
+      const families = new Set<string>();
+      [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE].forEach((ds) =>
+        ds.entries.forEach((e) => families.add(e.category)),
+      );
+      const list = Array.from(families).sort();
+      return {
+        content: [{ type: "text", text: JSON.stringify(list) }],
+        structuredContent: { families: list },
+      };
+    },
+  );
   mcp.tool(
     "api.byFamily",
+    "Get all APIs in a specific family (alias for byCategory)",
     {
       family: z.string(),
     },
-    async (args) => {
-      const fam = args.family.toLowerCase();
+    async ({ family }) => {
+      const fam = family.toLowerCase();
       const entries = [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE]
         .flatMap((ds) => ds.entries)
         .filter((e) => e.category.toLowerCase() === fam);
       return {
-        structuredContent: { family: args.family, entries },
         content: [{ type: "text", text: JSON.stringify(entries, null, 2) }],
-      } as any;
+        structuredContent: { family: family, entries },
+      };
     },
   );
 }

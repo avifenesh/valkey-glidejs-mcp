@@ -811,319 +811,325 @@ await breaker.execute(() => resilientClient.get('key'));
 export function registerGeneratorTools(mcp: McpServer) {
   mcp.tool(
     "gen.clientBasic",
+    "Generate basic GLIDE client connection code",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.clientBasic() },
-        content: [{ type: "text", text: templates.clientBasic() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.clientBasic() }],
+      structuredContent: { code: templates.clientBasic() },
+    }),
   );
   mcp.tool(
     "gen.clientCluster",
+    "Generate GLIDE cluster client connection code",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.clientCluster() },
-        content: [{ type: "text", text: templates.clientCluster() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.clientCluster() }],
+      structuredContent: { code: templates.clientCluster() },
+    }),
   );
   mcp.tool(
     "gen.cache",
-    { key: z.string(), ttlSeconds: z.number().int().positive() },
-    async (args) =>
-      ({
-        structuredContent: { code: templates.cache(args as any) },
-        content: [{ type: "text", text: templates.cache(args as any) }],
-      }) as any,
+    "Generate caching pattern with TTL",
+    {
+      key: z.string(),
+      ttlSeconds: z.number().int().positive(),
+    },
+    async ({ key, ttlSeconds }) => ({
+      content: [{ type: "text", text: templates.cache({ key, ttlSeconds }) }],
+      structuredContent: { code: templates.cache({ key, ttlSeconds }) },
+    }),
   );
   mcp.tool(
     "gen.lock",
-    { lockKey: z.string(), ttlMs: z.number().int().positive() },
-    async (args) =>
-      ({
-        structuredContent: { code: templates.lock(args as any) },
-        content: [{ type: "text", text: templates.lock(args as any) }],
-      }) as any,
+    "Generate distributed lock pattern",
+    {
+      lockKey: z.string(),
+      ttlMs: z.number().int().positive(),
+    },
+    async ({ lockKey, ttlMs }) => ({
+      content: [{ type: "text", text: templates.lock({ lockKey, ttlMs }) }],
+      structuredContent: { code: templates.lock({ lockKey, ttlMs }) },
+    }),
   );
   mcp.tool(
     "gen.pubsubPublisher",
-    { channel: z.string() },
-    async (args) =>
-      ({
-        structuredContent: { code: templates.pubsubPublisher(args as any) },
-        content: [
-          { type: "text", text: templates.pubsubPublisher(args as any) },
-        ],
-      }) as any,
+    "Generate pub/sub publisher pattern",
+    {
+      channel: z.string(),
+    },
+    async ({ channel }) => ({
+      content: [{ type: "text", text: templates.pubsubPublisher({ channel }) }],
+      structuredContent: { code: templates.pubsubPublisher({ channel }) },
+    }),
   );
   mcp.tool(
     "gen.pubsubSubscriber",
-    { channel: z.string() },
-    async (args) =>
-      ({
-        structuredContent: { code: templates.pubsubSubscriber(args as any) },
-        content: [
-          { type: "text", text: templates.pubsubSubscriber(args as any) },
-        ],
-      }) as any,
+    "Generate pub/sub subscriber pattern",
+    {
+      channel: z.string(),
+    },
+    async ({ channel }) => ({
+      content: [{ type: "text", text: templates.pubsubSubscriber({ channel }) }],
+      structuredContent: { code: templates.pubsubSubscriber({ channel }) },
+    }),
   );
   mcp.tool(
     "gen.pubsubAdvanced",
-    { channel: z.string() },
-    async (args) =>
-      ({
-        structuredContent: { code: templates.pubsubAdvanced(args as any) },
-        content: [
-          { type: "text", text: templates.pubsubAdvanced(args as any) },
-        ],
-      }) as any,
+    "Generate advanced pub/sub pattern with message queuing",
+    {
+      channel: z.string(),
+    },
+    async ({ channel }) => ({
+      content: [{ type: "text", text: templates.pubsubAdvanced({ channel }) }],
+      structuredContent: { code: templates.pubsubAdvanced({ channel }) },
+    }),
   );
   mcp.tool(
     "gen.fastify",
+    "Generate Fastify plugin integration with GLIDE",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.fastify() },
-        content: [{ type: "text", text: templates.fastify() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.fastify() }],
+      structuredContent: { code: templates.fastify() },
+    }),
   );
   mcp.tool(
     "gen.rateLimiter",
+    "Generate rate limiting pattern",
     {
       key: z.string(),
       points: z.number().int().positive(),
       duration: z.number().int().positive(),
     },
-    async (args) =>
-      ({
-        structuredContent: { code: templates.rateLimiter(args as any) },
-        content: [{ type: "text", text: templates.rateLimiter(args as any) }],
-      }) as any,
+    async ({ key, points, duration }) => ({
+      content: [{ type: "text", text: templates.rateLimiter({ key, points, duration }) }],
+      structuredContent: { code: templates.rateLimiter({ key, points, duration }) },
+    }),
   );
   mcp.tool(
     "gen.queueProducer",
-    { queue: z.string() },
-    async (args) =>
-      ({
-        structuredContent: { code: templates.queueProducer(args as any) },
-        content: [{ type: "text", text: templates.queueProducer(args as any) }],
-      }) as any,
+    "Generate queue producer pattern",
+    {
+      queue: z.string(),
+    },
+    async ({ queue }) => ({
+      content: [{ type: "text", text: templates.queueProducer({ queue }) }],
+      structuredContent: { code: templates.queueProducer({ queue }) },
+    }),
   );
   mcp.tool(
     "gen.queueConsumer",
-    { queue: z.string() },
-    async (args) =>
-      ({
-        structuredContent: { code: templates.queueConsumer(args as any) },
-        content: [{ type: "text", text: templates.queueConsumer(args as any) }],
-      }) as any,
+    "Generate queue consumer pattern",
+    {
+      queue: z.string(),
+    },
+    async ({ queue }) => ({
+      content: [{ type: "text", text: templates.queueConsumer({ queue }) }],
+      structuredContent: { code: templates.queueConsumer({ queue }) },
+    }),
   );
   mcp.tool(
     "gen.sets",
+    "Generate Redis sets operations example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.setExample() },
-        content: [{ type: "text", text: templates.setExample() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.setExample() }],
+      structuredContent: { code: templates.setExample() },
+    }),
   );
   mcp.tool(
     "gen.zsets",
+    "Generate Redis sorted sets operations example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.zsetExample() },
-        content: [{ type: "text", text: templates.zsetExample() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.zsetExample() }],
+      structuredContent: { code: templates.zsetExample() },
+    }),
   );
   mcp.tool(
     "gen.streams",
+    "Generate Redis streams operations example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.streamExample() },
-        content: [{ type: "text", text: templates.streamExample() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.streamExample() }],
+      structuredContent: { code: templates.streamExample() },
+    }),
   );
   mcp.tool(
     "gen.transaction",
+    "Generate Redis transaction operations example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.transactionExample() },
-        content: [{ type: "text", text: templates.transactionExample() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.transactionExample() }],
+      structuredContent: { code: templates.transactionExample() },
+    }),
   );
   mcp.tool(
     "gen.batch",
+    "Generate Redis batch operations example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.batchExample() },
-        content: [{ type: "text", text: templates.batchExample() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.batchExample() }],
+      structuredContent: { code: templates.batchExample() },
+    }),
   );
   mcp.tool(
     "gen.pipeline",
+    "Generate Redis pipeline operations example (deprecated, use gen.batch instead)",
     {},
-    async () =>
-      ({
-        structuredContent: {
-          code: templates.pipelineExample(),
-          deprecated:
-            "Pipeline is deprecated. Use gen.batch instead. This tool now returns Batch example.",
+    async () => ({
+      content: [
+        {
+          type: "text",
+          text: "⚠️  Pipeline is deprecated. Use gen.batch instead.\n\n",
         },
-        content: [
-          {
-            type: "text",
-            text: "⚠️  Pipeline is deprecated. Use gen.batch instead.\n\n",
-          },
-          { type: "text", text: templates.pipelineExample() },
-        ],
-      }) as any,
+        { type: "text", text: templates.pipelineExample() },
+      ],
+      structuredContent: { code: templates.pipelineExample() },
+    }),
   );
   mcp.tool(
     "gen.geo",
+    "Generate Redis geospatial operations example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.geoExample() },
-        content: [{ type: "text", text: templates.geoExample() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.geoExample() }],
+      structuredContent: { code: templates.geoExample() },
+    }),
   );
   mcp.tool(
     "gen.bitmaps",
+    "Generate Redis bitmaps operations example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.bitmapsExample() },
-        content: [{ type: "text", text: templates.bitmapsExample() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.bitmapsExample() }],
+      structuredContent: { code: templates.bitmapsExample() },
+    }),
   );
   mcp.tool(
     "gen.hll",
+    "Generate Redis HyperLogLog operations example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.hllExample() },
-        content: [{ type: "text", text: templates.hllExample() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.hllExample() }],
+      structuredContent: { code: templates.hllExample() },
+    }),
   );
   mcp.tool(
     "gen.json",
+    "Generate Redis JSON operations example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.jsonExample() },
-        content: [{ type: "text", text: templates.jsonExample() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.jsonExample() }],
+      structuredContent: { code: templates.jsonExample() },
+    }),
   );
   mcp.tool(
     "gen.hashesAdvanced",
+    "Generate Redis hashes advanced operations example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.hashesAdvanced() },
-        content: [{ type: "text", text: templates.hashesAdvanced() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.hashesAdvanced() }],
+      structuredContent: { code: templates.hashesAdvanced() },
+    }),
   );
   mcp.tool(
     "gen.listsAdvanced",
+    "Generate Redis lists advanced operations example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.listsAdvanced() },
-        content: [{ type: "text", text: templates.listsAdvanced() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.listsAdvanced() }],
+      structuredContent: { code: templates.listsAdvanced() },
+    }),
   );
   mcp.tool(
     "gen.zsetRankings",
+    "Generate Redis sorted set rankings operations example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.zsetRankings() },
-        content: [{ type: "text", text: templates.zsetRankings() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.zsetRankings() }],
+      structuredContent: { code: templates.zsetRankings() },
+    }),
   );
   mcp.tool(
     "gen.jsonAdvanced",
+    "Generate Redis JSON advanced operations example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.jsonAdvanced() },
-        content: [{ type: "text", text: templates.jsonAdvanced() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.jsonAdvanced() }],
+      structuredContent: { code: templates.jsonAdvanced() },
+    }),
   );
   mcp.tool(
     "gen.scan",
+    "Generate Redis key scanning operations example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.scanExample() },
-        content: [{ type: "text", text: templates.scanExample() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.scanExample() }],
+      structuredContent: { code: templates.scanExample() },
+    }),
   );
   mcp.tool(
     "gen.clientAdvanced",
+    "Generate advanced GLIDE client configuration example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.clientAdvanced() },
-        content: [{ type: "text", text: templates.clientAdvanced() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.clientAdvanced() }],
+      structuredContent: { code: templates.clientAdvanced() },
+    }),
   );
   mcp.tool(
     "gen.azAffinityClient",
+    "Generate availability zone affinity client configuration example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.azAffinityClient() },
-        content: [{ type: "text", text: templates.azAffinityClient() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.azAffinityClient() }],
+      structuredContent: { code: templates.azAffinityClient() },
+    }),
   );
   mcp.tool(
     "gen.readPreferenceClient",
+    "Generate read preference client configuration example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.readPreferenceClient() },
-        content: [{ type: "text", text: templates.readPreferenceClient() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.readPreferenceClient() }],
+      structuredContent: { code: templates.readPreferenceClient() },
+    }),
   );
   mcp.tool(
     "gen.clusterScanAdvanced",
+    "Generate advanced cluster scanning operations example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.clusterScanAdvanced() },
-        content: [{ type: "text", text: templates.clusterScanAdvanced() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.clusterScanAdvanced() }],
+      structuredContent: { code: templates.clusterScanAdvanced() },
+    }),
   );
   mcp.tool(
     "gen.routingStrategies",
+    "Generate cluster routing strategies example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.routingStrategies() },
-        content: [{ type: "text", text: templates.routingStrategies() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.routingStrategies() }],
+      structuredContent: { code: templates.routingStrategies() },
+    }),
   );
   mcp.tool(
     "gen.telemetryClient",
+    "Generate client with telemetry and metrics tracking example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.telemetryClient() },
-        content: [{ type: "text", text: templates.telemetryClient() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.telemetryClient() }],
+      structuredContent: { code: templates.telemetryClient() },
+    }),
   );
   mcp.tool(
     "gen.connectionBackoff",
+    "Generate resilient client with connection backoff and circuit breaker example",
     {},
-    async () =>
-      ({
-        structuredContent: { code: templates.connectionBackoff() },
-        content: [{ type: "text", text: templates.connectionBackoff() }],
-      }) as any,
+    async () => ({
+      content: [{ type: "text", text: templates.connectionBackoff() }],
+      structuredContent: { code: templates.connectionBackoff() },
+    }),
   );
 }

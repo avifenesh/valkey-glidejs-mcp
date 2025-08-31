@@ -8,15 +8,13 @@ import {
 } from "../data/api/mappings.js";
 
 export function registerApiTools(mcp: McpServer) {
-  // Use registerTool API like the official examples
-  mcp.registerTool(
+  // Use tool() method with ZodRawShape (not wrapped in z.object)
+  mcp.tool(
     "api.findEquivalent",
+    "Find GLIDE equivalent for ioredis or node-redis methods",
     {
-      description: "Find GLIDE equivalent for ioredis or node-redis methods",
-      inputSchema: {
-        source: z.enum(["ioredis", "node-redis"]).describe("Source client"),
-        symbol: z.string().describe("Function or usage, e.g., set(key,value,{EX:10})"),
-      },
+      source: z.enum(["ioredis", "node-redis"]).describe("Source client"),
+      symbol: z.string().describe("Function or usage, e.g., set(key,value,{EX:10})"),
     },
     async ({ source, symbol }) => {
       const results = findEquivalent(source as any, symbol);
@@ -29,14 +27,12 @@ export function registerApiTools(mcp: McpServer) {
     }
   );
 
-  // API search tool using registerTool
-  mcp.registerTool(
+  // API search tool
+  mcp.tool(
     "api.search",
+    "Search for keywords across all datasets",
     {
-      description: "Search for keywords across all datasets",
-      inputSchema: {
-        query: z.string().describe("Keyword to search across datasets"),
-      },
+      query: z.string().describe("Keyword to search across datasets"),
     },
     async ({ query }) => {
       const results = searchAll(query);
@@ -50,14 +46,12 @@ export function registerApiTools(mcp: McpServer) {
   );
 
   // API diff tool
-  mcp.registerTool(
+  mcp.tool(
     "api.diff",
+    "Compare API differences between source client and GLIDE",
     {
-      description: "Compare API differences between source client and GLIDE",
-      inputSchema: {
-        from: z.enum(["ioredis", "node-redis"]).describe("Source client"),
-        symbol: z.string(),
-      },
+      from: z.enum(["ioredis", "node-redis"]).describe("Source client"),
+      symbol: z.string(),
     },
     async ({ from, symbol }) => {
       const results = findEquivalent(from, symbol);
@@ -74,12 +68,10 @@ export function registerApiTools(mcp: McpServer) {
   );
 
   // Browse by category - no parameters
-  mcp.registerTool(
+  mcp.tool(
     "api.categories",
-    {
-      description: "Get all available API categories",
-      inputSchema: {},
-    },
+    "Get all available API categories",
+    {},
     async () => {
       const categories = new Set<string>();
       [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE].forEach((ds) =>
@@ -92,13 +84,11 @@ export function registerApiTools(mcp: McpServer) {
     }
   );
 
-  mcp.registerTool(
+  mcp.tool(
     "api.byCategory",
+    "Get all APIs in a specific category",
     {
-      description: "Get all APIs in a specific category",
-      inputSchema: {
-        category: z.string(),
-      },
+      category: z.string(),
     },
     async ({ category }) => {
       const cat = category.toLowerCase();
@@ -112,12 +102,10 @@ export function registerApiTools(mcp: McpServer) {
   );
 
   // Aliases: families
-  mcp.registerTool(
+  mcp.tool(
     "api.families",
-    {
-      description: "Get all available API families (alias for categories)",
-      inputSchema: {},
-    },
+    "Get all available API families (alias for categories)",
+    {},
     async () => {
       const families = new Set<string>();
       [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE].forEach((ds) =>
@@ -130,13 +118,11 @@ export function registerApiTools(mcp: McpServer) {
     }
   );
 
-  mcp.registerTool(
+  mcp.tool(
     "api.byFamily",
+    "Get all APIs in a specific family (alias for byCategory)",
     {
-      description: "Get all APIs in a specific family (alias for byCategory)",
-      inputSchema: {
-        family: z.string(),
-      },
+      family: z.string(),
     },
     async ({ family }) => {
       const fam = family.toLowerCase();

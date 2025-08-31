@@ -1,64 +1,91 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
 import { findEquivalent, searchAll } from "../data/api/mappings.js";
 import {
   IOREDIS_DATASET,
   NODE_REDIS_DATASET,
   GLIDE_SURFACE,
 } from "../data/api/mappings.js";
-import { registerEnhancedTool } from "../utils/mcp-wrapper.js";
 
 export function registerApiTools(mcp: McpServer) {
-  // Enhanced API tool with dual schema support
-  registerEnhancedTool(mcp, {
-    name: "api.findEquivalent",
-    description: "Find GLIDE equivalent for ioredis or node-redis methods",
-    zodSchema: {
-      source: z.enum(["ioredis", "node-redis"]).describe("Source client"),
-      symbol: z
-        .string()
-        .describe("Function or usage, e.g., set(key,value,{EX:10})"),
-    },
-    handler: async ({ source, symbol }) => {
+  // API findEquivalent tool - use any type to bypass Zod validation issues
+  (mcp as any).tool(
+    "api.findEquivalent",
+    "Find GLIDE equivalent for ioredis or node-redis methods",
+    async (args: any) => {
+      // Manual validation
+      if (!args || typeof args !== 'object') {
+        return {
+          content: [
+            { type: "text", text: "❌ Error: Invalid arguments" },
+          ],
+        };
+      }
+      
+      const { source, symbol } = args;
+      
+      if (!source || !symbol) {
+        return {
+          content: [
+            { type: "text", text: "❌ Error: Missing required parameters 'source' and 'symbol'" },
+          ],
+        };
+      }
+      
+      if (source !== "ioredis" && source !== "node-redis") {
+        return {
+          content: [
+            { type: "text", text: "❌ Error: source must be 'ioredis' or 'node-redis'" },
+          ],
+        };
+      }
+      
       const results = findEquivalent(source as any, symbol);
       return {
         content: [
           { type: "text", text: `✅ Found ${results.length} mapping(s) for ${symbol}` },
           { type: "text", text: JSON.stringify(results, null, 2) },
         ],
-        structuredContent: { results, source, symbol, count: results.length },
       };
-    },
-  });
+    }
+  );
 
-  // Enhanced search tool
-  registerEnhancedTool(mcp, {
-    name: "api.search",
-    description: "Search for keywords across all datasets",
-    zodSchema: {
-      query: z.string().describe("Keyword to search across datasets"),
-    },
-    handler: async ({ query }) => {
-      const results = searchAll(query);
+  // API search tool
+  (mcp as any).tool(
+    "api.search",
+    "Search for keywords across all datasets",
+    async (args: any) => {
+      if (!args || !args.query) {
+        return {
+          content: [
+            { type: "text", text: "❌ Error: Missing required parameter 'query'" },
+          ],
+        };
+      }
+      
+      const results = searchAll(args.query);
       return {
         content: [
-          { type: "text", text: `✅ Found ${results.length} result(s) for "${query}"` },
+          { type: "text", text: `✅ Found ${results.length} result(s) for "${args.query}"` },
           { type: "text", text: JSON.stringify(results, null, 2) },
         ],
-        structuredContent: { results, query, count: results.length },
       };
-    },
-  });
+    }
+  );
 
-  mcp.tool(
+  // API diff tool
+  (mcp as any).tool(
     "api.diff",
     "Compare API differences between source client and GLIDE",
-    {
-      from: z.enum(["ioredis", "node-redis"]).describe("Source client"),
-      symbol: z.string(),
-    },
-    async ({ from, symbol }) => {
-      const results = findEquivalent(from as any, symbol);
+    async (args: any) => {
+      if (!args || !args.from || !args.symbol) {
+        return {
+          content: [
+            { type: "text", text: "❌ Error: Missing required parameters 'from' and 'symbol'" },
+          ],
+        };
+      }
+      
+      const results = findEquivalent(args.from, args.symbol);
       const diff = results.map((r) => ({
         symbol: r.symbol,
         paramsDiff: r.paramsDiff,
@@ -67,79 +94,83 @@ export function registerApiTools(mcp: McpServer) {
       }));
       return {
         content: [{ type: "text", text: JSON.stringify(diff, null, 2) }],
-        structuredContent: { diff },
       };
-    },
+    }
   );
 
-  // Browse by category
-  mcp.tool(
+  // Browse by category - no parameters
+  (mcp as any).tool(
     "api.categories",
     "Get all available API categories",
-    {},
     async () => {
       const categories = new Set<string>();
       [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE].forEach((ds) =>
-        ds.entries.forEach((e) => categories.add(e.category)),
+        ds.entries.forEach((e) => categories.add(e.category))
       );
       const list = Array.from(categories).sort();
       return {
         content: [{ type: "text", text: JSON.stringify(list) }],
-        structuredContent: { categories: list },
       };
-    },
+    }
   );
 
-  mcp.tool(
+  (mcp as any).tool(
     "api.byCategory",
     "Get all APIs in a specific category",
-    {
-      category: z.string(),
-    },
-    async ({ category }) => {
-      const cat = category.toLowerCase();
+    async (args: any) => {
+      if (!args || !args.category) {
+        return {
+          content: [
+            { type: "text", text: "❌ Error: Missing required parameter 'category'" },
+          ],
+        };
+      }
+      
+      const cat = args.category.toLowerCase();
       const entries = [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE]
         .flatMap((ds) => ds.entries)
         .filter((e) => e.category.toLowerCase() === cat);
       return {
         content: [{ type: "text", text: JSON.stringify(entries, null, 2) }],
-        structuredContent: { category: category, entries },
       };
-    },
+    }
   );
 
   // Aliases: families
-  mcp.tool(
+  (mcp as any).tool(
     "api.families",
     "Get all available API families (alias for categories)",
-    {},
     async () => {
       const families = new Set<string>();
       [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE].forEach((ds) =>
-        ds.entries.forEach((e) => families.add(e.category)),
+        ds.entries.forEach((e) => families.add(e.category))
       );
       const list = Array.from(families).sort();
       return {
         content: [{ type: "text", text: JSON.stringify(list) }],
-        structuredContent: { families: list },
       };
-    },
+    }
   );
-  mcp.tool(
+
+  (mcp as any).tool(
     "api.byFamily",
     "Get all APIs in a specific family (alias for byCategory)",
-    {
-      family: z.string(),
-    },
-    async ({ family }) => {
-      const fam = family.toLowerCase();
+    async (args: any) => {
+      if (!args || !args.family) {
+        return {
+          content: [
+            { type: "text", text: "❌ Error: Missing required parameter 'family'" },
+          ],
+        };
+      }
+      
+      const fam = args.family.toLowerCase();
       const entries = [IOREDIS_DATASET, NODE_REDIS_DATASET, GLIDE_SURFACE]
         .flatMap((ds) => ds.entries)
         .filter((e) => e.category.toLowerCase() === fam);
       return {
         content: [{ type: "text", text: JSON.stringify(entries, null, 2) }],
-        structuredContent: { family: family, entries },
       };
-    },
+    }
   );
 }

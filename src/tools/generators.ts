@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { registerEnhancedTool, registerSimpleTool } from "../utils/mcp-wrapper.js";
 
 const templates = {
   clientBasic: () =>
@@ -827,18 +828,30 @@ export function registerGeneratorTools(mcp: McpServer) {
       structuredContent: { code: templates.clientCluster() },
     }),
   );
-  mcp.tool(
-    "gen.cache",
-    "Generate caching pattern with TTL",
-    {
-      key: z.string(),
-      ttlSeconds: z.number().int().positive(),
+  // Enhanced cache generator with dual schema support
+  registerEnhancedTool(mcp, {
+    name: "gen.cache", 
+    description: "Generate caching pattern with TTL",
+    zodSchema: {
+      key: z.string().describe("Cache key name"),
+      ttlSeconds: z.number().int().positive().describe("TTL in seconds"),
     },
-    async ({ key, ttlSeconds }) => ({
-      content: [{ type: "text", text: templates.cache({ key, ttlSeconds }) }],
-      structuredContent: { code: templates.cache({ key, ttlSeconds }) },
-    }),
-  );
+    handler: async ({ key, ttlSeconds }) => {
+      const code = templates.cache({ key, ttlSeconds });
+      return {
+        content: [
+          { type: "text", text: `✅ Generated cache pattern for key "${key}" with ${ttlSeconds}s TTL` },
+          { type: "text", text: code }
+        ],
+        structuredContent: { 
+          code, 
+          key, 
+          ttlSeconds, 
+          pattern: "cache-with-ttl" 
+        },
+      };
+    },
+  });
   mcp.tool(
     "gen.lock",
     "Generate distributed lock pattern",

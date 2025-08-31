@@ -6,46 +6,49 @@ import {
   NODE_REDIS_DATASET,
   GLIDE_SURFACE,
 } from "../data/api/mappings.js";
+import { registerEnhancedTool } from "../utils/mcp-wrapper.js";
 
 export function registerApiTools(mcp: McpServer) {
-  mcp.tool(
-    "api.findEquivalent",
-    "Find GLIDE equivalent for ioredis or node-redis methods",
-    {
+  // Enhanced API tool with dual schema support
+  registerEnhancedTool(mcp, {
+    name: "api.findEquivalent",
+    description: "Find GLIDE equivalent for ioredis or node-redis methods",
+    zodSchema: {
       source: z.enum(["ioredis", "node-redis"]).describe("Source client"),
       symbol: z
         .string()
         .describe("Function or usage, e.g., set(key,value,{EX:10})"),
     },
-    async ({ source, symbol }) => {
+    handler: async ({ source, symbol }) => {
       const results = findEquivalent(source as any, symbol);
       return {
         content: [
-          { type: "text", text: `Found ${results.length} mapping(s)` },
+          { type: "text", text: `✅ Found ${results.length} mapping(s) for ${symbol}` },
           { type: "text", text: JSON.stringify(results, null, 2) },
         ],
-        structuredContent: { results },
+        structuredContent: { results, source, symbol, count: results.length },
       };
     },
-  );
+  });
 
-  mcp.tool(
-    "api.search",
-    "Search for keywords across all datasets",
-    {
+  // Enhanced search tool
+  registerEnhancedTool(mcp, {
+    name: "api.search",
+    description: "Search for keywords across all datasets",
+    zodSchema: {
       query: z.string().describe("Keyword to search across datasets"),
     },
-    async ({ query }) => {
+    handler: async ({ query }) => {
       const results = searchAll(query);
       return {
         content: [
-          { type: "text", text: `Found ${results.length} result(s)` },
+          { type: "text", text: `✅ Found ${results.length} result(s) for "${query}"` },
           { type: "text", text: JSON.stringify(results, null, 2) },
         ],
-        structuredContent: { results },
+        structuredContent: { results, query, count: results.length },
       };
     },
-  );
+  });
 
   mcp.tool(
     "api.diff",

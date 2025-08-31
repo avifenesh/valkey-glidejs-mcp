@@ -1,6 +1,6 @@
 {
   "name": "valkey-glidejs-mcp",
-  "version": "0.5.7",
+  "version": "0.5.8",
   "type": "module",
   "description": "Model Context Protocol (MCP) server for Valkey Glide Node.js migration, API mapping, and use-case generation",
   "keywords": [

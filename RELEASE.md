@@ -60,6 +60,40 @@ For urgent fixes, use workflow dispatch:
 # Set "Publish to npm after tests" to "true"
 ```
 
+## Retry Failed Publishes
+
+If a publish fails, you have several retry options:
+
+### Option 1: Re-run Failed Workflow (Recommended)
+- Go to GitHub Actions → Find failed workflow → "Re-run all jobs"
+- Uses same tag, preserves git history
+
+### Option 2: Manual Workflow Dispatch  
+- GitHub Actions → "CI and Publish to npm" → "Run workflow"
+- Set "Publish to npm after tests" to `true`
+- Bypasses tag requirement
+
+### Option 3: Delete and Re-create Tag
+```bash
+# Delete tag locally and remotely
+git tag -d v0.7.1
+git push origin :refs/tags/v0.7.1
+
+# Make fixes, then re-create tag
+git tag -a v0.7.1 -m "v0.7.1 - Release Title"
+git push origin main && git push origin v0.7.1
+```
+
+### Option 4: Bump to New Version
+```bash
+# If version conflict or tag already published
+npm version patch --no-git-tag-version
+git add package.json
+git commit -m "chore: bump for retry"
+git tag -a v0.7.2 -m "v0.7.2 - Retry publish"
+git push origin main && git push origin v0.7.2
+```
+
 ## Workflow Status
 
 - ✅ **CI** (`ci.yml`) - Runs on PRs and pushes to main

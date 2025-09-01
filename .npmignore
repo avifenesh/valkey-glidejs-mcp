@@ -64,3 +64,4 @@ coverage/
 
 # Package artifacts
 *.tgz
+.qoder/

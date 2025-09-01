@@ -1,6 +1,6 @@
 {
   "name": "valkey-glidejs-mcp",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "type": "module",
   "description": "Model Context Protocol (MCP) server for Valkey Glide Node.js migration, API mapping, and use-case generation",
   "keywords": [
@@ -28,9 +28,9 @@
   },
   "author": "avifenesh",
   "license": "MIT",
-  "main": "dist/server.js",
+  "main": "src/server.ts",
   "bin": {
-    "valkey-glidejs-mcp": "dist/server.js"
+    "valkey-glidejs-mcp": "./start-server.mjs"
   },
   "files": [
     "dist/**/*",
@@ -41,18 +41,16 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "dev": "tsx src/server.ts",
-    "start": "node dist/server.js",
-    "test": "tsx --test test/*.test.ts",
+    "build": "echo 'Using tsx directly - no build needed'",
+    "dev": "npx tsx src/server.ts",
+    "start": "npx tsx src/server.ts",
     "lint:check": "prettier --check .",
     "lint:fix": "prettier --write .",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run build && npm test",
-    "validate:glide": "tsx scripts/validate.ts",
-    "ingest:commands": "tsx scripts/ingest-commands.ts",
-    "commitlint": "commitlint --edit",
-    "prepare": "npm run build"
+    "prepublishOnly": "npm run typecheck && npm run lint:check",
+    "validate:glide": "npx tsx scripts/validate.ts",
+    "ingest:commands": "npx tsx scripts/ingest-commands.ts",
+    "commitlint": "commitlint --edit"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.1.4",

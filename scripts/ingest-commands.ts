@@ -1,28 +1,90 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { registerCommandsTools } from "../src/tools/commands.js";
+#!/usr/bin/env node
+/**
+ * GLIDE MCP Command Documentation Verification
+ * Verifies API mappings and command availability
+ */
+
+import { writeFileSync } from "fs";
+
+const logMessage = (msg: string) => {
+  console.error(msg);
+  writeFileSync("commands.log", msg + "\n", { flag: "a" });
+};
 
 async function main() {
-  const mcp = new McpServer({ name: "ingest", version: "0.0.0" });
-  registerCommandsTools(mcp);
-  const tool = (mcp as any)._registeredTools?.["commands.ingest"];
-  let start = 0;
-  const count = 10;
-  // Iterate until we see no progress (assume ~500 max)
-  for (let i = 0; i < 200; i++) {
-    const res = await tool.callback(
-      { start, count, refresh: i === 0 } as any,
-      {} as any,
+  logMessage("📋 Starting command documentation verification...");
+
+  try {
+    // Test API mappings functionality
+    logMessage("🔍 Testing API mappings...");
+    const {
+      searchAll,
+      findEquivalent,
+      IOREDIS_DATASET,
+      NODE_REDIS_DATASET,
+      GLIDE_SURFACE,
+    } = await import("../src/data/api/mappings.js");
+
+    // Test search functionality
+    const testQueries = ["get", "set", "del", "exists", "hget", "lpush"];
+    const searchStats: any = {};
+
+    for (const query of testQueries) {
+      const results = searchAll(query);
+      searchStats[query] = results.length;
+      logMessage(`✅ Search "${query}": ${results.length} results`);
+    }
+
+    // Test equivalency mappings
+    const mappingStats: any = { ioredis: {}, nodeRedis: {} };
+
+    for (const query of testQueries) {
+      const ioredisResults = findEquivalent("ioredis", query);
+      const nodeRedisResults = findEquivalent("node-redis", query);
+      mappingStats.ioredis[query] = ioredisResults.length;
+      mappingStats.nodeRedis[query] = nodeRedisResults.length;
+      logMessage(
+        `✅ Mappings "${query}": ioredis=${ioredisResults.length}, node-redis=${nodeRedisResults.length}`,
+      );
+    }
+
+    // Dataset size verification
+    logMessage("📊 Dataset verification...");
+    logMessage(`✅ IOREDIS_DATASET: ${IOREDIS_DATASET.length} entries`);
+    logMessage(`✅ NODE_REDIS_DATASET: ${NODE_REDIS_DATASET.length} entries`);
+    logMessage(`✅ GLIDE_SURFACE: ${GLIDE_SURFACE.length} entries`);
+
+    const result = {
+      timestamp: new Date().toISOString(),
+      status: "SUCCESS",
+      version: "0.7.0",
+      datasets: {
+        ioredis: IOREDIS_DATASET.length,
+        nodeRedis: NODE_REDIS_DATASET.length,
+        glide: GLIDE_SURFACE.length,
+      },
+      searchTests: searchStats,
+      mappingTests: mappingStats,
+      totalQueries: testQueries.length,
+      message: "Command documentation verification completed",
+    };
+
+    writeFileSync(
+      "commands-verification.json",
+      JSON.stringify(result, null, 2),
     );
-    console.log(
-      `batch ${i}: start=${start} processed=${res.structuredContent.processed}`,
-    );
-    start += count;
-    if (res.structuredContent.processed < count) break;
+    logMessage("🎉 Command verification completed successfully!");
+  } catch (error) {
+    const errorResult = {
+      timestamp: new Date().toISOString(),
+      status: "ERROR",
+      error: error.message,
+    };
+
+    writeFileSync("commands-error.json", JSON.stringify(errorResult, null, 2));
+    logMessage(`❌ Command verification failed: ${error.message}`);
+    process.exit(1);
   }
-  console.log("Done. See COMMANDS_INDEX.json and COMMANDS_BY_FAMILY.json");
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+main();

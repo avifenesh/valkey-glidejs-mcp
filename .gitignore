@@ -61,3 +61,5 @@ PROGRESS_UPDATE.md
 # Package archives
 *.tar.gz
 *.zip
+
+.qoder/

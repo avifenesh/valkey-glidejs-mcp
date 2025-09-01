@@ -4,7 +4,24 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
 
-**The complete Model Context Protocol (MCP) server for [Valkey GLIDE](https://github.com/valkey-io/valkey-glide)** - providing comprehensive migration assistance, intelligent code generation, and complete API coverage for AI assistants.
+**A streamlined Model Context Protocol (MCP) server for [Valkey GLIDE](https://github.com/valkey-io/valkey-glide)** - providing intelligent migration assistance, code generation, and complete API coverage for AI assistants.
+
+## ✨ Smart Tool Architecture
+
+### 🔧 4 Intelligent Tools
+
+| Tool           | Purpose                  | Key Features                             |
+| -------------- | ------------------------ | ---------------------------------------- |
+| **`api`**      | API exploration & search | Context-aware search, smart filtering    |
+| **`generate`** | Code generation          | Pattern detection, parameter inference   |
+| **`migrate`**  | Migration engine         | Complexity assessment, automatic routing |
+| **`system`**   | System utilities         | Health, validation, docs, debugging      |
+
+### 🧠 Intelligent Features
+
+- **Smart Parameter Detection**: Tools automatically understand your intent
+- **Context-Aware Routing**: Responses adapt based on query complexity
+- **Unified Interfaces**: Consistent experience across all operations
 
 ## ✨ Features at a Glance
 
@@ -14,6 +31,7 @@
 🏗️ **Intelligent Generation**: Context-aware code templates for all use cases  
 ✅ **Runtime Validated**: All migrations tested against live Valkey instances  
 🔧 **Production Ready**: Based on actual GitHub repositories, not toy examples
+🧠 **AI-Optimized**: Streamlined tool interface reduces cognitive load
 
 ## 🎯 What This Tool Does
 
@@ -45,7 +63,7 @@ npx valkey-glidejs-mcp
 **Option 1: Using Claude Code CLI (Recommended)**
 
 ```bash
-claude mcp add --scope user valkey-glidejs-mcp valkey-glidejs-mcp
+claude mcp add --scope user valkey-glidejs-mcp npx valkey-glidejs-mcp
 ```
 
 **Option 2: Manual Configuration**
@@ -85,9 +103,9 @@ Then restart Claude Desktop.
 
 ## 💬 What You Can Ask
 
-Once installed, your AI assistant becomes a Valkey GLIDE expert. Try these prompts:
+Describe what you need - the system automatically routes to the right functionality:
 
-### 🔄 Migration Assistance
+### 🔄 Migration
 
 ```
 "Migrate this ioredis code to GLIDE"
@@ -110,19 +128,32 @@ Once installed, your AI assistant becomes a Valkey GLIDE expert. Try these promp
 "What GLIDE methods work with sorted sets?"
 "How do I use GLIDE for geospatial operations?"
 "Show me all available GLIDE string commands"
+"Find GLIDE equivalent for ioredis.get()"
 ```
 
-### 🎯 Advanced Patterns
+### 🔧 System Operations
 
 ```
-"Implement a Redis cache-aside pattern with GLIDE"
-"Create a job queue using GLIDE streams"
-"Build idempotency with GLIDE transactions"
+"Check server health"
+"Validate this GLIDE code"
+"Show documentation for caching patterns"
+"Debug this Redis connection"
 ```
 
-## 🛠️ Comprehensive Tool Suite
+## 🔧 Smart Tool Architecture
 
-### 🔄 Universal Migration Engine
+### 🧠 Intelligent Tool Consolidation
+
+4 smart tools with context-aware routing for optimal AI agent experience:
+
+| Smart Tool     | Capabilities                              | Intelligence Features                                                                 |
+| -------------- | ----------------------------------------- | ------------------------------------------------------------------------------------- |
+| **`api`**      | Search, equivalents, categories, browsing | • Query complexity detection<br>• Smart result filtering<br>• Context-aware responses |
+| **`generate`** | Clients, patterns, applications, advanced | • Parameter inference<br>• Pattern recognition<br>• Complexity-based routing          |
+| **`migrate`**  | ioredis, node-redis transformations       | • Source detection<br>• Pattern analysis<br>• Smart transformations                   |
+| **`system`**   | Health, validation, docs, debugging       | • Action inference<br>• Error detection<br>• Help routing                             |
+
+### 🔄 Universal Migration Engine (`migrate` tool)
 
 **Complete Client Support**: Handles **both** ioredis and node-redis with 65+ tested migration patterns
 
@@ -134,7 +165,7 @@ Once installed, your AI assistant becomes a Valkey GLIDE expert. Try these promp
 - ✅ **Pub/Sub Conversion**: Complete event-driven pattern migration with examples
 - ✅ **Native Operations**: Direct mapping to GLIDE's native blocking and atomic operations
 
-### 🏗️ Intelligent Code Generation
+### 🏗️ Intelligent Code Generation (`generate` tool)
 
 **Production-Ready Templates** for every Valkey use case:
 
@@ -143,7 +174,7 @@ Once installed, your AI assistant becomes a Valkey GLIDE expert. Try these promp
 - **Advanced Patterns**: Distributed locks, rate limiters, caching, pub/sub, transactions
 - **Real-World Scenarios**: Session management, job queues, idempotency, circuit breakers
 
-### 📚 Complete API Coverage
+### 📚 Complete API Coverage (`api` tool)
 
 **673 Methods** with comprehensive documentation:
 
@@ -151,6 +182,15 @@ Once installed, your AI assistant becomes a Valkey GLIDE expert. Try these promp
 - 📋 **Category Browsing**: Organized by command families (strings, lists, sets, etc.)
 - 📖 **Detailed Docs**: Usage examples, parameters, and return types for every method
 - ✅ **Validation Tools**: Verify API usage and code correctness
+
+### 🔧 System Utilities (`system` tool)
+
+**Unified Management**: Health, validation, documentation, and debugging
+
+- ❤️ **Health Monitoring**: Server status and performance metrics
+- 🔍 **Code Validation**: Static analysis and GLIDE compliance checking
+- 📖 **Documentation**: Context-aware help and examples
+- 🐛 **Debugging**: Parameter validation and error diagnosis
 
 ## 🏃‍♂️ Quick Example
 
@@ -184,6 +224,7 @@ client.close();
 | **Migration Success**  | 100%            | Tested on 65+ migration patterns |
 | **Test Coverage**      | 65+ patterns    | Real GitHub repository code      |
 | **Runtime Validation** | ✅ Live testing | Against actual Valkey instances  |
+| **Smart Tools**        | 4 unified tools | Context-aware routing            |
 
 ## 🎯 Key Differences from ioredis/node-redis
 

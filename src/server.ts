@@ -1,74 +1,87 @@
 #!/usr/bin/env node
+/**
+ * OPTIMIZED MCP SERVER - Reduced from 42 tools to 4 smart tools
+ *
+ * BEFORE: 42 tools across 18 files causing AI agent confusion
+ * AFTER: 4 intelligent tools with smart routing
+ *
+ * Smart Tools:
+ * 1. "api" - Unified API exploration (replaces 19 API tools)
+ * 2. "generate" - Intelligent code generation (replaces 12 generation tools)
+ * 3. "migrate" - Smart migration engine (replaces 3 migration tools)
+ * 4. "system" - System utilities (replaces 8 system tools)
+ *
+ * Benefits:
+ * - 90% reduction in tool count (42 → 4)
+ * - Context-aware routing
+ * - Preserved functionality
+ * - Reduced AI agent cognitive load
+ */
+
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { registerHealthTool } from "./tools/health.js";
-import { registerDocsTools } from "./tools/docs.js";
-import { registerApiTools } from "./tools/api.js";
-import { registerEnhancedApiTools } from "./tools/enhanced-api.js";
-import { registerMigrationTools } from "./tools/migrate.js";
-// import { registerGeneratorTools } from "./tools/generators.js"; // DISABLED - has params
-import { registerNoParamGeneratorTools } from "./tools/generators-no-params.js";
-import { registerEnhancedGeneratorTools } from "./tools/enhanced-generators.js";
-import { registerVerifyTools } from "./tools/verify.js";
-import { registerDataTools } from "./tools/data.js";
-import { registerValidationTools } from "./tools/validate.js";
-import { registerCommandsTools } from "./tools/commands.js";
-import { registerDebugTools } from "./tools/debug.js";
-import { registerTestTools } from "./tools/test-basic.js";
 
-const mcp = new McpServer({ name: "valkey-glidejs-mcp", version: "0.1.0" });
+// Import unified tools
+import { registerUnifiedApiExplorer } from "./tools/core/api-explorer.js";
+import { registerUnifiedCodeGenerator } from "./tools/core/code-generator.js";
+import { registerSmartMigrationEngine } from "./tools/core/migration-engine.js";
+import { registerSystemTools } from "./tools/core/system-tools.js";
+
+// For compatibility, also import original data mapping
+import { findEquivalent, searchAll } from "./data/api/mappings.js";
+
+const mcp = new McpServer({
+  name: "valkey-glidejs-mcp",
+  version: "2.0.0",
+});
 
 // ============================================================
-// TEMPORARY: Tools with parameters are disabled due to Claude MCP bug
-// Issue: "keyValidator._parse is not a function" error
-// These will be re-enabled once Claude's MCP client is fixed
+// OPTIMIZED TOOL REGISTRATION - 4 SMART TOOLS ONLY
 // ============================================================
 
-// Debug tools (has params) - DISABLED
-// registerDebugTools(mcp);
+console.error("🚀 Starting MCP Server with 4 smart tools...");
 
-// Test tools (has params) - DISABLED  
-// registerTestTools(mcp);
+// 1. API Explorer - Handles all API-related requests intelligently
+registerUnifiedApiExplorer(mcp);
+console.error("✅ Registered API Explorer (unified API tools)");
 
-// Health check - NO PARAMS - WORKING
-registerHealthTool(mcp);
+// 2. Code Generator - Intelligent code generation with context awareness
+registerUnifiedCodeGenerator(mcp);
+console.error("✅ Registered Code Generator (unified generation tools)");
 
-// Docs tools (has params) - DISABLED
-// registerDocsTools(mcp);
+// 3. Migration Engine - Smart migration with pattern detection
+registerSmartMigrationEngine(mcp);
+console.error("✅ Registered Migration Engine (smart migration)");
 
-// API tools (has params) - DISABLED
-// registerApiTools(mcp);
+// 4. System Tools - Health, validation, docs, debug utilities
+registerSystemTools(mcp);
+console.error("✅ Registered System Tools (system utilities)");
 
-// Enhanced API tools - NO PARAMS - WORKING
-registerEnhancedApiTools(mcp);
-
-// Migration tools (has params) - DISABLED
-// registerMigrationTools(mcp);
-
-// Generator tools - ONLY NO-PARAM ONES
-registerNoParamGeneratorTools(mcp);
-
-// Enhanced generator tools - NO PARAMS - WORKING
-registerEnhancedGeneratorTools(mcp);
-
-// Verify tools (has params) - DISABLED
-// registerVerifyTools(mcp);
-
-// Data tools (has params) - DISABLED
-// registerDataTools(mcp);
-
-// Validation tools (has params) - DISABLED
-// registerValidationTools(mcp);
-
-// Commands tools (has params) - DISABLED
-// registerCommandsTools(mcp);
+// ============================================================
+// SERVER STARTUP
+// ============================================================
 
 async function main() {
   const transport = new StdioServerTransport();
+
+  console.error("🎯 MCP Server ready with 4 smart tools:");
+  console.error("   • 'api' - API exploration, search, comparison");
+  console.error("   • 'generate' - Code generation for all patterns");
+  console.error("   • 'migrate' - Intelligent Redis → GLIDE migration");
+  console.error("   • 'system' - Health, validation, docs, debug");
+  console.error("");
+  console.error("🔗 Server ready on stdio transport...");
+
   await mcp.connect(transport);
 }
 
+// Handle graceful shutdown
+process.on("SIGINT", async () => {
+  console.error("\n🛑 Shutting down MCP server...");
+  process.exit(0);
+});
+
 main().catch((error) => {
-  console.error(error);
+  console.error("❌ Failed to start MCP server:", error);
   process.exit(1);
 });

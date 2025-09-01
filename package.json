@@ -44,6 +44,7 @@
     "build": "echo 'Using tsx directly - no build needed'",
     "dev": "npx tsx src/server.ts",
     "start": "npx tsx src/server.ts",
+    "test": "npm run typecheck && npm run lint:check && npm run validate:glide",
     "lint:check": "prettier --check .",
     "lint:fix": "prettier --write .",
     "typecheck": "tsc --noEmit",

@@ -72,6 +72,7 @@ claude mcp add --scope user valkey-glide npx tsx /path/to/valkey-glidejs-mcp/src
 ```
 
 **Alternative (once fixed package is published):**
+
 ```bash
 claude mcp add --scope user valkey-glidejs-mcp npx valkey-glidejs-mcp@latest
 ```
@@ -84,6 +85,7 @@ Add to your Claude Desktop config file:
 - **Linux**: `~/.config/Claude/claude_desktop_config.json`
 
 **Current Workaround (until package fix):**
+
 ```json
 {
   "mcpServers": {
@@ -96,6 +98,7 @@ Add to your Claude Desktop config file:
 ```
 
 **Future (once package is fixed):**
+
 ```json
 {
   "mcpServers": {

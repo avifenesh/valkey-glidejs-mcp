@@ -40,7 +40,7 @@ jobs:
         run: npm ci
 
       - name: Run type check
-        run: npm run build
+        run: npm run typecheck
 
       - name: Run tests
         run: npm test
@@ -65,7 +65,7 @@ jobs:
         run: npm ci
 
       - name: Check formatting
-        run: npx prettier --check .
+        run: npm run lint:check
 
       - name: Type check
-        run: npm run build
+        run: npm run typecheck

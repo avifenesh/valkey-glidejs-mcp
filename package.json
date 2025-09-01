@@ -33,7 +33,9 @@
     "valkey-glidejs-mcp": "./start-server.mjs"
   },
   "files": [
-    "dist/**/*",
+    "src/**/*",
+    "scripts/**/*",
+    "start-server.mjs",
     "README.md",
     "package.json"
   ],

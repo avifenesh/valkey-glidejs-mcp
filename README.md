@@ -63,6 +63,16 @@ npx valkey-glidejs-mcp@latest
 **Option 1: Using Claude Code CLI (Recommended)**
 
 ```bash
+# Current published package has missing files - use local development method:
+clone https://github.com/avifenesh/valkey-glidejs-mcp.git
+cd valkey-glidejs-mcp
+npm install
+# Then use in Claude:
+claude mcp add --scope user valkey-glide npx tsx /path/to/valkey-glidejs-mcp/src/server.ts
+```
+
+**Alternative (once fixed package is published):**
+```bash
 claude mcp add --scope user valkey-glidejs-mcp npx valkey-glidejs-mcp@latest
 ```
 
@@ -73,6 +83,19 @@ Add to your Claude Desktop config file:
 - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 - **Linux**: `~/.config/Claude/claude_desktop_config.json`
 
+**Current Workaround (until package fix):**
+```json
+{
+  "mcpServers": {
+    "valkey-glide": {
+      "command": "npx",
+      "args": ["tsx", "/full/path/to/valkey-glidejs-mcp/src/server.ts"]
+    }
+  }
+}
+```
+
+**Future (once package is fixed):**
 ```json
 {
   "mcpServers": {

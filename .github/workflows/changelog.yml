@@ -21,12 +21,30 @@ jobs:
 
       - name: Generate Changelog
         id: changelog
-        uses: requarks/changelog-action@v1
-        with:
-          token: ${{ github.token }}
-          tag: ${{ github.ref_name }}
-          excludeTypes: "chore,style,docs"
-          includeInvalidCommits: true
+        run: |
+          # Get the previous tag
+          PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -v "${{ github.ref_name }}" | head -1)
+          echo "Previous tag: $PREVIOUS_TAG"
+          echo "Current tag: ${{ github.ref_name }}"
+          
+          # Generate changelog between tags
+          if [ -z "$PREVIOUS_TAG" ]; then
+            # If no previous tag, get all commits
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            # Get commits between previous and current tag
+            CHANGELOG=$(git log $PREVIOUS_TAG..${{ github.ref_name }} --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          
+          # Filter out chore, style, docs commits
+          FILTERED_CHANGELOG=$(echo "$CHANGELOG" | grep -v -E "^- (chore|style|docs|ci):" || true)
+          
+          # Set output
+          echo "changes<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILTERED_CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          echo "previousTag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
 
       - name: Create Release
         uses: ncipollo/release-action@v1

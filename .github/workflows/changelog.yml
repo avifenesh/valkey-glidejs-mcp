@@ -72,7 +72,7 @@ jobs:
               "mcpServers": {
                 "valkey-glide": {
                   "command": "npx",
-                  "args": ["valkey-glidejs-mcp"]
+                  "args": ["valkey-glidejs-mcp@latest"]
                 }
               }
             }

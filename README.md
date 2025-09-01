@@ -52,7 +52,7 @@ This MCP server transforms AI assistants (Claude, Continue, Cline, Zed, etc.) in
 npm install -g valkey-glidejs-mcp
 
 # Or use with npx (no installation)
-npx valkey-glidejs-mcp
+npx valkey-glidejs-mcp@latest
 ```
 
 ### 🔧 Setup for AI Assistants
@@ -63,7 +63,7 @@ npx valkey-glidejs-mcp
 **Option 1: Using Claude Code CLI (Recommended)**
 
 ```bash
-claude mcp add --scope user valkey-glidejs-mcp npx valkey-glidejs-mcp
+claude mcp add --scope user valkey-glidejs-mcp npx valkey-glidejs-mcp@latest
 ```
 
 **Option 2: Manual Configuration**
@@ -78,7 +78,7 @@ Add to your Claude Desktop config file:
   "mcpServers": {
     "valkey-glide": {
       "command": "npx",
-      "args": ["valkey-glidejs-mcp"]
+      "args": ["valkey-glidejs-mcp@latest"]
     }
   }
 }
@@ -94,7 +94,7 @@ Then restart Claude Desktop.
 **Configuration:**
 
 - **Command**: `npx` or `valkey-glidejs-mcp` (if globally installed)
-- **Args**: `["valkey-glidejs-mcp"]` (only if using `npx`)
+- **Args**: `["valkey-glidejs-mcp@latest"]` (only if using `npx`)
 - **Transport**: `stdio`
 
 **Supported Tools:** Continue, Cline, Zed, and any MCP-compatible AI assistant

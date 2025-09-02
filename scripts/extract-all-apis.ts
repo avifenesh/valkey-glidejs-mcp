@@ -33,7 +33,7 @@ function extractMethodsFromFile(filePath: string): ApiMethod[] {
     filePath,
     content,
     ts.ScriptTarget.Latest,
-    true
+    true,
   );
 
   const methods: ApiMethod[] = [];
@@ -59,7 +59,7 @@ function extractMethodsFromFile(filePath: string): ApiMethod[] {
 
         // Extract parameters with modifiers
         method.parameters = node.parameters.map((p) =>
-          p.name.getText(sourceFile)
+          p.name.getText(sourceFile),
         );
         method.paramsDetailed = node.parameters.map((p) => {
           const name = p.name.getText(sourceFile);
@@ -68,10 +68,10 @@ function extractMethodsFromFile(filePath: string): ApiMethod[] {
           return { name, optional, rest };
         });
         method.paramTypes = node.parameters.map(
-          (p) => p.type?.getText(sourceFile) || "any"
+          (p) => p.type?.getText(sourceFile) || "any",
         );
         const requiredCount = node.parameters.filter(
-          (p) => !(p.questionToken || p.initializer || p.dotDotDotToken)
+          (p) => !(p.questionToken || p.initializer || p.dotDotDotToken),
         ).length;
         method.minArity = requiredCount;
         const hasRest = node.parameters.some((p) => !!p.dotDotDotToken);
@@ -193,7 +193,7 @@ async function main() {
     "node_modules",
     "@valkey",
     "valkey-glide",
-    "package.json"
+    "package.json",
   );
   if (fs.existsSync(candidatePkg)) {
     pkgRoot = path.dirname(candidatePkg);
@@ -201,7 +201,7 @@ async function main() {
     console.error(
       "Unable to locate @valkey/valkey-glide package.json at expected path: " +
         candidatePkg +
-        "\nHave you installed dependencies?"
+        "\nHave you installed dependencies?",
     );
     process.exit(1);
   }
@@ -222,8 +222,8 @@ async function main() {
       if (
         dtsFiles.some((f) =>
           /Glide(Client|ClusterClient|Json|Ft)|BaseClient|Transaction|Commands/.test(
-            f
-          )
+            f,
+          ),
         )
       ) {
         apiDir = dir;
@@ -234,7 +234,7 @@ async function main() {
 
   if (!apiDir) {
     console.error(
-      "Could not locate Glide API .d.ts directory inside @valkey/valkey-glide package."
+      "Could not locate Glide API .d.ts directory inside @valkey/valkey-glide package.",
     );
     console.error("Checked:", candidateDirs.join(", "));
     process.exit(1);
@@ -314,7 +314,7 @@ async function main() {
   console.log(`BaseClient:         ${inventory.baseClient.length} methods`);
   console.log(`GlideClient:        ${inventory.glideClient.length} methods`);
   console.log(
-    `GlideClusterClient: ${inventory.glideClusterClient.length} methods`
+    `GlideClusterClient: ${inventory.glideClusterClient.length} methods`,
   );
   console.log(`Commands:           ${inventory.commands.length} methods`);
   console.log(`Transaction:        ${inventory.transaction.length} methods`);

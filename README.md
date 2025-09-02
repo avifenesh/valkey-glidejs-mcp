@@ -305,7 +305,9 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 **Resources:**
 
 - 📦 [NPM Package](https://www.npmjs.com/package/valkey-glidejs-mcp)
-- 📖 [Valkey GLIDE Documentation](https://github.com/valkey-io/valkey-glide)
+- 📖 [Valkey GLIDE wiki](https://github.com/valkey-io/valkey-glide/wiki)
+- 📖 [Migration Guide](https://github.com/valkey-io/valkey-glide/wiki/Migration-Guide-ioredis)
+- 📖 [Valkey GLIDE Documentation](https://valkey.io/valkey-glide/node/)
 - 🔗 [Model Context Protocol](https://modelcontextprotocol.io)
 - 🐛 [Issues & Feedback](https://github.com/avifenesh/valkey-glidejs-mcp/issues)
 

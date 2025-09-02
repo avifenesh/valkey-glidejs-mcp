@@ -8,14 +8,21 @@
 import { spawn } from "child_process";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
+import { existsSync } from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const serverPath = resolve(__dirname, "src", "server.ts");
+const tsEntry = resolve(__dirname, "src", "server.ts");
+const jsEntry = resolve(__dirname, "dist", "server.js");
 
-// Launch the server with tsx
-const server = spawn("npx", ["tsx", serverPath], {
+// Prefer built output if available, otherwise fall back to tsx
+const hasBuilt = existsSync(jsEntry);
+const entryPath = hasBuilt ? jsEntry : tsEntry;
+const args = hasBuilt ? [entryPath] : ["tsx", entryPath];
+const cmd = hasBuilt ? "node" : "npx";
+
+const server = spawn(cmd, args, {
   stdio: "inherit",
   cwd: __dirname,
 });

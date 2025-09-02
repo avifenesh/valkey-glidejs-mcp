@@ -72,3 +72,6 @@ PROGRESS_UPDATE.md
 
 *result*
 **/copilot-*
+.local-test/
+.cursor/
+mcp.json

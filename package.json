@@ -1,6 +1,6 @@
 {
   "name": "valkey-glidejs-mcp",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "type": "module",
   "description": "Universal MCP Tool Enhancement System for Valkey Glide Node.js - Intelligent, conversational interface with progressive learning, migration assistance, and production-ready code generation",
   "keywords": [
@@ -36,43 +36,35 @@
   },
   "author": "avifenesh",
   "license": "MIT",
-  "main": "src/server.ts",
+  "main": "dist/server.js",
   "bin": {
     "valkey-glidejs-mcp": "./start-server.mjs"
   },
   "files": [
-    "src/**/*",
-    "scripts/**/*",
-    "docs/**/*",
+    "dist/**/*",
     "start-server.mjs",
     "README.md",
-    "package.json"
+    "package.json",
+    "mcp.json"
   ],
   "engines": {
     "node": ">=18.0.0"
   },
   "scripts": {
-    "build": "echo 'Using tsx directly - no build needed'",
+    "build": "tsc -p tsconfig.json",
     "dev": "npx tsx src/server.ts",
     "start": "npx tsx src/server.ts",
     "test": "npm run typecheck && npm run lint:check && npm run validate:glide && npm run test:integration",
     "test:integration": "npx tsx scripts/verify-integration.ts",
-    "test:ai-agent": "npx tsx src/testing/ai-agent/index.ts",
-    "test:quality": "npx tsx src/testing/ai-agent/quality-metrics.ts",
-    "test:e2e": "npx tsx src/testing/integration/e2e-testing.ts",
     "lint:check": "prettier --check .",
     "lint:fix": "prettier --write .",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run typecheck && npm run lint:check && npm run test:integration",
+    "prepublishOnly": "npm run build && npm run typecheck && npm run lint:check && npm run test:integration",
     "validate:glide": "npx tsx scripts/validate.ts",
     "validate:coverage": "npx tsx scripts/validate-api-coverage.ts",
     "extract:apis": "npx tsx scripts/extract-all-apis.ts",
-  "validate:glide:extended": "npm run extract:apis && npx tsx scripts/validate-glide-parameters.ts",
-    "ingest:commands": "npx tsx scripts/ingest-commands.ts",
-    "enhanced:setup": "npm run extract:apis && npm run validate:coverage && npm run test:integration",
-    "enhanced:test": "npm run test:ai-agent && npm run test:quality && npm run test:e2e",
-    "enhanced:validate": "npm run enhanced:setup && npm run enhanced:test",
-    "commitlint": "commitlint --edit"
+    "validate:glide:extended": "npm run extract:apis && npx tsx scripts/validate-glide-parameters.ts",
+    "ingest:commands": "npx tsx scripts/ingest-commands.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.1.4",

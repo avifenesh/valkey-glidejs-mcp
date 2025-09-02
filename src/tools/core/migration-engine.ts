@@ -180,6 +180,8 @@ export class SmartMigrationEngine implements SmartTool {
       transformed = this.applyNodeRedisTransformations(transformed);
     }
 
+    // Also apply common transformations for parity on simple cases
+    transformed = this.applyCommonTransformations(transformed);
     return transformed;
   }
 
@@ -230,29 +232,61 @@ export class SmartMigrationEngine implements SmartTool {
     const notes: string[] = [];
 
     // Handle pipeline/multi transformations
-    if (code.includes("pipeline")) {
-      transformed = transformed.replace(
-        /\.pipeline\s*\(\s*\)/g,
-        "new Batch(false)",
-      );
-      notes.push(
-        "Converted pipeline() to Batch(false) - non-atomic operations",
-      );
-    }
+    // Replace variable-initialized pipeline/multi() with Batch and track client for exec routing
+    const execRedirects: Array<{ batchVar: string; clientExpr: string }> = [];
 
-    if (code.includes("multi")) {
-      transformed = transformed.replace(
-        /\.multi\s*\(\s*\)/g,
-        "new Batch(true)",
-      );
+    transformed = transformed.replace(
+      /const\s+(\w+)\s*=\s*([A-Za-z0-9_\.]+)\.pipeline\s*\(\s*\)\s*;/g,
+      (match, batchVar: string, clientExpr: string) => {
+        execRedirects.push({ batchVar, clientExpr });
+        notes.push(
+          `Converted ${batchVar} = ${clientExpr}.pipeline() to Batch(false) - non-atomic operations`,
+        );
+        return `const ${batchVar} = new Batch(false);`;
+      },
+    );
+
+    transformed = transformed.replace(
+      /const\s+(\w+)\s*=\s*([A-Za-z0-9_\.]+)\.multi\s*\(\s*\)\s*;/g,
+      (match, batchVar: string, clientExpr: string) => {
+        execRedirects.push({ batchVar, clientExpr });
+        notes.push(
+          `Converted ${batchVar} = ${clientExpr}.multi() to Batch(true) - atomic operations`,
+        );
+        return `const ${batchVar} = new Batch(true);`;
+      },
+    );
+
+    // If direct method calls like redis.pipeline() without variable assignment exist, fallback simple replacement
+    if (/\.pipeline\s*\(\s*\)/.test(transformed)) {
+      transformed = transformed.replace(/\.pipeline\s*\(\s*\)/g, "new Batch(false)");
+      notes.push("Converted pipeline() to Batch(false) - non-atomic operations");
+    }
+    if (/\.multi\s*\(\s*\)/.test(transformed)) {
+      transformed = transformed.replace(/\.multi\s*\(\s*\)/g, "new Batch(true)");
       notes.push("Converted multi() to Batch(true) - atomic operations");
     }
 
-    if (code.includes("exec")) {
+    // Redirect exec calls on batch variables to client.exec(batchVar)
+    execRedirects.forEach(({ batchVar, clientExpr }) => {
+      // pipeline.exec() -> client.exec(batch)
+      const execCallRegex = new RegExp(`${batchVar}\\.exec\\s*\\(\\s*\\)`, 'g');
+      transformed = transformed.replace(execCallRegex, `${clientExpr}.exec(${batchVar})`);
+
+      // pipeline.set(...) -> batch.set(...)
+      const methodNames = [
+        'set', 'get', 'del', 'exists', 'expire', 'hset', 'hget', 'lpush', 'lpop', 'rpush', 'rpop', 'sadd', 'srem', 'zadd',
+      ];
+      methodNames.forEach((m) => {
+        const re = new RegExp(`${clientExpr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\.${batchVar}\\.${m}`, 'g');
+        transformed = transformed.replace(re, `${batchVar}.${m}`);
+      });
+    });
+
+    // If generic .exec() present, ensure it receives a batch variable
+    if (/\.exec\s*\(\s*\)/.test(transformed)) {
       transformed = transformed.replace(/\.exec\s*\(\s*\)/g, ".exec(batch)");
-      warnings.push(
-        "Ensure 'batch' variable is properly defined before exec()",
-      );
+      warnings.push("Ensure 'batch' variable is properly defined before exec()");
     }
 
     // Add Batch import
@@ -303,11 +337,142 @@ export class SmartMigrationEngine implements SmartTool {
 
     // Handle pub/sub
     if (patterns.includes("pubsub")) {
-      warnings.push(
-        "Pub/Sub implementation differs significantly in GLIDE - manual migration required",
+      // Emit full GLIDE pub/sub skeleton at creation time
+      // Replace new Redis(...) subscriber creation with Glide client configured for subscriptions
+      transformed = transformed.replace(
+        /(const\s+\w+\s*=\s*)new\s+Redis\s*\(\s*([0-9]+)\s*,\s*(['"][^'"]+['"])\s*\)\s*;?/g,
+        (match, lhs: string, port: string, host: string) => {
+          return `${lhs}await GlideClient.createClient({ addresses: [{ host: ${host}, port: ${port} }],\n  pubsubSubscriptions: {\n    channelsAndPatterns: { [GlideClientConfiguration.PubSubChannelModes.Exact]: new Set([]) }\n  }\n});`;
+        },
       );
+
+      // If no explicit ctor matched, ensure we show a correct pattern comment
       notes.push(
-        "Consider using GLIDE's PubSub classes for publish/subscribe operations",
+        "Use GlideClient.createClient({ pubsubSubscriptions: { channelsAndPatterns: { [GlideClientConfiguration.PubSubChannelModes.Exact]: new Set([...]) } } })",
+      );
+
+      // Extract subscribed channels/patterns from source and inject into configuration
+      try {
+        const exactChannels = Array.from(
+          new Set(
+            Array.from(code.matchAll(/\.subscribe\s*\(\s*(['\"])([^'\"]+)\1/g)).map((m) => m[2]),
+          ),
+        );
+        const patternChannels = Array.from(
+          new Set(
+            Array.from(code.matchAll(/\.psubscribe\s*\(\s*(['\"])([^'\"]+)\1/g)).map((m) => m[2]),
+          ),
+        );
+
+        if (exactChannels.length > 0 || patternChannels.length > 0) {
+          const exactEntry = exactChannels.length
+            ? `[GlideClientConfiguration.PubSubChannelModes.Exact]: new Set([${exactChannels
+                .map((c) => `'${c}'`)
+                .join(", ")}])`
+            : "";
+          const patternEntry = patternChannels.length
+            ? `[GlideClientConfiguration.PubSubChannelModes.Pattern]: new Set([${patternChannels
+                .map((c) => `'${c}'`)
+                .join(", ")}])`
+            : "";
+          const joiner = exactEntry && patternEntry ? ", " : "";
+
+          // Replace placeholder new Set([]) with populated entries
+          transformed = transformed.replace(
+            /channelsAndPatterns:\s*\{\s*\[GlideClientConfiguration\.PubSubChannelModes\.Exact\]:\s*new Set\(\[\]\)\s*\}/,
+            `channelsAndPatterns: { ${exactEntry}${joiner}${patternEntry} }`,
+          );
+
+          // Remove legacy subscribe/psubscribe calls
+          transformed = transformed.replace(/[^\n;]*\.p?subscribe\s*\(\s*['\"][^'\"]+['\"]\s*\)\s*;?\s*\n/g, "");
+        }
+      } catch {
+        // best-effort injection; ignore errors silently
+      }
+
+      // Replace legacy '<receiver>.on("message")' with repeated getPubSubMessage awaits on the same receiver
+      transformed = transformed.replace(
+        /([A-Za-z0-9_\.]+)\.on\s*\(\s*['"]message['"]\s*,\s*\(([^)]*)\)\s*=>\s*\{([\s\S]*?)\}\s*\)\s*;?/g,
+        (match, receiver: string, params: string, body: string) => {
+          const cleanedBody = body.trim();
+          return `// GLIDE Pub/Sub consumption\n(async () => {\n  while (true) {\n    const msg = await ${receiver}.getPubSubMessage();\n    const channel = msg.channel as string;\n    const message = msg.message as string;\n    ${cleanedBody}\n  }\n})();`;
+        },
+      );
+
+      // Inject pubsubSubscriptions into subscriber client creation based on detected channels/patterns
+      try {
+        const exactChannels = Array.from(
+          new Set(
+            Array.from(code.matchAll(/\.subscribe\s*\(\s*(['\"])([^'\"]+)\1/g)).map((m) => m[2] as string),
+          ),
+        );
+        const patternChannels = Array.from(
+          new Set(
+            Array.from(code.matchAll(/\.psubscribe\s*\(\s*(['\"])([^'\"]+)\1/g)).map((m) => m[2] as string),
+          ),
+        );
+        const subscriberVars = Array.from(
+          new Set(
+            Array.from(code.matchAll(/([A-Za-z0-9_\.]+)\.subscribe\s*\(/g)).map((m) => m[1]),
+          ),
+        );
+
+        if ((exactChannels.length > 0 || patternChannels.length > 0) && subscriberVars.length > 0) {
+          const configEntries: string[] = [];
+          if (exactChannels.length > 0) {
+            configEntries.push(`[GlideClientConfiguration.PubSubChannelModes.Exact]: new Set([${exactChannels
+              .map((c: string) => `'${c}'`)
+              .join(', ')}])`);
+          }
+          if (patternChannels.length > 0) {
+            configEntries.push(`[GlideClientConfiguration.PubSubChannelModes.Pattern]: new Set([${patternChannels
+              .map((c: string) => `'${c}'`)
+              .join(', ')}])`);
+          }
+          const configSnippet = `, pubsubSubscriptions: { channelsAndPatterns: { ${configEntries.join(', ')} } }`;
+
+          subscriberVars.forEach((v) => {
+            const re = new RegExp(
+              `(const\\s+${v}\\s*=\\s*await\\s+GlideClient\\.createClient\\s*\\(\\s*\\{\\s*addresses\\s*:\\s*\\[[\\s\\S]*?\\]\\s*)(\\})`,
+              'g',
+            );
+            transformed = transformed.replace(re, (_m, head: string, closeBrace: string) => {
+              if (/pubsubSubscriptions\s*:/.test(_m)) return _m; // already has config
+              return `${head}${configSnippet} ${closeBrace}`;
+            });
+          });
+
+          if (configEntries.length > 0 && !/GlideClientConfiguration/.test(transformed)) {
+            transformed = transformed.replace(
+              /(import\s+\{[^}]*)(}\s+from\s+['"]@valkey\/valkey-glide['"];?)/g,
+              '$1, GlideClientConfiguration$2',
+            );
+            transformed = transformed.replace(
+              /(const\s*\{[^}]*)(\}\s*=\s*require\(\s*['"]@valkey\/valkey-glide['"]\s*\)\s*;?)/g,
+              '$1, GlideClientConfiguration$2',
+            );
+          }
+        }
+      } catch {
+        // best-effort injection
+      }
+
+      // Ensure imports mention GlideClientConfiguration for enum access if used
+      if (transformed.includes("GlideClientConfiguration.PubSubChannelModes")) {
+        transformed = transformed.replace(
+          /(import\s+\{[^}]*)(}\s+from\s+['"]@valkey\/valkey-glide['"];?)/g,
+          "$1, GlideClientConfiguration$2",
+        );
+        transformed = transformed.replace(
+          /(const\s*\{[^}]*)(\}\s*=\s*require\(\s*['"]@valkey\/valkey-glide['"]\s*\)\s*;?)/g,
+          "$1, GlideClientConfiguration$2",
+        );
+      }
+
+      // Correct publish signature to GLIDE order: publish(message, channel)
+      transformed = transformed.replace(
+        /\.publish\s*\(\s*([^,]+)\s*,\s*([^\)]+)\s*\)/g,
+        (m, arg1: string, arg2: string) => `.publish(${arg2.trim()}, ${arg1.trim()})`,
       );
     }
 
@@ -332,6 +497,66 @@ export class SmartMigrationEngine implements SmartTool {
       transformed = this.applyNodeRedisTransformations(transformed);
     }
 
+    // After source-specific transforms, if pubsub, inject pubsubSubscriptions into created clients for subscribers
+    if (patterns.includes("pubsub")) {
+      try {
+        const exactChannels = Array.from(
+          new Set(
+            Array.from(code.matchAll(/\.subscribe\s*\(\s*(['\"])([^'\"]+)\1/g)).map((m) => m[2] as string),
+          ),
+        );
+        const patternChannels = Array.from(
+          new Set(
+            Array.from(code.matchAll(/\.psubscribe\s*\(\s*(['\"])([^'\"]+)\1/g)).map((m) => m[2] as string),
+          ),
+        );
+        const subscriberVars = Array.from(
+          new Set(
+            Array.from(code.matchAll(/([A-Za-z0-9_\.]+)\.subscribe\s*\(/g)).map((m) => m[1]),
+          ),
+        );
+
+        if ((exactChannels.length > 0 || patternChannels.length > 0) && subscriberVars.length > 0) {
+          const configEntries: string[] = [];
+          if (exactChannels.length > 0) {
+            configEntries.push(`[GlideClientConfiguration.PubSubChannelModes.Exact]: new Set([${exactChannels
+              .map((c: string) => `'${c}'`)
+              .join(', ')}])`);
+          }
+          if (patternChannels.length > 0) {
+            configEntries.push(`[GlideClientConfiguration.PubSubChannelModes.Pattern]: new Set([${patternChannels
+              .map((c: string) => `'${c}'`)
+              .join(', ')}])`);
+          }
+          const configSnippet = `, pubsubSubscriptions: { channelsAndPatterns: { ${configEntries.join(', ')} } }`;
+
+          subscriberVars.forEach((v) => {
+            const re = new RegExp(
+              `(const\\s+${v}\\s*=\\s*await\\s+GlideClient\\.createClient\\s*\\(\\s*\\{\\s*addresses\\s*:\\s*\\[[\\s\\S]*?\\]\\s*)(\\})`,
+              'g',
+            );
+            transformed = transformed.replace(re, (_m, head: string, closeBrace: string) => {
+              if (/pubsubSubscriptions\s*:/.test(_m)) return _m;
+              return `${head}${configSnippet} ${closeBrace}`;
+            });
+          });
+
+          if (configEntries.length > 0 && !/GlideClientConfiguration/.test(transformed)) {
+            transformed = transformed.replace(
+              /(import\s+\{[^}]*)(}\s+from\s+['"]@valkey\/valkey-glide['"];?)/g,
+              '$1, GlideClientConfiguration$2',
+            );
+            transformed = transformed.replace(
+              /(const\s*\{[^}]*)(\}\s*=\s*require\(\s*['"]@valkey\/valkey-glide['"]\s*\)\s*;?)/g,
+              '$1, GlideClientConfiguration$2',
+            );
+          }
+        }
+      } catch {
+        // best-effort injection
+      }
+    }
+
     return { code: transformed, warnings, notes };
   }
 
@@ -344,10 +569,30 @@ export class SmartMigrationEngine implements SmartTool {
       "import { GlideClient, GlideClusterClient } from '@valkey/valkey-glide';",
     );
 
+    // CommonJS require replacement
+    transformed = transformed.replace(
+      /(?:const|let|var)\s+Redis\s*=\s*require\(\s*['"]ioredis['"]\s*\);?/g,
+      (match) => {
+        // If GLIDE require already present, drop the ioredis require
+        if (/require\(\s*['"]@valkey\/valkey-glide['"]\s*\)/.test(transformed)) {
+          return '';
+        }
+        return "const { GlideClient, GlideClusterClient, Batch, Script } = require('@valkey/valkey-glide');";
+      },
+    );
+
     // Connection patterns
     transformed = transformed.replace(
       /new\s+Redis\s*\(\s*\)/g,
       "await GlideClient.createClient({ addresses: [{ host: 'localhost', port: 6379 }] })",
+    );
+
+    // new Redis(port, host)
+    transformed = transformed.replace(
+      /new\s+Redis\s*\(\s*([0-9]+)\s*,\s*(['"][^'"]+['"])\s*\)/g,
+      (match, port: string, host: string) => {
+        return `await GlideClient.createClient({ addresses: [{ host: ${host}, port: ${port} }] })`;
+      },
     );
 
     transformed = transformed.replace(
@@ -371,6 +616,21 @@ export class SmartMigrationEngine implements SmartTool {
       ".set($1, $3, { expiry: { type: 'PX', count: $2 } })",
     );
 
+    // quit() -> close()
+    transformed = transformed.replace(/\.quit\s*\(\s*\)\s*;?/g, ".close();");
+
+    // Remove legacy subscribe/psubscribe calls (subscriptions configured at creation time in GLIDE)
+    transformed = transformed.replace(/[^\n;]*\.p?subscribe\s*\(\s*[^\)]*\)\s*;?\s*\n/g, "");
+
+    // Pub/Sub message handler replacement: use repeated getPubSubMessage awaits
+    transformed = transformed.replace(
+      /\.on\s*\(\s*['"]message['"]\s*,\s*(\([^)]*\)\s*=>\s*\{[\s\S]*?\})\s*\)\s*;?/g,
+      (match, handler: string) => {
+        const body = handler.replace(/^\(|\)\s*=>\s*\{|\}$/g, '').trim();
+        return `/* GLIDE Pub/Sub consumption example:\nwhile (true) {\n  const msg = await subscriber.getPubSubMessage();\n  const channel = msg.channel as string;\n  const message = msg.message as string;\n  ${body}\n}\n*/`;
+      },
+    );
+
     return transformed;
   }
 
@@ -381,6 +641,12 @@ export class SmartMigrationEngine implements SmartTool {
     transformed = transformed.replace(
       /import\s+\{[^}]*\}\s+from\s+['"]redis['"];?/g,
       "import { GlideClient, GlideClusterClient } from '@valkey/valkey-glide';",
+    );
+
+    // CommonJS require replacement
+    transformed = transformed.replace(
+      /(?:const|let|var)\s+\w+\s*=\s*require\(\s*['"]redis['"]\s*\);?/g,
+      "const { GlideClient, GlideClusterClient, Batch, Script } = require('@valkey/valkey-glide');",
     );
 
     // Connection patterns
@@ -404,6 +670,9 @@ export class SmartMigrationEngine implements SmartTool {
       /\.setEx\s*\(\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/g,
       ".set($1, $3, { expiry: { type: 'EX', count: $2 } })",
     );
+
+    // quit() -> close()
+    transformed = transformed.replace(/\.quit\s*\(\s*\)\s*;?/g, ".close();");
 
     return transformed;
   }
@@ -450,6 +719,24 @@ export function registerSmartMigrationEngine(mcp: McpServer) {
     "migrate",
     "Smart migration engine for converting Redis client code to GLIDE",
     async (args: any) => {
+      // Normalize arguments: support JSON strings or { random_string: "{...}" }
+      let normalizedArgs: any = args;
+      try {
+        if (typeof normalizedArgs === "string") {
+          normalizedArgs = JSON.parse(normalizedArgs);
+        } else if (
+          normalizedArgs &&
+          typeof normalizedArgs.random_string === "string"
+        ) {
+          const maybe = JSON.parse(normalizedArgs.random_string);
+          if (maybe && typeof maybe === "object") {
+            normalizedArgs = maybe;
+          }
+        }
+      } catch {
+        // If parsing fails, fall back to original args
+      }
+
       const context = {
         userIntent: "migration" as const,
         complexity: "advanced" as const,
@@ -459,7 +746,7 @@ export function registerSmartMigrationEngine(mcp: McpServer) {
         patterns: [],
       };
 
-      return engine.execute(args, context);
+      return engine.execute(normalizedArgs, context);
     },
   );
 }

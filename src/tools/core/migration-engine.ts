@@ -259,26 +259,53 @@ export class SmartMigrationEngine implements SmartTool {
 
     // If direct method calls like redis.pipeline() without variable assignment exist, fallback simple replacement
     if (/\.pipeline\s*\(\s*\)/.test(transformed)) {
-      transformed = transformed.replace(/\.pipeline\s*\(\s*\)/g, "new Batch(false)");
-      notes.push("Converted pipeline() to Batch(false) - non-atomic operations");
+      transformed = transformed.replace(
+        /\.pipeline\s*\(\s*\)/g,
+        "new Batch(false)",
+      );
+      notes.push(
+        "Converted pipeline() to Batch(false) - non-atomic operations",
+      );
     }
     if (/\.multi\s*\(\s*\)/.test(transformed)) {
-      transformed = transformed.replace(/\.multi\s*\(\s*\)/g, "new Batch(true)");
+      transformed = transformed.replace(
+        /\.multi\s*\(\s*\)/g,
+        "new Batch(true)",
+      );
       notes.push("Converted multi() to Batch(true) - atomic operations");
     }
 
     // Redirect exec calls on batch variables to client.exec(batchVar)
     execRedirects.forEach(({ batchVar, clientExpr }) => {
       // pipeline.exec() -> client.exec(batch)
-      const execCallRegex = new RegExp(`${batchVar}\\.exec\\s*\\(\\s*\\)`, 'g');
-      transformed = transformed.replace(execCallRegex, `${clientExpr}.exec(${batchVar})`);
+      const execCallRegex = new RegExp(`${batchVar}\\.exec\\s*\\(\\s*\\)`, "g");
+      transformed = transformed.replace(
+        execCallRegex,
+        `${clientExpr}.exec(${batchVar})`,
+      );
 
       // pipeline.set(...) -> batch.set(...)
       const methodNames = [
-        'set', 'get', 'del', 'exists', 'expire', 'hset', 'hget', 'lpush', 'lpop', 'rpush', 'rpop', 'sadd', 'srem', 'zadd',
+        "set",
+        "get",
+        "del",
+        "exists",
+        "expire",
+        "hset",
+        "hget",
+        "lpush",
+        "lpop",
+        "rpush",
+        "rpop",
+        "sadd",
+        "srem",
+        "zadd",
       ];
       methodNames.forEach((m) => {
-        const re = new RegExp(`${clientExpr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\.${batchVar}\\.${m}`, 'g');
+        const re = new RegExp(
+          `${clientExpr.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\.${batchVar}\\.${m}`,
+          "g",
+        );
         transformed = transformed.replace(re, `${batchVar}.${m}`);
       });
     });
@@ -286,7 +313,9 @@ export class SmartMigrationEngine implements SmartTool {
     // If generic .exec() present, ensure it receives a batch variable
     if (/\.exec\s*\(\s*\)/.test(transformed)) {
       transformed = transformed.replace(/\.exec\s*\(\s*\)/g, ".exec(batch)");
-      warnings.push("Ensure 'batch' variable is properly defined before exec()");
+      warnings.push(
+        "Ensure 'batch' variable is properly defined before exec()",
+      );
     }
 
     // Add Batch import
@@ -355,12 +384,16 @@ export class SmartMigrationEngine implements SmartTool {
       try {
         const exactChannels = Array.from(
           new Set(
-            Array.from(code.matchAll(/\.subscribe\s*\(\s*(['\"])([^'\"]+)\1/g)).map((m) => m[2]),
+            Array.from(
+              code.matchAll(/\.subscribe\s*\(\s*(['\"])([^'\"]+)\1/g),
+            ).map((m) => m[2]),
           ),
         );
         const patternChannels = Array.from(
           new Set(
-            Array.from(code.matchAll(/\.psubscribe\s*\(\s*(['\"])([^'\"]+)\1/g)).map((m) => m[2]),
+            Array.from(
+              code.matchAll(/\.psubscribe\s*\(\s*(['\"])([^'\"]+)\1/g),
+            ).map((m) => m[2]),
           ),
         );
 
@@ -384,7 +417,10 @@ export class SmartMigrationEngine implements SmartTool {
           );
 
           // Remove legacy subscribe/psubscribe calls
-          transformed = transformed.replace(/[^\n;]*\.p?subscribe\s*\(\s*['\"][^'\"]+['\"]\s*\)\s*;?\s*\n/g, "");
+          transformed = transformed.replace(
+            /[^\n;]*\.p?subscribe\s*\(\s*['\"][^'\"]+['\"]\s*\)\s*;?\s*\n/g,
+            "",
+          );
         }
       } catch {
         // best-effort injection; ignore errors silently
@@ -403,53 +439,72 @@ export class SmartMigrationEngine implements SmartTool {
       try {
         const exactChannels = Array.from(
           new Set(
-            Array.from(code.matchAll(/\.subscribe\s*\(\s*(['\"])([^'\"]+)\1/g)).map((m) => m[2] as string),
+            Array.from(
+              code.matchAll(/\.subscribe\s*\(\s*(['\"])([^'\"]+)\1/g),
+            ).map((m) => m[2] as string),
           ),
         );
         const patternChannels = Array.from(
           new Set(
-            Array.from(code.matchAll(/\.psubscribe\s*\(\s*(['\"])([^'\"]+)\1/g)).map((m) => m[2] as string),
+            Array.from(
+              code.matchAll(/\.psubscribe\s*\(\s*(['\"])([^'\"]+)\1/g),
+            ).map((m) => m[2] as string),
           ),
         );
         const subscriberVars = Array.from(
           new Set(
-            Array.from(code.matchAll(/([A-Za-z0-9_\.]+)\.subscribe\s*\(/g)).map((m) => m[1]),
+            Array.from(code.matchAll(/([A-Za-z0-9_\.]+)\.subscribe\s*\(/g)).map(
+              (m) => m[1],
+            ),
           ),
         );
 
-        if ((exactChannels.length > 0 || patternChannels.length > 0) && subscriberVars.length > 0) {
+        if (
+          (exactChannels.length > 0 || patternChannels.length > 0) &&
+          subscriberVars.length > 0
+        ) {
           const configEntries: string[] = [];
           if (exactChannels.length > 0) {
-            configEntries.push(`[GlideClientConfiguration.PubSubChannelModes.Exact]: new Set([${exactChannels
-              .map((c: string) => `'${c}'`)
-              .join(', ')}])`);
+            configEntries.push(
+              `[GlideClientConfiguration.PubSubChannelModes.Exact]: new Set([${exactChannels
+                .map((c: string) => `'${c}'`)
+                .join(", ")}])`,
+            );
           }
           if (patternChannels.length > 0) {
-            configEntries.push(`[GlideClientConfiguration.PubSubChannelModes.Pattern]: new Set([${patternChannels
-              .map((c: string) => `'${c}'`)
-              .join(', ')}])`);
+            configEntries.push(
+              `[GlideClientConfiguration.PubSubChannelModes.Pattern]: new Set([${patternChannels
+                .map((c: string) => `'${c}'`)
+                .join(", ")}])`,
+            );
           }
-          const configSnippet = `, pubsubSubscriptions: { channelsAndPatterns: { ${configEntries.join(', ')} } }`;
+          const configSnippet = `, pubsubSubscriptions: { channelsAndPatterns: { ${configEntries.join(", ")} } }`;
 
           subscriberVars.forEach((v) => {
             const re = new RegExp(
               `(const\\s+${v}\\s*=\\s*await\\s+GlideClient\\.createClient\\s*\\(\\s*\\{\\s*addresses\\s*:\\s*\\[[\\s\\S]*?\\]\\s*)(\\})`,
-              'g',
+              "g",
             );
-            transformed = transformed.replace(re, (_m, head: string, closeBrace: string) => {
-              if (/pubsubSubscriptions\s*:/.test(_m)) return _m; // already has config
-              return `${head}${configSnippet} ${closeBrace}`;
-            });
+            transformed = transformed.replace(
+              re,
+              (_m, head: string, closeBrace: string) => {
+                if (/pubsubSubscriptions\s*:/.test(_m)) return _m; // already has config
+                return `${head}${configSnippet} ${closeBrace}`;
+              },
+            );
           });
 
-          if (configEntries.length > 0 && !/GlideClientConfiguration/.test(transformed)) {
+          if (
+            configEntries.length > 0 &&
+            !/GlideClientConfiguration/.test(transformed)
+          ) {
             transformed = transformed.replace(
               /(import\s+\{[^}]*)(}\s+from\s+['"]@valkey\/valkey-glide['"];?)/g,
-              '$1, GlideClientConfiguration$2',
+              "$1, GlideClientConfiguration$2",
             );
             transformed = transformed.replace(
               /(const\s*\{[^}]*)(\}\s*=\s*require\(\s*['"]@valkey\/valkey-glide['"]\s*\)\s*;?)/g,
-              '$1, GlideClientConfiguration$2',
+              "$1, GlideClientConfiguration$2",
             );
           }
         }
@@ -472,7 +527,8 @@ export class SmartMigrationEngine implements SmartTool {
       // Correct publish signature to GLIDE order: publish(message, channel)
       transformed = transformed.replace(
         /\.publish\s*\(\s*([^,]+)\s*,\s*([^\)]+)\s*\)/g,
-        (m, arg1: string, arg2: string) => `.publish(${arg2.trim()}, ${arg1.trim()})`,
+        (m, arg1: string, arg2: string) =>
+          `.publish(${arg2.trim()}, ${arg1.trim()})`,
       );
     }
 
@@ -502,53 +558,72 @@ export class SmartMigrationEngine implements SmartTool {
       try {
         const exactChannels = Array.from(
           new Set(
-            Array.from(code.matchAll(/\.subscribe\s*\(\s*(['\"])([^'\"]+)\1/g)).map((m) => m[2] as string),
+            Array.from(
+              code.matchAll(/\.subscribe\s*\(\s*(['\"])([^'\"]+)\1/g),
+            ).map((m) => m[2] as string),
           ),
         );
         const patternChannels = Array.from(
           new Set(
-            Array.from(code.matchAll(/\.psubscribe\s*\(\s*(['\"])([^'\"]+)\1/g)).map((m) => m[2] as string),
+            Array.from(
+              code.matchAll(/\.psubscribe\s*\(\s*(['\"])([^'\"]+)\1/g),
+            ).map((m) => m[2] as string),
           ),
         );
         const subscriberVars = Array.from(
           new Set(
-            Array.from(code.matchAll(/([A-Za-z0-9_\.]+)\.subscribe\s*\(/g)).map((m) => m[1]),
+            Array.from(code.matchAll(/([A-Za-z0-9_\.]+)\.subscribe\s*\(/g)).map(
+              (m) => m[1],
+            ),
           ),
         );
 
-        if ((exactChannels.length > 0 || patternChannels.length > 0) && subscriberVars.length > 0) {
+        if (
+          (exactChannels.length > 0 || patternChannels.length > 0) &&
+          subscriberVars.length > 0
+        ) {
           const configEntries: string[] = [];
           if (exactChannels.length > 0) {
-            configEntries.push(`[GlideClientConfiguration.PubSubChannelModes.Exact]: new Set([${exactChannels
-              .map((c: string) => `'${c}'`)
-              .join(', ')}])`);
+            configEntries.push(
+              `[GlideClientConfiguration.PubSubChannelModes.Exact]: new Set([${exactChannels
+                .map((c: string) => `'${c}'`)
+                .join(", ")}])`,
+            );
           }
           if (patternChannels.length > 0) {
-            configEntries.push(`[GlideClientConfiguration.PubSubChannelModes.Pattern]: new Set([${patternChannels
-              .map((c: string) => `'${c}'`)
-              .join(', ')}])`);
+            configEntries.push(
+              `[GlideClientConfiguration.PubSubChannelModes.Pattern]: new Set([${patternChannels
+                .map((c: string) => `'${c}'`)
+                .join(", ")}])`,
+            );
           }
-          const configSnippet = `, pubsubSubscriptions: { channelsAndPatterns: { ${configEntries.join(', ')} } }`;
+          const configSnippet = `, pubsubSubscriptions: { channelsAndPatterns: { ${configEntries.join(", ")} } }`;
 
           subscriberVars.forEach((v) => {
             const re = new RegExp(
               `(const\\s+${v}\\s*=\\s*await\\s+GlideClient\\.createClient\\s*\\(\\s*\\{\\s*addresses\\s*:\\s*\\[[\\s\\S]*?\\]\\s*)(\\})`,
-              'g',
+              "g",
             );
-            transformed = transformed.replace(re, (_m, head: string, closeBrace: string) => {
-              if (/pubsubSubscriptions\s*:/.test(_m)) return _m;
-              return `${head}${configSnippet} ${closeBrace}`;
-            });
+            transformed = transformed.replace(
+              re,
+              (_m, head: string, closeBrace: string) => {
+                if (/pubsubSubscriptions\s*:/.test(_m)) return _m;
+                return `${head}${configSnippet} ${closeBrace}`;
+              },
+            );
           });
 
-          if (configEntries.length > 0 && !/GlideClientConfiguration/.test(transformed)) {
+          if (
+            configEntries.length > 0 &&
+            !/GlideClientConfiguration/.test(transformed)
+          ) {
             transformed = transformed.replace(
               /(import\s+\{[^}]*)(}\s+from\s+['"]@valkey\/valkey-glide['"];?)/g,
-              '$1, GlideClientConfiguration$2',
+              "$1, GlideClientConfiguration$2",
             );
             transformed = transformed.replace(
               /(const\s*\{[^}]*)(\}\s*=\s*require\(\s*['"]@valkey\/valkey-glide['"]\s*\)\s*;?)/g,
-              '$1, GlideClientConfiguration$2',
+              "$1, GlideClientConfiguration$2",
             );
           }
         }
@@ -574,8 +649,10 @@ export class SmartMigrationEngine implements SmartTool {
       /(?:const|let|var)\s+Redis\s*=\s*require\(\s*['"]ioredis['"]\s*\);?/g,
       (match) => {
         // If GLIDE require already present, drop the ioredis require
-        if (/require\(\s*['"]@valkey\/valkey-glide['"]\s*\)/.test(transformed)) {
-          return '';
+        if (
+          /require\(\s*['"]@valkey\/valkey-glide['"]\s*\)/.test(transformed)
+        ) {
+          return "";
         }
         return "const { GlideClient, GlideClusterClient, Batch, Script } = require('@valkey/valkey-glide');";
       },
@@ -620,13 +697,16 @@ export class SmartMigrationEngine implements SmartTool {
     transformed = transformed.replace(/\.quit\s*\(\s*\)\s*;?/g, ".close();");
 
     // Remove legacy subscribe/psubscribe calls (subscriptions configured at creation time in GLIDE)
-    transformed = transformed.replace(/[^\n;]*\.p?subscribe\s*\(\s*[^\)]*\)\s*;?\s*\n/g, "");
+    transformed = transformed.replace(
+      /[^\n;]*\.p?subscribe\s*\(\s*[^\)]*\)\s*;?\s*\n/g,
+      "",
+    );
 
     // Pub/Sub message handler replacement: use repeated getPubSubMessage awaits
     transformed = transformed.replace(
       /\.on\s*\(\s*['"]message['"]\s*,\s*(\([^)]*\)\s*=>\s*\{[\s\S]*?\})\s*\)\s*;?/g,
       (match, handler: string) => {
-        const body = handler.replace(/^\(|\)\s*=>\s*\{|\}$/g, '').trim();
+        const body = handler.replace(/^\(|\)\s*=>\s*\{|\}$/g, "").trim();
         return `/* GLIDE Pub/Sub consumption example:\nwhile (true) {\n  const msg = await subscriber.getPubSubMessage();\n  const channel = msg.channel as string;\n  const message = msg.message as string;\n  ${body}\n}\n*/`;
       },
     );

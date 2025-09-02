@@ -4,7 +4,7 @@ import fs from "node:fs";
 
 async function run(code: string) {
   const engine = new SmartMigrationEngine();
-  const from = (process.argv[3] as 'ioredis' | 'node-redis') || 'ioredis';
+  const from = (process.argv[3] as "ioredis" | "node-redis") || "ioredis";
   const args = { from, code };
   const context = {
     userIntent: "migration" as const,
@@ -24,7 +24,7 @@ async function main() {
   if (arg.startsWith("@")) {
     input = fs.readFileSync(arg.slice(1), "utf8");
   } else {
-    input = arg || "const numbers = [1,3];\nawait redis.del(\"k\");";
+    input = arg || 'const numbers = [1,3];\nawait redis.del("k");';
   }
   await run(input);
 }

@@ -335,10 +335,7 @@ export class SmartSuggestionsEngine {
     const opportunities: OptimizationOpportunity[] = [];
 
     // Analyze for performance optimization opportunities
-    if (
-      context.intent === "help" ||
-      context.intent === "help" // secondary not available
-    ) {
+    if (context.intent === "help") {
       opportunities.push({
         opportunityId: "perf-optimization-1",
         category: "performance",
@@ -575,7 +572,7 @@ export {
   type SmartSuggestion,
   type DiscoveredCommand,
   type WorkflowRecommendation,
-// Export statement removed to prevent conflicts - already exported inline
+  // Export statement removed to prevent conflicts - already exported inline
 };
 
 export default SmartSuggestionsEngine;

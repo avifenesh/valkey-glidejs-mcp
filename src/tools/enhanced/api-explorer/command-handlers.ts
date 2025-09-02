@@ -76,47 +76,87 @@ export class CommandHandlers {
     this.registerHandler("HMSET", this.handleHsetCommand);
 
     // List Operations
-    this.registerHandler("LPUSH", this.handleCommand);
-    this.registerHandler("RPUSH", this.handleCommand);
-    this.registerHandler("LPOP", this.handleCommand);
-    this.registerHandler("RPOP", this.handleCommand);
+    this.registerHandler("LPUSH", (c, p) =>
+      this.handleGenericCommand("LPUSH", c, p),
+    );
+    this.registerHandler("RPUSH", (c, p) =>
+      this.handleGenericCommand("RPUSH", c, p),
+    );
+    this.registerHandler("LPOP", (c, p) =>
+      this.handleGenericCommand("LPOP", c, p),
+    );
+    this.registerHandler("RPOP", (c, p) =>
+      this.handleGenericCommand("RPOP", c, p),
+    );
     this.registerHandler("LRANGE", this.handleGetCommand);
 
     // Set Operations
-    this.registerHandler("SADD", this.handleCommand);
-    this.registerHandler("SREM", this.handleCommand);
-    this.registerHandler("SMEMBERS", this.handleCommand);
-    this.registerHandler("SINTER", this.handleCommand);
+    this.registerHandler("SADD", (c, p) =>
+      this.handleGenericCommand("SADD", c, p),
+    );
+    this.registerHandler("SREM", (c, p) =>
+      this.handleGenericCommand("SREM", c, p),
+    );
+    this.registerHandler("SMEMBERS", (c, p) =>
+      this.handleGenericCommand("SMEMBERS", c, p),
+    );
+    this.registerHandler("SINTER", (c, p) =>
+      this.handleGenericCommand("SINTER", c, p),
+    );
 
     // Sorted Set Operations
     this.registerHandler("ZADD", this.handleZaddCommand);
     this.registerHandler("ZRANGE", this.handleGetCommand);
-    this.registerHandler("ZRANK", this.handleCommand);
-    this.registerHandler("ZSCORE", this.handleCommand);
+    this.registerHandler("ZRANK", (c, p) =>
+      this.handleGenericCommand("ZRANK", c, p),
+    );
+    this.registerHandler("ZSCORE", (c, p) =>
+      this.handleGenericCommand("ZSCORE", c, p),
+    );
 
     // Stream Operations
-    this.registerHandler("XADD", this.handleCommand);
+    this.registerHandler("XADD", (c, p) =>
+      this.handleGenericCommand("XADD", c, p),
+    );
     this.registerHandler("XREAD", this.handleXreadCommand);
-    this.registerHandler("XGROUP", this.handleCommand);
+    this.registerHandler("XGROUP", (c, p) =>
+      this.handleGenericCommand("XGROUP", c, p),
+    );
     this.registerHandler("XREADGROUP", this.handleXreadCommand);
 
     // Pub/Sub Operations
-    this.registerHandler("PUBLISH", this.handleCommand);
-    this.registerHandler("SUBSCRIBE", this.handleCommand);
+    this.registerHandler("PUBLISH", (c, p) =>
+      this.handleGenericCommand("PUBLISH", c, p),
+    );
+    this.registerHandler("SUBSCRIBE", (c, p) =>
+      this.handleGenericCommand("SUBSCRIBE", c, p),
+    );
 
     // Geospatial Operations
-    this.registerHandler("GEOADD", this.handleCommand);
+    this.registerHandler("GEOADD", (c, p) =>
+      this.handleGenericCommand("GEOADD", c, p),
+    );
     this.registerHandler("GEORADIUS", this.handleGetCommand);
 
     // Transaction Operations
-    this.registerHandler("MULTI", this.handleCommand);
-    this.registerHandler("EXEC", this.handleCommand);
+    this.registerHandler("MULTI", (c, p) =>
+      this.handleGenericCommand("MULTI", c, p),
+    );
+    this.registerHandler("EXEC", (c, p) =>
+      this.handleGenericCommand("EXEC", c, p),
+    );
 
     // Key Operations
-    this.registerHandler("DEL", this.handleCommand);
+    this.registerHandler("DEL", (c, p) =>
+      this.handleGenericCommand("DEL", c, p),
+    );
     this.registerHandler("EXISTS", this.handleGetCommand);
-    this.registerHandler("EXPIRE", this.handleCommand);
-    this.registerHandler("TTL", this.handleCommand);
+    this.registerHandler("EXPIRE", (c, p) =>
+      this.handleGenericCommand("EXPIRE", c, p),
+    );
+    this.registerHandler("TTL", (c, p) =>
+      this.handleGenericCommand("TTL", c, p),
+    );
   }
 
   /**
@@ -126,7 +166,12 @@ export class CommandHandlers {
     command: string,
     handler: CommandHandler,
   ): void {
-    this.handlers.set(command.toUpperCase(), handler);
+    // Wrap raw handler (context, parameters) into standardized form to avoid signature mismatches
+    const adapted: CommandHandler = async (
+      context: EnhancedQueryContext,
+      parameters?: Record<string, any>,
+    ) => handler(context, parameters);
+    this.handlers.set(command.toUpperCase(), adapted);
   }
 
   /**
@@ -732,7 +777,7 @@ console.log("Score added to leaderboard");`,
         syntax: registryCommand.glideMethod,
         examples: registryCommand.examples.map((ex) => ({
           title: "Example",
-          code: typeof ex === 'string' ? ex : ex.code || 'No example available',
+          code: typeof ex === "string" ? ex : ex.code || "No example available",
           explanation: "Basic usage example",
           complexity: "simple" as const,
           category: "basic",

@@ -516,7 +516,12 @@ export class SessionMemoryManager {
         trigger: { type: "access_frequency", threshold: 3 },
         consolidationType: "strengthen",
         condition: "accessCount >= 3 AND daysSinceCreation <= 7",
-        action: { type: "increase_strength", target: "memory", action: "strengthen", result: "success" },
+        action: {
+          type: "increase_strength",
+          target: "memory",
+          action: "strengthen",
+          result: "success",
+        },
         priority: 1,
       },
       {
@@ -524,7 +529,12 @@ export class SessionMemoryManager {
         trigger: { type: "inactivity_period", threshold: 72 },
         consolidationType: "weaken",
         condition: "hoursSinceLastAccess >= 72",
-        action: { type: "decrease_strength", target: "memory", action: "weaken", result: "success" },
+        action: {
+          type: "decrease_strength",
+          target: "memory",
+          action: "weaken",
+          result: "success",
+        },
         priority: 2,
       },
     ];

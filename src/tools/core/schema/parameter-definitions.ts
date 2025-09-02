@@ -343,7 +343,10 @@ export const createZodSchema = (paramDef: ParameterDefinition): z.ZodSchema => {
       switch (rule.type) {
         case "regex":
           if (rule.pattern && schema instanceof z.ZodString) {
-            schema = (schema as z.ZodString).regex(rule.pattern, rule.errorMessage);
+            schema = (schema as z.ZodString).regex(
+              rule.pattern,
+              rule.errorMessage,
+            );
           }
           break;
         case "range":

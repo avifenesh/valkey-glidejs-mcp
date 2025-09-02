@@ -340,12 +340,13 @@ export class AutoCompletionEngine {
   ): Promise<CompletionHint[]> {
     const hints: CompletionHint[] = [];
 
+    // Datasets expose 'symbol' (original API surface name) – earlier code referenced a non-existent 'original' property
     if (source === "ioredis" && IOREDIS_DATASET?.entries) {
       IOREDIS_DATASET.entries.forEach((entry) => {
-        if (entry.original) {
+        if (entry.symbol) {
           hints.push({
-            value: entry.original,
-            description: `ioredis method: ${entry.original}`,
+            value: entry.symbol,
+            description: `ioredis method: ${entry.symbol}`,
             category: "ioredis-methods",
             relevance: 2,
             contextual: true,
@@ -354,10 +355,10 @@ export class AutoCompletionEngine {
       });
     } else if (source === "node-redis" && NODE_REDIS_DATASET?.entries) {
       NODE_REDIS_DATASET.entries.forEach((entry) => {
-        if (entry.original) {
+        if (entry.symbol) {
           hints.push({
-            value: entry.original,
-            description: `node-redis method: ${entry.original}`,
+            value: entry.symbol,
+            description: `node-redis method: ${entry.symbol}`,
             category: "node-redis-methods",
             relevance: 2,
             contextual: true,

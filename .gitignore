@@ -63,3 +63,6 @@ PROGRESS_UPDATE.md
 *.zip
 
 .qoder/
+
+*result*
+**/copilot-*

@@ -218,7 +218,8 @@ export class AIAgentTestingFramework {
 
       return report;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       throw new Error(`Test plan execution failed: ${errorMessage}`);
     }
   }

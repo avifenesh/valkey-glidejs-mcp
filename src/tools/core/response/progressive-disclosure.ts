@@ -405,7 +405,8 @@ export class ProgressiveDisclosure {
       compare: ["detailed-analysis"],
     };
 
-    const boosts = intentBoosts[context.intent as keyof typeof intentBoosts] || [];
+    const boosts =
+      intentBoosts[context.intent as keyof typeof intentBoosts] || [];
     if (boosts.some((boost: string) => followUp.action.includes(boost))) {
       score += 0.5;
     }
@@ -601,7 +602,9 @@ export class ProgressiveDisclosure {
     const contextKey = Object.keys(contextMap).find((key) =>
       action.includes(key),
     );
-    return description + (contextMap?.[contextKey as keyof typeof contextMap] || "");
+    return (
+      description + (contextMap?.[contextKey as keyof typeof contextMap] || "")
+    );
   }
 
   /**

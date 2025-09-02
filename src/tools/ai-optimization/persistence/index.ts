@@ -330,7 +330,8 @@ export class ContextPersistenceSystem {
     const { data } = request;
 
     // Store in memory system
-    const memoryRequest: any = { // MemoryStorageRequest type not found
+    const memoryRequest: any = {
+      // MemoryStorageRequest type not found
       content: data.content,
       type: data.type || "experiential",
       importance: data.importance || 0.5,
@@ -350,7 +351,7 @@ export class ContextPersistenceSystem {
       interaction_type: data.interactionType || "conversation",
       performance: data.performance || 0.7,
       timestamp: new Date(),
-      context: ""
+      context: "",
     };
 
     const contextBuildingResult =
@@ -400,7 +401,8 @@ export class ContextPersistenceSystem {
       throw new Error(`Session ${request.sessionId} not found`);
     }
 
-    const retrievalContext: any = { // MemoryRetrievalContext type not found
+    const retrievalContext: any = {
+      // MemoryRetrievalContext type not found
       query: request.data?.query || "",
       concepts: request.data?.concepts || [],
       strategy: request.data?.strategy || "comprehensive",
@@ -412,7 +414,7 @@ export class ContextPersistenceSystem {
       retrievalContext,
     );
     const learningSnapshot = this.learningExperience.createLearningSnapshot(
-      session.learningExperience.experienceId
+      session.learningExperience.experienceId,
     );
 
     // Combine memory and learning context
@@ -444,13 +446,11 @@ export class ContextPersistenceSystem {
 
     // Consolidate memory
     const memoryConsolidation = this.memoryManager.consolidateMemory(
-      request.sessionId
+      request.sessionId,
     );
 
     // Update learning experience based on memory insights
-    const learningAdvancement = this.advanceLearningBasedOnMemory(
-      session,
-    );
+    const learningAdvancement = this.advanceLearningBasedOnMemory(session);
 
     // Strengthen context connections
     const connectionUpdates = this.strengthenContextConnections(session);
@@ -462,9 +462,8 @@ export class ContextPersistenceSystem {
       adaptationType: "memory_learning_sync",
       previousState: "pre_consolidation",
       newState: "post_consolidation",
-      effectiveness: this.calculateConsolidationEffectiveness(
-        learningAdvancement,
-      ),
+      effectiveness:
+        this.calculateConsolidationEffectiveness(learningAdvancement),
       source: "context",
     };
 
@@ -474,9 +473,8 @@ export class ContextPersistenceSystem {
       sessionId: request.sessionId,
       success: true,
       memoryInsights: memoryConsolidation.insights,
-      recommendations: this.generateConsolidationRecommendations(
-        memoryConsolidation,
-      ),
+      recommendations:
+        this.generateConsolidationRecommendations(memoryConsolidation),
       nextActions: this.generateNextActions(session, "consolidate"),
     };
   }
@@ -529,11 +527,11 @@ export class ContextPersistenceSystem {
     }
 
     const learningSnapshot = this.learningExperience.createLearningSnapshot(
-      session.learningExperience.experienceId
+      session.learningExperience.experienceId,
     );
 
     const memoryInsights = this.memoryManager.generateMemoryInsights(
-      request.sessionId
+      request.sessionId,
     );
 
     const contextSnapshot: ContextSnapshot = {
@@ -558,7 +556,10 @@ export class ContextPersistenceSystem {
         progressVelocity:
           learningSnapshot.progress_indicators.learning_velocity,
         masteryDistribution: Object.fromEntries(
-          Object.entries(learningSnapshot.mastery_levels).map(([k, v]) => [k, Number(v)])
+          Object.entries(learningSnapshot.mastery_levels).map(([k, v]) => [
+            k,
+            Number(v),
+          ]),
         ),
       },
       contextConnections: session.contextConnections,

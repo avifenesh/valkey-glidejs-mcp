@@ -361,14 +361,12 @@ export class EnhancedCodeGenerator {
       options: {
         includeErrorHandling: options.includeErrorHandling,
         includeLogging: options.includeLogging,
-        // includeValidation: options.securityLevel === "enhanced", // Property not available
-        // useAsync: true, // Property not available in GenerationOptions
         targetEnvironment: options.targetEnvironment,
         codeStyle: options.codeStyle,
-        optimizationLevel: options.optimizationLevel,
+        // Fields above conform to GenerationOptions; removed unsupported optimizationLevel
+        includeTests: options.includeTests,
       },
       placeholders: request.placeholders,
-      includeTests: options.includeTests,
     };
 
     const result = await PatternAwareGenerator.generateCode(

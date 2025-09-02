@@ -390,7 +390,8 @@ export class ConversationalSession {
   private updateContext(newContext: EnhancedQueryContext): void {
     // Update user experience level based on conversation history
     if (this.shouldUpgradeExperience(newContext)) {
-      this.currentContext.userExperienceLevel = this.calculateNewExperience() as "beginner" | "intermediate" | "expert";
+      this.currentContext.userExperienceLevel =
+        this.calculateNewExperience() as "beginner" | "intermediate" | "expert";
     }
 
     // Merge contextual data
@@ -407,11 +408,14 @@ export class ConversationalSession {
   private shouldUpgradeExperience(context: EnhancedQueryContext): boolean {
     const expertAnswers = this.messages.filter(
       (msg) =>
-        msg.type === "user" && msg.metadata?.responseQuality?.accuracy && msg.metadata.responseQuality.accuracy > 0.8,
+        msg.type === "user" &&
+        msg.metadata?.responseQuality?.accuracy &&
+        msg.metadata.responseQuality.accuracy > 0.8,
     ).length;
 
     return (
-      expertAnswers > 5 && this.currentContext.userExperienceLevel === "beginner"
+      expertAnswers > 5 &&
+      this.currentContext.userExperienceLevel === "beginner"
     );
   }
 
@@ -431,9 +435,7 @@ export class ConversationalSession {
     const changes: ContextChange[] = [];
 
     // Check for intent clarification
-    if (
-      userMsg.context?.intent !== this.currentContext.intent
-    ) {
+    if (userMsg.context?.intent !== this.currentContext.intent) {
       changes.push({
         type: "intent_clarification",
         before: this.currentContext.intent,
@@ -621,7 +623,9 @@ export class ConversationalSession {
           .slice(0, 2);
 
         const adequatelyAnswered = subsequentResponses.some(
-          (response) => response.metadata?.responseQuality?.completeness && response.metadata.responseQuality.completeness > 0.7,
+          (response) =>
+            response.metadata?.responseQuality?.completeness &&
+            response.metadata.responseQuality.completeness > 0.7,
         );
 
         if (!adequatelyAnswered) {

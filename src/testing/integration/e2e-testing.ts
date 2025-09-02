@@ -621,7 +621,9 @@ export class E2ETestingFramework {
         qualityScores: {},
         performanceMetrics: {},
         output: null,
-        errors: [`Step execution failed: ${error instanceof Error ? error.message : String(error)}`],
+        errors: [
+          `Step execution failed: ${error instanceof Error ? error.message : String(error)}`,
+        ],
       };
     }
   }

@@ -520,12 +520,18 @@ export class FollowUpQuestionGenerator {
     }
 
     // Check for deepening opportunities
-    if (lastMessage.metadata?.responseQuality?.completeness && lastMessage.metadata.responseQuality.completeness > 0.8) {
+    if (
+      lastMessage.metadata?.responseQuality?.completeness &&
+      lastMessage.metadata.responseQuality.completeness > 0.8
+    ) {
       categories.push("deepening");
     }
 
     // Check for exploration potential
-    if (lastMessage.metadata?.commandsUsed?.length && lastMessage.metadata.commandsUsed.length > 0) {
+    if (
+      lastMessage.metadata?.commandsUsed?.length &&
+      lastMessage.metadata.commandsUsed.length > 0
+    ) {
       categories.push("exploration");
     }
 

@@ -200,7 +200,9 @@ export class AgentQuerySimulator {
         overallScore: 0,
         passed: false,
         executionTime: Date.now() - startTime,
-        errors: [`Simulation failed: ${error instanceof Error ? error.message : String(error)}`],
+        errors: [
+          `Simulation failed: ${error instanceof Error ? error.message : String(error)}`,
+        ],
         recommendations: ["Fix system errors before retesting"],
       };
     } finally {

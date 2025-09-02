@@ -121,12 +121,8 @@ export class EnhancedMigrationEngine {
     // Step 2: Analyze dependencies and configuration
     const dependencyAnalysis = await DependencyAnalyzer.analyzeDependencies(
       request.projectPath || "package.json",
-      request.sourceLibrary,
-      {
-        includeDevDependencies: true,
-        analyzeLockFile: true,
-        checkVersionCompatibility: true,
-      },
+      [], // sourceCode array not supplied in current workflow
+      context,
     );
 
     // Step 3: Generate optimization report
@@ -189,18 +185,19 @@ export class EnhancedMigrationEngine {
     options: MigrationOptions,
   ): MigrationPlan {
     const basePlan: MigrationPlan = {
-      phases: dependencyAnalysis.migrationPlan?.phases.map(phase => ({
-        phase: (phase as any).id || 1,
-        title: (phase as any).name || "Migration Phase",
-        description: (phase as any).description || "Phase description",
-        tasks: (phase as any).tasks || [],
-        dependencies: [],
-        estimatedTime: "2-4 hours",
-      })) || [],
+      phases:
+        dependencyAnalysis.migrationPlan?.phases.map((phase) => ({
+          phase: (phase as any).id || 1,
+          title: (phase as any).name || "Migration Phase",
+          description: (phase as any).description || "Phase description",
+          tasks: (phase as any).tasks || [],
+          dependencies: [],
+          estimatedTime: "2-4 hours",
+        })) || [],
       totalSteps: 0,
       estimatedTime: "To be determined",
       dependencies: [],
-      validationCheckpoints: []
+      validationCheckpoints: [],
     };
 
     // Enhance with optimization recommendations
@@ -228,7 +225,7 @@ export class EnhancedMigrationEngine {
         options,
       ),
       dependencies: [],
-      validationCheckpoints: []
+      validationCheckpoints: [],
     };
   }
 
@@ -253,7 +250,10 @@ export class EnhancedMigrationEngine {
             type: "pattern-conversion",
             line: occurrence.startLine,
             original: occurrence.sourceCode,
-            converted: this.applyConversionStrategy(occurrence.sourceCode, strategy),
+            converted: this.applyConversionStrategy(
+              occurrence.sourceCode,
+              strategy,
+            ),
             reasoning: strategy.description,
           };
 
@@ -325,9 +325,12 @@ export class EnhancedMigrationEngine {
         phase: 2,
         title: "Dependency Migration",
         description: "Update package dependencies and configuration",
-        tasks: dependencyAnalysis.migrationPlan?.phases
-          ?.filter((phase: any) => phase.name && phase.name.includes("dependency"))
-          ?.map((phase: any) => phase.name) || [],
+        tasks:
+          dependencyAnalysis.migrationPlan?.phases
+            ?.filter(
+              (phase: any) => phase.name && phase.name.includes("dependency"),
+            )
+            ?.map((phase: any) => phase.name) || [],
         dependencies: ["Phase 1"],
         estimatedTime: "1-2 hours",
       },
@@ -430,7 +433,9 @@ export class EnhancedMigrationEngine {
   }
 
   // Helper methods
-  private static createPlaceholderAnalysis(sourceLibrary: string): SourceAnalysis {
+  private static createPlaceholderAnalysis(
+    sourceLibrary: string,
+  ): SourceAnalysis {
     return {
       sourceLibrary: sourceLibrary as "ioredis" | "node-redis",
       detectedPatterns: [],
@@ -438,13 +443,13 @@ export class EnhancedMigrationEngine {
         totalLines: 0,
         redisLines: 0,
         complexity: "low",
-        factors: []
+        factors: [],
       },
       migrationStrategy: {
         approach: "incremental",
         phases: [],
         dependencies: [],
-        risks: []
+        risks: [],
       },
       estimatedEffort: {
         totalHours: 0,
@@ -453,15 +458,18 @@ export class EnhancedMigrationEngine {
           conversion: 0,
           testing: 0,
           validation: 0,
-          documentation: 0
+          documentation: 0,
         },
         confidence: 0.8,
-        assumptions: []
-      }
+        assumptions: [],
+      },
     };
   }
 
-  private static applyConversionStrategy(sourceCode: string, strategy: any): string {
+  private static applyConversionStrategy(
+    sourceCode: string,
+    strategy: any,
+  ): string {
     // Mock implementation - apply first conversion step
     if (strategy.steps && strategy.steps.length > 0) {
       const step = strategy.steps[0];
@@ -475,11 +483,13 @@ export class EnhancedMigrationEngine {
   }
 
   private static extractDependencies(phases: MigrationPhase[]): string[] {
-    return phases.flatMap(phase => phase.dependencies);
+    return phases.flatMap((phase) => phase.dependencies);
   }
 
-  private static generateValidationCheckpoints(phases: MigrationPhase[]): string[] {
-    return phases.map(phase => `Validate ${phase.title}`);
+  private static generateValidationCheckpoints(
+    phases: MigrationPhase[],
+  ): string[] {
+    return phases.map((phase) => `Validate ${phase.title}`);
   }
 
   // Removed duplicate function implementations - they're already defined below
@@ -586,7 +596,9 @@ export class EnhancedMigrationEngine {
     optimizationReport: OptimizationReport,
     options: MigrationOptions,
   ): string {
-    const baseHours = parseInt((basePlan as any).estimatedDuration?.split("-")?.[0] || "8");
+    const baseHours = parseInt(
+      (basePlan as any).estimatedDuration?.split("-")?.[0] || "8",
+    );
     const optimizationHours = options.includeOptimizations
       ? optimizationReport.performanceOptimizations.length * 2
       : 0;

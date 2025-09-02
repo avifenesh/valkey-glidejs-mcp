@@ -302,7 +302,9 @@ export class IntegrationTestingFramework {
       this.executionHistory.push(report);
       return report;
     } catch (error) {
-      throw new Error(`Integration testing failed: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `Integration testing failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 

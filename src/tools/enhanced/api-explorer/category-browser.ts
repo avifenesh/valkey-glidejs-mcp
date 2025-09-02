@@ -702,7 +702,8 @@ await client.publish("notifications:user123", JSON.stringify({
       geo: ["sortedsets"],
     };
 
-    const directRelated = relationships[categoryName as keyof typeof relationships] || [];
+    const directRelated =
+      relationships[categoryName as keyof typeof relationships] || [];
     directRelated.forEach((rel: string) => {
       const relCategory = this.categories.get(rel);
       if (relCategory) {

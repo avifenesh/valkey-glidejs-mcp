@@ -152,7 +152,10 @@ export interface CommandEdge {
 }
 
 export class CommandDiscoveryEngine {
-  private commandGraph: { nodes: CommandNode[]; edges: CommandEdge[] } = { nodes: [], edges: [] };
+  private commandGraph: { nodes: CommandNode[]; edges: CommandEdge[] } = {
+    nodes: [],
+    edges: [],
+  };
   private workflowDatabase: Map<string, WorkflowRecommendation[]> = new Map();
   private relationshipMatrix: Map<string, Map<string, CommandRelationship>> =
     new Map();

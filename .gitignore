@@ -36,6 +36,12 @@ test-results.txt
 api-coverage-report.json
 behavior-differences.json
 glide-api-inventory.json
+glide-usage-scan.json
+glide-parameter-validation.json
+
+# Optional: any future glide validation artifacts
+glide-*-validation.json
+glide-*-scan.json
 
 # Validation artifacts
 test/validate-*.ts

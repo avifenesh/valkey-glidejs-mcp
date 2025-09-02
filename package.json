@@ -67,6 +67,7 @@
     "validate:glide": "npx tsx scripts/validate.ts",
     "validate:coverage": "npx tsx scripts/validate-api-coverage.ts",
     "extract:apis": "npx tsx scripts/extract-all-apis.ts",
+  "validate:glide:extended": "npm run extract:apis && npx tsx scripts/validate-glide-parameters.ts",
     "ingest:commands": "npx tsx scripts/ingest-commands.ts",
     "enhanced:setup": "npm run extract:apis && npm run validate:coverage && npm run test:integration",
     "enhanced:test": "npm run test:ai-agent && npm run test:quality && npm run test:e2e",

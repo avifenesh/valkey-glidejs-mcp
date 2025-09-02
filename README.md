@@ -235,7 +235,12 @@ const userData = await client.get("user:1001");
 
 // Advanced operations work seamlessly
 await client.zadd("leaderboard", { alice: 95, bob: 87, charlie: 92 });
-const topPlayers = await client.zrevrange("leaderboard", 0, 2);
+// Retrieve top 3 scores in reverse order using a range-by-index query
+const topPlayers = await client.zrange(
+  "leaderboard",
+  { start: 0, end: 2, type: "byIndex" },
+  { reverse: true },
+);
 
 // Clean shutdown
 client.close();

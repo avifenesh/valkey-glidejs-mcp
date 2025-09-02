@@ -8,6 +8,10 @@ interface ApiMethod {
   file: string;
   category?: string;
   parameters?: string[];
+  paramsDetailed?: { name: string; optional: boolean; rest: boolean }[];
+  paramTypes?: string[];
+  minArity?: number; // required param count (excluding optional & rest)
+  maxArity?: number | null; // total param count if no rest, else null (unbounded upper)
   returnType?: string;
   isAsync?: boolean;
 }
@@ -29,7 +33,7 @@ function extractMethodsFromFile(filePath: string): ApiMethod[] {
     filePath,
     content,
     ts.ScriptTarget.Latest,
-    true,
+    true
   );
 
   const methods: ApiMethod[] = [];
@@ -53,10 +57,25 @@ function extractMethodsFromFile(filePath: string): ApiMethod[] {
           method.isAsync = returnType.includes("Promise");
         }
 
-        // Extract parameters
+        // Extract parameters with modifiers
         method.parameters = node.parameters.map((p) =>
-          p.name.getText(sourceFile),
+          p.name.getText(sourceFile)
         );
+        method.paramsDetailed = node.parameters.map((p) => {
+          const name = p.name.getText(sourceFile);
+          const optional = !!p.questionToken || !!p.initializer;
+          const rest = !!p.dotDotDotToken;
+          return { name, optional, rest };
+        });
+        method.paramTypes = node.parameters.map(
+          (p) => p.type?.getText(sourceFile) || "any"
+        );
+        const requiredCount = node.parameters.filter(
+          (p) => !(p.questionToken || p.initializer || p.dotDotDotToken)
+        ).length;
+        method.minArity = requiredCount;
+        const hasRest = node.parameters.some((p) => !!p.dotDotDotToken);
+        method.maxArity = hasRest ? null : node.parameters.length;
 
         methods.push(method);
       }
@@ -164,8 +183,63 @@ function categorizeMethod(methodName: string): string {
 }
 
 async function main() {
-  const apiDir =
-    "/Users/avifen/valkey-glidejs-mcp/valkey-glidejs-mcp/examples-validation/api";
+  // Allow overriding output path via CLI: `npm run extract:apis -- ./custom-output.json`
+  const cliOutput = process.argv[2];
+  // Resolve the installed @valkey/valkey-glide package root
+  let pkgRoot: string | undefined;
+  // Attempt direct resolution via node_modules path (avoid import.meta / require in ESM TSX context)
+  const candidatePkg = path.resolve(
+    process.cwd(),
+    "node_modules",
+    "@valkey",
+    "valkey-glide",
+    "package.json"
+  );
+  if (fs.existsSync(candidatePkg)) {
+    pkgRoot = path.dirname(candidatePkg);
+  } else {
+    console.error(
+      "Unable to locate @valkey/valkey-glide package.json at expected path: " +
+        candidatePkg +
+        "\nHave you installed dependencies?"
+    );
+    process.exit(1);
+  }
+
+  // Candidate directories that may contain .d.ts API definitions.
+  const candidateDirs = [
+    path.join(pkgRoot, "build-ts"),
+    path.join(pkgRoot, "dist"),
+    path.join(pkgRoot, "types"),
+    path.join(pkgRoot),
+  ];
+
+  let apiDir: string | undefined;
+  for (const dir of candidateDirs) {
+    if (fs.existsSync(dir)) {
+      const dtsFiles = fs.readdirSync(dir).filter((f) => f.endsWith(".d.ts"));
+      // Heuristic: must contain at least one Glide-related declaration file
+      if (
+        dtsFiles.some((f) =>
+          /Glide(Client|ClusterClient|Json|Ft)|BaseClient|Transaction|Commands/.test(
+            f
+          )
+        )
+      ) {
+        apiDir = dir;
+        break;
+      }
+    }
+  }
+
+  if (!apiDir) {
+    console.error(
+      "Could not locate Glide API .d.ts directory inside @valkey/valkey-glide package."
+    );
+    console.error("Checked:", candidateDirs.join(", "));
+    process.exit(1);
+  }
+
   const files = fs.readdirSync(apiDir).filter((f) => f.endsWith(".d.ts"));
 
   const inventory: ApiInventory = {
@@ -230,8 +304,7 @@ async function main() {
   console.log(`\n✅ Total GLIDE API methods extracted: ${inventory.total}`);
 
   // Save inventory
-  const outputPath =
-    "/Users/avifen/valkey-glidejs-mcp/valkey-glidejs-mcp/glide-api-inventory.json";
+  const outputPath = path.resolve(cliOutput || "glide-api-inventory.json");
   fs.writeFileSync(outputPath, JSON.stringify(inventory, null, 2));
   console.log(`\n💾 API inventory saved to: ${outputPath}`);
 
@@ -241,7 +314,7 @@ async function main() {
   console.log(`BaseClient:         ${inventory.baseClient.length} methods`);
   console.log(`GlideClient:        ${inventory.glideClient.length} methods`);
   console.log(
-    `GlideClusterClient: ${inventory.glideClusterClient.length} methods`,
+    `GlideClusterClient: ${inventory.glideClusterClient.length} methods`
   );
   console.log(`Commands:           ${inventory.commands.length} methods`);
   console.log(`Transaction:        ${inventory.transaction.length} methods`);
@@ -272,7 +345,8 @@ async function main() {
   return inventory;
 }
 
-if (import.meta.url.startsWith("file:")) {
+// Execute when run directly (best-effort heuristic for tsx execution)
+if (process.argv[1] && process.argv[1].includes("extract-all-apis")) {
   main().catch(console.error);
 }
 

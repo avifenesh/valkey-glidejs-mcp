@@ -2,7 +2,7 @@
   "name": "valkey-glidejs-mcp",
   "version": "0.7.1",
   "type": "module",
-  "description": "Model Context Protocol (MCP) server for Valkey Glide Node.js migration, API mapping, and use-case generation",
+  "description": "Universal MCP Tool Enhancement System for Valkey Glide Node.js - Intelligent, conversational interface with progressive learning, migration assistance, and production-ready code generation",
   "keywords": [
     "valkey-glide",
     "valkey client",
@@ -15,7 +15,15 @@
     "code-generation",
     "ai-assistant",
     "AI-agent",
-    "valkey-glide-mcp"
+    "valkey-glide-mcp",
+    "universal-tool-enhancement",
+    "conversational-interface",
+    "progressive-learning",
+    "intelligent-suggestions",
+    "production-ready",
+    "context-persistence",
+    "smart-migration",
+    "performance-optimization"
   ],
   "homepage": "https://github.com/avifenesh/valkey-glidejs-mcp#readme",
   "repository": {
@@ -35,6 +43,7 @@
   "files": [
     "src/**/*",
     "scripts/**/*",
+    "docs/**/*",
     "start-server.mjs",
     "README.md",
     "package.json"
@@ -46,13 +55,22 @@
     "build": "echo 'Using tsx directly - no build needed'",
     "dev": "npx tsx src/server.ts",
     "start": "npx tsx src/server.ts",
-    "test": "npm run typecheck && npm run lint:check && npm run validate:glide",
+    "test": "npm run typecheck && npm run lint:check && npm run validate:glide && npm run test:integration",
+    "test:integration": "npx tsx scripts/verify-integration.ts",
+    "test:ai-agent": "npx tsx src/testing/ai-agent/index.ts",
+    "test:quality": "npx tsx src/testing/ai-agent/quality-metrics.ts",
+    "test:e2e": "npx tsx src/testing/integration/e2e-testing.ts",
     "lint:check": "prettier --check .",
     "lint:fix": "prettier --write .",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run typecheck && npm run lint:check",
+    "prepublishOnly": "npm run typecheck && npm run lint:check && npm run test:integration",
     "validate:glide": "npx tsx scripts/validate.ts",
+    "validate:coverage": "npx tsx scripts/validate-api-coverage.ts",
+    "extract:apis": "npx tsx scripts/extract-all-apis.ts",
     "ingest:commands": "npx tsx scripts/ingest-commands.ts",
+    "enhanced:setup": "npm run extract:apis && npm run validate:coverage && npm run test:integration",
+    "enhanced:test": "npm run test:ai-agent && npm run test:quality && npm run test:e2e",
+    "enhanced:validate": "npm run enhanced:setup && npm run enhanced:test",
     "commitlint": "commitlint --edit"
   },
   "dependencies": {
